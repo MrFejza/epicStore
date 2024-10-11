@@ -9,11 +9,11 @@ const productSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  salePrice: {  
+  salePrice: {
     type: Number,
-    default: null,  // Only set this when the product is on sale
+    default: null,
     validate: {
-      validator: function(value) {
+      validator: function (value) {
         return this.onSale ? value !== null && value < this.price : value === null;
       },
       message: 'Sale price must be less than the original price when the product is on sale.',
@@ -26,12 +26,18 @@ const productSchema = new mongoose.Schema({
   image: {
     type: [String],
     required: true,
+    validate: {
+      validator: function (value) {
+        return value.length > 0;  // Ensure the array has at least one image
+      },
+      message: 'At least one image is required',
+    },
     default: [],
   },
   stock: {
-    type: Number,  // Can change this to Boolean or Number depending on your needs
+    type: Boolean,
     required: true,
-    min: [0, 'Stock cannot be negative'],
+    default: true,  // Default to in stock
   },
   category: {
     type: String,
@@ -42,13 +48,21 @@ const productSchema = new mongoose.Schema({
     required: true,
     default: false,
   },
-  onSale: {  
+  onSale: {
     type: Boolean,
     required: true,
     default: false,
   },
 }, {
-  timestamps: true,  
+  timestamps: true,
+});
+
+// Pre-save hook to validate sale price before saving
+productSchema.pre('save', function (next) {
+  if (this.onSale && (this.salePrice === null || this.salePrice >= this.price)) {
+    return next(new Error('Sale price must be set and lower than the original price when the product is on sale.'));
+  }
+  next();
 });
 
 const Product = mongoose.model('Product', productSchema);

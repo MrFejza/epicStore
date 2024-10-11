@@ -1,12 +1,17 @@
 import React, { useState, useContext } from 'react';
-import { CartContext } from '../context/CartContext';
+import { useCart } from '../context/CartContext';
 
 const ProductModal = ({ product, onClose }) => {
-  const { addToCart } = useContext(CartContext);
+  const { updateCart } = useCart();
   const [quantity, setQuantity] = useState(1);
 
+  if (!product) {
+    // Return null or a loading indicator if product is not available
+    return null;
+  }
+
   const handleAddToCart = () => {
-    addToCart(product, quantity);
+    updateCart(product, quantity);
     onClose(); // Close the modal after adding the product to the cart
   };
 

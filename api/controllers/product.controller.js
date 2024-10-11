@@ -4,24 +4,32 @@ import Product from '../models/product.model.js';
 export const createProduct = async (req, res) => {
   try {
     const { name, price, description, stock, category, popular, onSale, salePrice } = req.body;
+
+    // Ensure that the images are handled correctly if they exist
     const images = req.files ? req.files.map(file => `/uploads/${file.filename}`) : [];
 
+    // Validate required fields
+    if (!name || !price || !description) {
+      return res.status(400).json({ message: 'Missing required fields: name, price, and description are mandatory' });
+    }
+
     const newProduct = new Product({
-      name,
-      price,
-      description,
-      image: images,
-      stock,
-      category,
-      popular,
-      onSale: Boolean(onSale),   // Ensure onSale defaults to false if not provided
-      salePrice: onSale === 'true' || onSale === true ? salePrice : null  // Set salePrice only if onSale is true
+      name: req.body.name,
+      price: req.body.price,
+      description: req.body.description,
+      image: req.body.image,  // Assuming image paths are passed here
+      stock: req.body.stock === 'true',  // Convert stock to boolean
+      category: req.body.category,
+      popular: req.body.popular === 'true',  // Ensure it's a boolean
+      onSale: req.body.onSale === 'true',  // Ensure it's a boolean
+      salePrice: req.body.salePrice || null,  // Sale price if applicable
     });
+    
 
     await newProduct.save();
     res.status(201).json(newProduct);
   } catch (error) {
-    console.error('Error creating product:', error);
+    console.error('Error creating product:', error.message, error.stack);
     res.status(500).json({ message: 'Error creating product', error: error.message });
   }
 };
@@ -44,7 +52,6 @@ export const getProducts = async (req, res) => {
     if (random === 'true') {
       productsQuery = await Product.aggregate([{ $sample: { size: 10 } }]); // Random 10 products
     } else {
-      // Base query
       productsQuery = Product.find(query);
 
       // Sorting by createdAt
@@ -54,11 +61,10 @@ export const getProducts = async (req, res) => {
       }
     }
 
-    // Fetch products
     const products = await productsQuery;
     res.status(200).json(products);
   } catch (error) {
-    console.error('Error fetching products:', error);
+    console.error('Error fetching products:', error.message, error.stack);
     res.status(500).json({ message: 'Error fetching products', error: error.message });
   }
 };
@@ -77,8 +83,8 @@ export const getProductsByCategory = async (req, res) => {
 
     res.status(200).json(products);
   } catch (error) {
-    console.error('Error fetching products by category:', error);
-    res.status(500).json({ message: 'Error fetching products by category' });
+    console.error('Error fetching products by category:', error.message, error.stack);
+    res.status(500).json({ message: 'Error fetching products by category', error: error.message });
   }
 };
 
@@ -91,7 +97,7 @@ export const getProductById = async (req, res) => {
     }
     res.status(200).json(product);
   } catch (error) {
-    console.error('Error fetching product:', error);
+    console.error('Error fetching product:', error.message, error.stack);
     res.status(500).json({ message: 'Error fetching product', error: error.message });
   }
 };
@@ -99,7 +105,7 @@ export const getProductById = async (req, res) => {
 // Update a product by ID
 export const updateProduct = async (req, res) => {
   try {
-    const { existingImages, removedImages, onSale, salePrice } = req.body;
+    const { existingImages, removedImages = [], onSale, salePrice } = req.body;
     let newImages = [];
 
     // Handle new images
@@ -107,7 +113,7 @@ export const updateProduct = async (req, res) => {
       newImages = req.files.map(file => `/uploads/${file.filename}`);
     }
 
-    // Remove deleted images from the list of existing images
+    // Safely filter out removed images
     const updatedImages = existingImages ? existingImages.filter(img => !removedImages.includes(img)) : [];
 
     // Update the product with new data
@@ -116,15 +122,19 @@ export const updateProduct = async (req, res) => {
       {
         ...req.body,
         image: [...updatedImages, ...newImages], // Combine new and existing images
-        onSale: Boolean(onSale),  // Ensure onSale is treated as a boolean
-        salePrice: onSale === 'true' || onSale === true ? salePrice : null  // Set salePrice to null if onSale is false
+        onSale: Boolean(onSale), // Ensure onSale is treated as a boolean
+        salePrice: onSale === 'true' || onSale === true ? salePrice : null, // Set salePrice to null if onSale is false
       },
       { new: true }
     );
 
+    if (!updatedProduct) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
     res.status(200).json(updatedProduct);
   } catch (error) {
-    console.error('Error updating product:', error);
+    console.error('Error updating product:', error.message, error.stack);
     res.status(500).json({ message: 'Error updating product', error: error.message });
   }
 };
@@ -138,7 +148,7 @@ export const deleteProduct = async (req, res) => {
     }
     res.status(200).json({ message: 'Product deleted successfully' });
   } catch (error) {
-    console.error('Error deleting product:', error);
+    console.error('Error deleting product:', error.message, error.stack);
     res.status(500).json({ message: 'Error deleting product', error: error.message });
   }
 };

@@ -9,13 +9,15 @@ const Edit = () => {
 
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
+  const [salePrice, setSalePrice] = useState(''); // New state for sale price
+  const [onSale, setOnSale] = useState(false);  // New state for onSale flag
   const [description, setDescription] = useState('');
   const [stock, setStock] = useState('');
   const [category, setCategory] = useState('');
   const [popular, setPopular] = useState(false);
-  const [existingImages, setExistingImages] = useState([]); // Store existing images
-  const [newImages, setNewImages] = useState([]); // Store new images selected by the user
-  const [removedImages, setRemovedImages] = useState([]); // Track removed images
+  const [existingImages, setExistingImages] = useState([]);
+  const [newImages, setNewImages] = useState([]);
+  const [removedImages, setRemovedImages] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Fetch product data by ID
@@ -26,12 +28,14 @@ const Edit = () => {
         const product = res.data;
         setName(product.name);
         setPrice(product.price);
+        setSalePrice(product.salePrice || '');  // Load sale price
+        setOnSale(product.onSale || false);     // Load onSale flag
         setDescription(product.description);
         setStock(product.stock);
         setCategory(product.category);
         setPopular(product.popular);
-        setExistingImages(product.image || []); // Load existing images
-        setLoading(false); 
+        setExistingImages(product.image || []);
+        setLoading(false);
       })
       .catch((err) => console.log('Error fetching product:', err));
   }, [_id]);
@@ -45,13 +49,13 @@ const Edit = () => {
   // Remove an existing image
   const handleRemoveExistingImage = (index) => {
     const removed = existingImages[index];
-    setRemovedImages((prevRemoved) => [...prevRemoved, removed]); // Track removed image
-    setExistingImages(existingImages.filter((_, i) => i !== index)); // Remove from displayed images
+    setRemovedImages((prevRemoved) => [...prevRemoved, removed]);
+    setExistingImages(existingImages.filter((_, i) => i !== index));
   };
 
   // Remove a newly selected image
   const handleRemoveNewImage = (index) => {
-    setNewImages(newImages.filter((_, i) => i !== index)); // Remove from new images array
+    setNewImages(newImages.filter((_, i) => i !== index));
   };
 
   // Submit form and send all images (both existing and new) to the backend
@@ -59,27 +63,27 @@ const Edit = () => {
     e.preventDefault();
     try {
       const formData = new FormData();
-  
+
       // Append text fields
       formData.append('name', name);
       formData.append('price', price);
+      formData.append('salePrice', salePrice);  // Append sale price
+      formData.append('onSale', onSale);        // Append onSale flag
       formData.append('description', description);
       formData.append('stock', stock);
       formData.append('category', category);
       formData.append('popular', popular);
-  
-      // Convert existingImages array to a JSON string
-      formData.append('existingImages', JSON.stringify(existingImages)); // <-- Stringify the array
-  
-      // Append new images to the form data
+
+      formData.append('existingImages', JSON.stringify(existingImages));
+
       newImages.forEach((file) => {
         formData.append('image', file);
       });
-  
+
       // Send request to update product
       const config = { headers: { 'Content-Type': 'multipart/form-data' } };
       await axios.put(`/api/product/${_id}`, formData, config);
-  
+
       toast.success('Product updated successfully');
       navigate('/products');
     } catch (error) {
@@ -94,12 +98,12 @@ const Edit = () => {
   return (
     <div className="flex justify-center items-center bg-gray-100 min-h-screen py-10">
       <div className="container mx-auto px-4 mb-8">
-        <h1 className="text-4xl font-bold text-center text-primary-deep mb-8">Edit Product</h1>
+        <h1 className="text-4xl font-bold text-center text-primary-deep mb-8">Edit Produktin</h1>
         <div className="bg-white p-4 sm:p-8 rounded-lg shadow-lg max-w-xl mx-auto">
           <form onSubmit={handleSubmit}>
             {/* Name */}
             <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2">Name</label>
+              <label className="block text-gray-700 text-sm font-bold mb-2">Emri</label>
               <input
                 type="text"
                 value={name}
@@ -112,7 +116,7 @@ const Edit = () => {
 
             {/* Description */}
             <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2">Description</label>
+              <label className="block text-gray-700 text-sm font-bold mb-2">Pershkrimi</label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
@@ -125,7 +129,7 @@ const Edit = () => {
 
             {/* Price */}
             <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2">Price</label>
+              <label className="block text-gray-700 text-sm font-bold mb-2">Cmimi</label>
               <input
                 type="number"
                 value={price}
@@ -136,56 +140,81 @@ const Edit = () => {
               />
             </div>
 
+            {/* Sale Price */}
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2">Në Shitje</label>
+              <input
+                type="checkbox"
+                checked={onSale}
+                onChange={(e) => setOnSale(e.target.checked)}
+                className="mr-2"
+              />
+              <span>On Sale</span>
+            </div>
+
+            {onSale && (
+              <div className="mb-4">
+                <label className="block text-gray-700 text-sm font-bold mb-2">Sale Price</label>
+                <input
+                  type="number"
+                  value={salePrice}
+                  onChange={(e) => setSalePrice(e.target.value)}
+                  placeholder="Enter sale price"
+                  className="w-full p-3 border rounded-md focus:outline-none focus:border-primary-deep"
+                />
+              </div>
+            )}
+
             {/* Stock */}
             <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2">Stock</label>
+              <label className="block text-gray-700 text-sm font-bold mb-2">Gjendje</label>
               <select
                 value={stock}
                 onChange={(e) => setStock(e.target.value)}
                 className="w-full p-3 border rounded-md"
               >
-                <option value="">Select Stock Status</option>
-                <option value="in_stock">In Stock</option>
-                <option value="out_of_stock">Out of Stock</option>
+                <option value="">Zgjidh statusin e Gjendjes</option>
+                <option value="in_stock">Ka Gjendje</option>
+                <option value="out_of_stock">Nuk ka Gjendje</option>
               </select>
             </div>
 
             {/* Category */}
             <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2">Category</label>
+              <label className="block text-gray-700 text-sm font-bold mb-2">Kategoria</label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
                 className="w-full p-3 border rounded-md"
               >
-                <option value="">Select Category</option>
-                <option value="Electronics">Electronics</option>
-                <option value="Clothing">Clothing</option>
-                <option value="Books">Books</option>
-                <option value="Home">Home</option>
+                <option value="">Zgjidh Kategorine</option>
+                <option value="Electronics">Elektrike</option>
+                <option value="Clothing">Rroba</option>
+                <option value="Books">Libra</option>
+                <option value="Home">Shtepi</option>
                 <option value="Beauty">Beauty</option>
-                <option value="Sports">Sports</option>
-                <option value="Toys">Toys</option>
-                <option value="Food">Food</option>
-                <option value="Other">Other</option>
+                <option value="Sports">Sport</option>
+                <option value="Toys">Lodra</option>
+                <option value="Food">Ushqim</option>
+                <option value="Other">Tjeter</option>
               </select>
             </div>
 
             {/* Popular */}
             <div className="mb-4 flex items-center">
-              <label className="text-gray-700 text-sm font-bold mr-4">Popular</label>
+              <label className="text-gray-700 text-sm font-bold mr-4">Shume e Blere</label>
               <input
                 type="checkbox"
                 checked={popular}
                 onChange={(e) => setPopular(e.target.checked)}
                 className="p-3 border rounded-md focus:outline-none focus:border-primary-deep"
               />
-              <span className="ml-2 text-sm text-gray-700">Mark as Popular</span>
+              <span className="ml-2 text-sm text-gray-700">Perzgjedhe si shume e shitur</span>
             </div>
 
             {/* Image upload and existing images display */}
             <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2">Images</label>
+              <label className="block text-gray-700 text-sm font-bold mb-2">Imazhe</label>
               <input
                 type="file"
                 onChange={handleFileChange}
@@ -247,7 +276,7 @@ const Edit = () => {
                 type="submit"
                 className="bg-gray-500 w-full text-white font-bold py-3 px-6 rounded-md hover:bg-primary-dark transition-colors"
               >
-                Update Product
+                Perditso Produktin
               </button>
               <Link
                 to="/dashboard/products"

@@ -23,7 +23,7 @@ const deleteImages = async (imagePaths) => {
         .catch(err => console.error(`Error deleting ${fullPath}:`, err));
     } else {
       console.log(`File does not exist: ${fullPath}`);
-      return Promise.resolve();  // Prevent breaking the Promise chain if the file doesn't exist
+      return Promise.resolve();
     }
   }));
 };
@@ -31,9 +31,6 @@ const deleteImages = async (imagePaths) => {
 // Route to handle product creation with file upload
 router.post('/', upload, async (req, res) => {
   try {
-    console.log("Create method", req.body); 
-    console.log(req.files); 
-
     if (!req.files || req.files.length === 0) {
       return res.status(400).json({
         success: false,
@@ -63,7 +60,7 @@ router.post('/', upload, async (req, res) => {
       product: newProduct
     });
   } catch (error) {
-    console.error('Error creating product:', error);
+    console.error('Error creating product:', error.message, error.stack);
     res.status(500).json({
       success: false,
       message: 'Error creating product',
@@ -78,7 +75,7 @@ router.get('/', async (req, res) => {
     const products = await Product.find();
     res.status(200).json(products);
   } catch (error) {
-    console.error('Error fetching products:', error);
+    console.error('Error fetching products:', error.message, error.stack);
     res.status(500).json({ success: false, message: 'Error fetching products', error: error.message });
   }
 });
@@ -95,7 +92,7 @@ router.get('/:id', async (req, res) => {
     }
     res.status(200).json(product);
   } catch (error) {
-    console.error('Error fetching product:', error);
+    console.error('Error fetching product:', error.message, error.stack);
     res.status(500).json({ success: false, message: 'Error fetching product', error: error.message });
   }
 });
@@ -103,8 +100,6 @@ router.get('/:id', async (req, res) => {
 // Route to update a specific product by ID
 router.put('/:id', upload, async (req, res) => {
   try {
-    console.log("Edit method------", req.files ? req.files.length : 0);
-    
     const product = await Product.findById(req.params.id);
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
@@ -115,11 +110,11 @@ router.put('/:id', upload, async (req, res) => {
     product.name = req.body.name || product.name;
     product.price = req.body.price || product.price;
     product.description = req.body.description || product.description;
-    product.image = images; // Retain existing images if no new ones are provided
+    product.image = images;
     product.stock = req.body.stock || product.stock;
     product.category = req.body.category || product.category;
-    product.popular = req.body.popular === 'true';  // Ensure it's a boolean
-    product.onSale = req.body.onSale === 'true';    // Ensure it's a boolean
+    product.popular = req.body.popular !== undefined ? req.body.popular === 'true' : product.popular;
+    product.onSale = req.body.onSale !== undefined ? req.body.onSale === 'true' : product.onSale;
     product.salePrice = req.body.salePrice || product.salePrice;
 
     await product.save();
@@ -131,7 +126,7 @@ router.put('/:id', upload, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error updating product:', error);
+    console.error('Error updating product:', error.message, error.stack);
     res.status(500).json({ success: false, message: 'Error updating product', error: error.message });
   }
 });
@@ -146,15 +141,16 @@ router.delete('/:id', async (req, res) => {
     }
 
     if (product.image && Array.isArray(product.image)) {
-      await deleteImages(product.image);  // Delete associated images
+      await deleteImages(product.image);
     }
 
     await Product.findByIdAndDelete(req.params.id);
 
     res.status(200).json({ message: 'Product and images deleted successfully' });
   } catch (error) {
-    console.error('Error deleting product:', error);
+    console.error('Error deleting product:', error.message, error.stack);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
+
 export default router;
