@@ -61,6 +61,7 @@ const Orders = () => {
                 <th className="py-2 px-4 border-b">Customer</th>
                 <th className="py-2 px-4 border-b">Phone</th>
                 <th className="py-2 px-4 border-b">Email</th>
+                <th className="py-2 px-4 border-b">Address</th> {/* New Address Column */}
                 <th className="py-2 px-4 border-b">Total Amount</th>
                 <th className="py-2 px-4 border-b">Products</th>
                 <th className="py-2 px-4 border-b">Order Date</th>
@@ -73,6 +74,7 @@ const Orders = () => {
                   <td className="py-2 px-4 border-b">{order.customerName} {order.customerLastName}</td>
                   <td className="py-2 px-4 border-b">{order.phone}</td>
                   <td className="py-2 px-4 border-b">{order.email || 'N/A'}</td>
+                  <td className="py-2 px-4 border-b">{order.address || 'N/A'}</td> {/* Display address */}
                   <td className="py-2 px-4 border-b">${order.totalAmount.toFixed(2)}</td>
                   <td className="py-2 px-4 border-b">
                     {order.products.map((product) => (

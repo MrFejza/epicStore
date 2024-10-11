@@ -1,45 +1,54 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useContext } from 'react';
+import { CartContext } from '../context/CartContext';
 
-const ProductModal = ({ isOpen, onClose, product, onConfirm }) => {
-  const [quantity, setQuantity] = useState(1);  // Default quantity
+const ProductModal = ({ product, onClose }) => {
+  const { addToCart } = useContext(CartContext);
+  const [quantity, setQuantity] = useState(1);
 
-  // Reset quantity to 0 whenever the modal is opened
-  useEffect(() => {
-    if (isOpen) {
-      setQuantity(0);  // Set quantity to 0 when modal opens
-    }
-  }, [isOpen]);
-
-  if (!isOpen || !product) return null;
-
-  const handleIncrease = () => {
-    setQuantity(quantity + 1);
+  const handleAddToCart = () => {
+    addToCart(product, quantity);
+    onClose(); // Close the modal after adding the product to the cart
   };
 
-  const handleDecrease = () => {
-    if (quantity > 0) {
-      setQuantity(quantity - 1);
-    }
-  };
-
-  const handleConfirm = () => {
-    onConfirm(product, quantity);  // Send product and quantity to parent
-    onClose();
+  const handleQuantityChange = (e) => {
+    const value = parseInt(e.target.value);
+    setQuantity(value > 0 ? value : 1); // Ensure quantity is always 1 or more
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-violet-950 w-11/12 md:w-1/3 p-6 rounded-lg shadow-lg relative text-white">
-        <button className="absolute top-2 right-2 text-white hover:text-gray-300" onClick={onClose}>✖</button>
-        <h2 className="text-2xl font-bold mb-4">Add {product?.name} to Cart</h2>
-        <div className="flex justify-center items-center mb-4">
-          <button className="bg-gray-700 text-white px-3 py-1 rounded-md" onClick={handleDecrease}>-</button>
-          <span className="mx-4 text-lg">{quantity}</span>
-          <button className="bg-gray-700 text-white px-3 py-1 rounded-md" onClick={handleIncrease}>+</button>
+    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-white p-6 rounded-lg max-w-sm w-full">
+        <h2 className="text-lg font-bold">{product.name}</h2>
+        <p className="text-gray-700">{product.description}</p>
+        <p className="text-green-500 font-bold">{product.price} ALL</p>
+        {product.stock > 0 ? (
+          <p className="text-green-500">Ka stock</p>
+        ) : (
+          <p className="text-red-500">Nuk ka stock</p>
+        )}
+        <div className="mt-4">
+          <label className="block text-sm font-medium text-gray-700">Sasia:</label>
+          <input
+            type="number"
+            value={quantity}
+            onChange={handleQuantityChange}
+            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            min="1"
+          />
         </div>
-        <div className="flex justify-between">
-          <button className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600" onClick={onClose}>Cancel</button>
-          <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600" onClick={handleConfirm}>Confirm</button>
+        <div className="flex justify-between items-center mt-6">
+          <button
+            onClick={handleAddToCart}
+            className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+          >
+            Shto në shportë
+          </button>
+          <button
+            onClick={onClose}
+            className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-600"
+          >
+            Mbyll
+          </button>
         </div>
       </div>
     </div>

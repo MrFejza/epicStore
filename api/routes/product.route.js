@@ -4,18 +4,37 @@ import upload from '../middleware/upload.js';
 import fs from 'fs-extra';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { getProductsByCategory } from '../controllers/product.controller.js';
 
 const router = express.Router();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Helper function to delete images
+const deleteImages = async (imagePaths) => {
+  return Promise.all(imagePaths.map(imagePath => {
+    const fullPath = path.join(__dirname, '..', imagePath);
+    
+    console.log(`Attempting to delete ${fullPath}`);
+    
+    if (fs.existsSync(fullPath)) {
+      return fs.remove(fullPath)
+        .then(() => console.log(`Deleted ${fullPath}`))
+        .catch(err => console.error(`Error deleting ${fullPath}:`, err));
+    } else {
+      console.log(`File does not exist: ${fullPath}`);
+      return Promise.resolve();  // Prevent breaking the Promise chain if the file doesn't exist
+    }
+  }));
+};
+
 // Route to handle product creation with file upload
 router.post('/', upload, async (req, res) => {
   try {
-    console.log("create method", req.body); // Check form fields
-    console.log(req.files); // Check if files are present
+    console.log("Create method", req.body); 
+    console.log(req.files); 
 
-    if (!req.files) {
+    if (!req.files || req.files.length === 0) {
       return res.status(400).json({
         success: false,
         message: 'No files were uploaded.'
@@ -31,7 +50,9 @@ router.post('/', upload, async (req, res) => {
       image: filePaths,
       stock: req.body.stock,
       category: req.body.category,
-      popular: req.body.popular
+      popular: req.body.popular === 'true',  // Ensure it's a boolean
+      onSale: req.body.onSale === 'true',  // Ensure it's a boolean
+      salePrice: req.body.salePrice || 0  // Default salePrice if not provided
     });
 
     await newProduct.save();
@@ -62,6 +83,9 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Route to get products by category
+router.get('/category/:category', getProductsByCategory);
+
 // Route to get a single product by ID
 router.get('/:id', async (req, res) => {
   try {
@@ -79,22 +103,24 @@ router.get('/:id', async (req, res) => {
 // Route to update a specific product by ID
 router.put('/:id', upload, async (req, res) => {
   try {
-    console.log("edit method------", req.files ? req.files.length : 0);
+    console.log("Edit method------", req.files ? req.files.length : 0);
     
     const product = await Product.findById(req.params.id);
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
 
-    const images = req.files ? req.files.map(file => `uploads/${file.filename}`) : [];
+    const images = req.files && req.files.length > 0 ? req.files.map(file => `uploads/${file.filename}`) : product.image;
 
     product.name = req.body.name || product.name;
     product.price = req.body.price || product.price;
     product.description = req.body.description || product.description;
-    product.image = images.length > 0 ? images : product.image;
+    product.image = images; // Retain existing images if no new ones are provided
     product.stock = req.body.stock || product.stock;
     product.category = req.body.category || product.category;
-    product.popular = req.body.popular || product.popular;
+    product.popular = req.body.popular === 'true';  // Ensure it's a boolean
+    product.onSale = req.body.onSale === 'true';    // Ensure it's a boolean
+    product.salePrice = req.body.salePrice || product.salePrice;
 
     await product.save();
 
@@ -111,23 +137,6 @@ router.put('/:id', upload, async (req, res) => {
 });
 
 // Route to delete a product by ID
-const deleteImages = async (imagePaths) => {
-  return Promise.all(imagePaths.map(imagePath => {
-    const fullPath = path.join(__dirname, '..', imagePath);  // Directly use the imagePath provided by the backend
-    
-    console.log(`Attempting to delete ${fullPath}`);
-    
-    if (fs.existsSync(fullPath)) {  // Check if the file exists before trying to delete it
-      return fs.remove(fullPath)
-        .then(() => console.log(`Deleted ${fullPath}`))
-        .catch(err => console.error(`Error deleting ${fullPath}:`, err));
-    } else {
-      console.log(`File does not exist: ${fullPath}`);
-      return Promise.resolve();  // Prevent breaking the Promise chain if the file doesn't exist
-    }
-  }));
-};
-
 router.delete('/:id', async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -137,7 +146,7 @@ router.delete('/:id', async (req, res) => {
     }
 
     if (product.image && Array.isArray(product.image)) {
-      await deleteImages(product.image);
+      await deleteImages(product.image);  // Delete associated images
     }
 
     await Product.findByIdAndDelete(req.params.id);
@@ -148,6 +157,4 @@ router.delete('/:id', async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
-
-
 export default router;

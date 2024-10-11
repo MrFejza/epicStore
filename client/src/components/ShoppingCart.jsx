@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
+import { useCart } from '../context/CartContext';
+import { useCheckoutModal } from '../context/CheckoutModalContext'; // Import useCheckoutModal to control the checkout modal
 
-const ShoppingCart = ({ cartItems, setCart, handleCheckout, removeFromCart }) => {
+const ShoppingCart = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { cart, updateCart, removeFromCart } = useCart(); // Use Cart Context
+  const { openCheckoutModal } = useCheckoutModal(); // Access the modal context
 
   // Toggle cart modal visibility
   const toggleCart = () => {
@@ -10,47 +14,46 @@ const ShoppingCart = ({ cartItems, setCart, handleCheckout, removeFromCart }) =>
 
   // Increase product quantity
   const increaseQuantity = (productId) => {
-    setCart((prevCart) =>
-      prevCart.map((item) =>
-        item.product._id === productId ? { ...item, quantity: item.quantity + 1 } : item
-      )
-    );
+    const product = cart.find((item) => item.product._id === productId);
+    if (product) {
+      updateCart(product.product, product.quantity + 1);
+    }
   };
 
   // Decrease product quantity
   const decreaseQuantity = (productId) => {
-    setCart((prevCart) =>
-      prevCart.map((item) =>
-        item.product._id === productId && item.quantity > 1
-          ? { ...item, quantity: item.quantity - 1 }
-          : item
-      )
-    );
+    const product = cart.find((item) => item.product._id === productId);
+    if (product && product.quantity > 1) {
+      updateCart(product.product, product.quantity - 1);
+    }
   };
 
-  // Get total amount of cart items
+  // Get total amount of cart items, considering sale price if applicable
   const getTotalAmount = () => {
-    return cartItems.reduce((total, item) => total + item.quantity * item.product.price, 0);
+    return cart.reduce((total, item) => {
+      const itemPrice = item.product.onSale && item.product.salePrice ? item.product.salePrice : item.product.price;
+      return total + item.quantity * itemPrice;
+    }, 0);
   };
 
-  // Pass cart items and total amount to handleCheckout
+  // Proceed to checkout
   const proceedToCheckout = () => {
     const totalAmount = getTotalAmount();
-    handleCheckout(cartItems, totalAmount);
-    toggleCart(); // Close the cart after proceeding to checkout
+    console.log('Proceeding to checkout with cart items:', cart, 'Total amount:', totalAmount);
+    toggleCart(); // Close the cart modal
+    openCheckoutModal(cart, totalAmount); // Open the checkout modal with cart data and total amount
   };
 
   return (
     <div>
       {/* Shopping Cart Icon */}
-      <div
-        className="fixed bottom-5 right-5 bg-violet-950 text-white p-3 rounded-full cursor-pointer shadow-lg hover:bg-violet-700"
-        onClick={toggleCart}
-      >
-        <span className="text-lg">🛒</span>
-        <span className="absolute -top-1 -left-1 bg-red-600 text-white rounded-full px-2 text-xs">
-          {cartItems.length}
-        </span>
+      <div className="relative cursor-pointer" onClick={toggleCart}>
+        <span className="text-2xl">🛒</span>
+        {cart.length > 0 && (
+          <span className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full px-2 text-xs">
+            {cart.length}
+          </span>
+        )}
       </div>
 
       {/* Modal for Cart */}
@@ -63,12 +66,12 @@ const ShoppingCart = ({ cartItems, setCart, handleCheckout, removeFromCart }) =>
             >
               ✖
             </button>
-            <h2 className="text-2xl font-bold mb-4">Your Shopping Cart</h2>
-            {cartItems.length === 0 ? (
-              <p className="text-gray-600">Your cart is empty.</p>
+            <h2 className="text-2xl font-bold mb-4">Shporta juaj</h2>
+            {cart.length === 0 ? (
+              <p className="text-gray-600">Shporta eshte bosh.</p>
             ) : (
               <ul className="divide-y divide-gray-200">
-                {cartItems.map((item) => (
+                {cart.map((item) => (
                   <li key={item.product._id} className="py-4 flex justify-between items-center">
                     <div className="flex flex-col">
                       <span>{item.product.name}</span>
@@ -89,12 +92,14 @@ const ShoppingCart = ({ cartItems, setCart, handleCheckout, removeFromCart }) =>
                       </div>
                     </div>
                     <div className="flex flex-col items-end">
-                      <span>${(item.product.price * item.quantity).toFixed(2)}</span>
+                      <span>
+                        {(item.product.onSale && item.product.salePrice ? item.product.salePrice : item.product.price) * item.quantity} Lek
+                      </span>
                       <button
                         onClick={() => removeFromCart(item.product._id)}
                         className="mt-2 bg-red-500 text-white px-2 py-1 rounded-md hover:bg-red-600"
                       >
-                        Remove
+                        Hiq nga Shporta
                       </button>
                     </div>
                   </li>
@@ -102,12 +107,12 @@ const ShoppingCart = ({ cartItems, setCart, handleCheckout, removeFromCart }) =>
               </ul>
             )}
             <div className="mt-4 text-right">
-              <h3 className="text-xl font-semibold">Total: ${getTotalAmount().toFixed(2)}</h3>
+              <h3 className="text-xl font-semibold">Totali: {getTotalAmount().toFixed(2)} Lek</h3>
               <button
                 className="mt-4 bg-violet-950 text-white px-4 py-2 rounded hover:bg-violet-700"
-                onClick={proceedToCheckout} // Now passing the cartItems and total amount
+                onClick={proceedToCheckout}
               >
-                Checkout
+                Kasa
               </button>
             </div>
           </div>

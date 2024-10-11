@@ -1,8 +1,5 @@
 import mongoose from 'mongoose';
 
-
-
-
 const productSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -11,6 +8,16 @@ const productSchema = new mongoose.Schema({
   price: {
     type: Number,
     required: true,
+  },
+  salePrice: {  
+    type: Number,
+    default: null,  // Only set this when the product is on sale
+    validate: {
+      validator: function(value) {
+        return this.onSale ? value !== null && value < this.price : value === null;
+      },
+      message: 'Sale price must be less than the original price when the product is on sale.',
+    },
   },
   description: {
     type: String,
@@ -22,8 +29,9 @@ const productSchema = new mongoose.Schema({
     default: [],
   },
   stock: {
-    type: String,
+    type: Number,  // Can change this to Boolean or Number depending on your needs
     required: true,
+    min: [0, 'Stock cannot be negative'],
   },
   category: {
     type: String,
@@ -34,10 +42,14 @@ const productSchema = new mongoose.Schema({
     required: true,
     default: false,
   },
-}, {  
-  timestamps: true,
+  onSale: {  
+    type: Boolean,
+    required: true,
+    default: false,
+  },
+}, {
+  timestamps: true,  
 });
-
 
 const Product = mongoose.model('Product', productSchema);
 export default Product;
