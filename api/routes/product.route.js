@@ -14,9 +14,9 @@ const __dirname = path.dirname(__filename);
 const deleteImages = async (imagePaths) => {
   return Promise.all(imagePaths.map(imagePath => {
     const fullPath = path.join(__dirname, '..', imagePath);
-    
+
     console.log(`Attempting to delete ${fullPath}`);
-    
+
     if (fs.existsSync(fullPath)) {
       return fs.remove(fullPath)
         .then(() => console.log(`Deleted ${fullPath}`))
@@ -26,6 +26,26 @@ const deleteImages = async (imagePaths) => {
       return Promise.resolve();
     }
   }));
+};
+
+// Error handler helper function
+const handleServerError = (res, error, message) => {
+  console.error(`${message}:`, error.message, error.stack);
+  res.status(500).json({ success: false, message, error: error.message });
+};
+
+// Middleware to check if the product exists by ID
+const checkProductExists = async (req, res, next) => {
+  try {
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+    req.product = product;
+    next();
+  } catch (error) {
+    handleServerError(res, error, 'Error checking product existence');
+  }
 };
 
 // Route to handle product creation with file upload
@@ -38,34 +58,38 @@ router.post('/', upload, async (req, res) => {
       });
     }
 
+    const { name, price, salePrice, description, stock, category, popular, onSale } = req.body;
     const filePaths = req.files.map(file => `uploads/${file.filename}`);
 
+    // Validation: Sale price should be less than original price if on sale
+    if (onSale === 'true' && parseFloat(salePrice) >= parseFloat(price)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Sale price must be less than the original price when the product is on sale.'
+      });
+    }
+
     const newProduct = new Product({
-      name: req.body.name,
-      price: req.body.price,
-      description: req.body.description,
+      name,
+      price,
+      description,
       image: filePaths,
-      stock: req.body.stock,
-      category: req.body.category,
-      popular: req.body.popular === 'true',  // Ensure it's a boolean
-      onSale: req.body.onSale === 'true',  // Ensure it's a boolean
-      salePrice: req.body.salePrice || 0  // Default salePrice if not provided
+      stock: stock === 'true',  // Ensure stock is treated as a boolean
+      category,
+      popular: popular === 'true',  // Ensure it's a boolean
+      onSale: onSale === 'true',  // Ensure it's a boolean
+      salePrice: onSale === 'true' ? salePrice : null  // Set salePrice to null if not on sale
     });
 
     await newProduct.save();
-    
+
     res.status(201).json({
       success: true,
       message: 'Product created successfully',
       product: newProduct
     });
   } catch (error) {
-    console.error('Error creating product:', error.message, error.stack);
-    res.status(500).json({
-      success: false,
-      message: 'Error creating product',
-      error: error.message
-    });
+    handleServerError(res, error, 'Error creating product');
   }
 });
 
@@ -75,8 +99,7 @@ router.get('/', async (req, res) => {
     const products = await Product.find();
     res.status(200).json(products);
   } catch (error) {
-    console.error('Error fetching products:', error.message, error.stack);
-    res.status(500).json({ success: false, message: 'Error fetching products', error: error.message });
+    handleServerError(res, error, 'Error fetching products');
   }
 });
 
@@ -92,30 +115,40 @@ router.get('/:id', async (req, res) => {
     }
     res.status(200).json(product);
   } catch (error) {
-    console.error('Error fetching product:', error.message, error.stack);
-    res.status(500).json({ success: false, message: 'Error fetching product', error: error.message });
+    handleServerError(res, error, 'Error fetching product');
   }
 });
 
 // Route to update a specific product by ID
-router.put('/:id', upload, async (req, res) => {
+router.put('/:id', upload, checkProductExists, async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
-    if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
-    }
-
+    const product = req.product;
+    const { name, price, salePrice, description, stock, category, popular, onSale } = req.body;
+    
     const images = req.files && req.files.length > 0 ? req.files.map(file => `uploads/${file.filename}`) : product.image;
 
-    product.name = req.body.name || product.name;
-    product.price = req.body.price || product.price;
-    product.description = req.body.description || product.description;
+    if (req.files && req.files.length > 0 && product.image && Array.isArray(product.image)) {
+      await deleteImages(product.image);
+    }
+
+    // Validation: Sale price should be less than original price if on sale
+    if (onSale === 'true' && parseFloat(salePrice) >= parseFloat(price)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Sale price must be less than the original price when the product is on sale.'
+      });
+    }
+
+    // Update the product fields
+    product.name = name || product.name;
+    product.price = price || product.price;
+    product.description = description || product.description;
     product.image = images;
-    product.stock = req.body.stock || product.stock;
-    product.category = req.body.category || product.category;
-    product.popular = req.body.popular !== undefined ? req.body.popular === 'true' : product.popular;
-    product.onSale = req.body.onSale !== undefined ? req.body.onSale === 'true' : product.onSale;
-    product.salePrice = req.body.salePrice || product.salePrice;
+    product.stock = stock === 'true' || product.stock;  // Convert stock to boolean
+    product.category = category || product.category;
+    product.popular = popular !== undefined ? popular === 'true' : product.popular;
+    product.onSale = onSale !== undefined ? onSale === 'true' : product.onSale;
+    product.salePrice = onSale === 'true' ? salePrice : null;
 
     await product.save();
 
@@ -126,19 +159,14 @@ router.put('/:id', upload, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error updating product:', error.message, error.stack);
-    res.status(500).json({ success: false, message: 'Error updating product', error: error.message });
+    handleServerError(res, error, 'Error updating product');
   }
 });
 
 // Route to delete a product by ID
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', checkProductExists, async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
-
-    if (!product) {
-      return res.status(404).json({ message: 'Product not found' });
-    }
+    const product = req.product;
 
     if (product.image && Array.isArray(product.image)) {
       await deleteImages(product.image);
@@ -148,8 +176,7 @@ router.delete('/:id', async (req, res) => {
 
     res.status(200).json({ message: 'Product and images deleted successfully' });
   } catch (error) {
-    console.error('Error deleting product:', error.message, error.stack);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    handleServerError(res, error, 'Error deleting product');
   }
 });
 

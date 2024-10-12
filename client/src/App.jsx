@@ -13,6 +13,7 @@ import Kategori from './pages/Kategori';
 import { CartProvider } from './context/CartContext'; 
 import { CheckoutModalProvider } from './context/CheckoutModalContext';
 import CheckoutModal from './components/CheckoutModal'; // Import the CheckoutModal
+import Footer from './components/Footer';
 
 function App() {
   return (
@@ -27,7 +28,7 @@ function App() {
             <Route path="/" element={<Home />} />
             
             {/* Search Route */}
-            <Route path="/kategori/search" element={<Kategori />} />
+            <Route path="/search" element={<Kategori />} />
             
             {/* Category Route */}
             <Route path="/kategori/:category" element={<Kategori />} />
@@ -52,6 +53,7 @@ function App() {
             {/* Catch-all route for undefined routes */}
             <Route path="*" element={<Navigate to="/admin" replace />} />
           </Routes>
+          <Footer />
         </Router>
       </CartProvider>
     </CheckoutModalProvider>

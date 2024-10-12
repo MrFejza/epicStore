@@ -8,6 +8,7 @@ import { useCart } from '../context/CartContext';
 import RelatedProducts from '../components/RelatedProducts.jsx';
 import ProductModal from '../components/ProductModal'; // Import ProductModal
 import Sale from '../assets/SaleTag.png'; // SaleTag image
+import ScrollToTopButton from '../components/ScrollToTopButton.jsx';
 
 const Information = () => {
   const navigate = useNavigate();
@@ -183,8 +184,8 @@ const Information = () => {
             <p className="my-10 whitespace-pre-wrap">{product.description}</p>
 
             {/* Display stock status */}
-            <p className={`text-lg mb-4 font-bold ${product.stock === 'in_stock' ? 'text-green-600' : 'text-red-600'}`}>
-              {product.stock === 'in_stock' ? 'Ka stok' : 'Nuk ka stok'}
+            <p className={`text-lg mb-4 font-bold ${product.stock ? 'text-green-600' : 'text-red-600'}`}>
+              {product.stock ? 'Ka stok' : 'Nuk ka stok'}
             </p>
 
             {/* Display price */}
@@ -206,12 +207,12 @@ const Information = () => {
             {/* Shto në Shport Button - Opens the modal */}
             <div className='py-4 '>
               <button
-              onClick={() => handleAddToCartClick(product)}  // Pass the product to the modal
-              className={`bg-violet-950 text-white font-bold py-2 px-6 rounded-md hover:bg-violet-800 transition-colors ${product.stock !== 'in_stock' && 'opacity-50 cursor-not-allowed '}`}
-              disabled={product.stock !== 'in_stock'} // Disable if out of stock
-            >
-              Shto në Shportë
-            </button>
+                onClick={() => handleAddToCartClick(product)}  // Pass the product to the modal
+                className={`bg-violet-950 text-white font-bold py-2 px-6 rounded-md hover:bg-violet-800 transition-colors ${!product.stock && 'opacity-50 cursor-not-allowed '}`}
+                disabled={!product.stock} // Disable if out of stock
+              >
+                Shto në Shportë
+              </button>
             </div>
 
 
@@ -230,6 +231,7 @@ const Information = () => {
         </div>
 
         <WhatsAppButton phoneNumber="+355683687387" />
+        <ScrollToTopButton />
 
         {/* ProductModal to select the quantity and confirm adding to cart */}
         {isModalOpen && (

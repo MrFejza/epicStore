@@ -9,22 +9,21 @@ export const createProduct = async (req, res) => {
     const images = req.files ? req.files.map(file => `/uploads/${file.filename}`) : [];
 
     // Validate required fields
-    if (!name || !price || !description) {
-      return res.status(400).json({ message: 'Missing required fields: name, price, and description are mandatory' });
+    if (!name || !price || !description || images.length === 0) {
+      return res.status(400).json({ message: 'Missing required fields: name, price, description, and at least one image are mandatory' });
     }
 
     const newProduct = new Product({
-      name: req.body.name,
-      price: req.body.price,
-      description: req.body.description,
-      image: req.body.image,  // Assuming image paths are passed here
-      stock: req.body.stock === 'true',  // Convert stock to boolean
-      category: req.body.category,
-      popular: req.body.popular === 'true',  // Ensure it's a boolean
-      onSale: req.body.onSale === 'true',  // Ensure it's a boolean
-      salePrice: req.body.salePrice || null,  // Sale price if applicable
+      name,
+      price,
+      description,
+      image: images,  // Use images array here
+      stock: stock === 'true',  // Convert stock to boolean
+      category,
+      popular: popular === 'true',  // Ensure it's a boolean
+      onSale: onSale === 'true',  // Ensure it's a boolean
+      salePrice: onSale === 'true' && salePrice ? salePrice : null,  // Sale price if applicable
     });
-    
 
     await newProduct.save();
     res.status(201).json(newProduct);
@@ -75,7 +74,7 @@ export const getProductsByCategory = async (req, res) => {
     const category = req.params.category;
 
     // Case-insensitive category search
-    const products = await Product.find({ category: new RegExp(`^${category}$`, 'i') });
+    const products = await Product.find({ category: new RegExp(`${category}$`, 'i') });
 
     if (!products.length) {
       return res.status(404).json({ message: 'No products found in this category' });

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Slider from 'react-slick';
 import { Link } from 'react-router-dom';
 import 'slick-carousel/slick/slick.css';
@@ -9,6 +9,7 @@ import ShtepiaImage from '../assets/Shtepi.png';
 import ElektronikaImage from '../assets/Elektronike.png';
 import WhatsAppButton from '../components/WhatsAppButton.jsx';
 import ServiceHighlights from '../components/ServiceHighlights.jsx';
+import ScrollToTopButton from '../components/ScrollToTopButton.jsx';
 
 const Carousel = ({ images, rtl = false }) => {
   const carouselSettings = {
@@ -38,6 +39,37 @@ const Carousel = ({ images, rtl = false }) => {
 };
 
 const Home = () => {
+  const [expanded, setExpanded] = useState(false);
+  const [navHeight, setNavHeight] = useState('auto'); // State to store the dynamic height of the navigation
+  const carouselRef = useRef(null); // Ref to track the carousel height
+
+  // Inject custom CSS for hiding scrollbars dynamically
+  useEffect(() => {
+    const styleTag = document.createElement('style');
+    styleTag.innerHTML = `
+      
+      .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+
+
+    `;
+    document.head.appendChild(styleTag);
+
+    // Cleanup on unmount
+    return () => {
+      document.head.removeChild(styleTag);
+    };
+  }, []);
+
+  // Set the height of the navigation based on the height of the carousel
+  useEffect(() => {
+    if (carouselRef.current) {
+      const carouselHeight = carouselRef.current.offsetHeight;
+      setNavHeight(`${carouselHeight}px`); // Set the navigation height to match the carousel
+    }
+  }, [expanded]); // Run the effect when 'expanded' changes
+
   // Assign images directly to each carousel
   const firstCarouselImages = [
     { src: LodraImage, alt: 'Lodra' },
@@ -57,47 +89,66 @@ const Home = () => {
       {/* Grid layout with 2-5 column ratio */}
       <div className="grid grid-cols-12 gap-4">
         {/* Kategoritë section - 2/12 portion */}
-        <div className="col-span-2 lg:col-span-2 md:col-span-4 bg-violet-100 p-4 hidden sm:block">
+        <div
+          className={`col-span-2 lg:col-span-2 md:col-span-4 bg-violet-100 p-4 hidden sm:block hide-scrollbar`}
+          style={{ height: expanded ? navHeight : 'auto', overflowY: expanded ? 'auto' : 'hidden' }}
+        >
           {/* Hidden on phone, visible on small screens and larger */}
-          <ul className="space-y-5 text-center">
-            <li>
-              <Link to="/kategori/new" className="text-gray-800">Të Rejat</Link>
-            </li>
-            <li>
-              <Link to="/kategori/offers" className="text-gray-800">Oferta</Link>
-            </li>
-            <li>
-              <Link to="/kategori/electronics" className="text-gray-800">Elektrike</Link>
-            </li>
-            <li>
-              <Link to="/kategori/clothing" className="text-gray-800">Rroba</Link>
-            </li>
-            <li>
-              <Link to="/kategori/books" className="text-gray-800">Libra</Link>
-            </li>
-            <li>
-              <Link to="/kategori/home" className="text-gray-800">Shtepi</Link>
-            </li>
-            <li>
-              <Link to="/kategori/beauty" className="text-gray-800">Beauty</Link>
-            </li>
-            <li>
-              <Link to="/kategori/sports" className="text-gray-800">Sport</Link>
-            </li>
-            <li>
-              <Link to="/kategori/toys" className="text-gray-800">Lodra</Link>
-            </li>
-            <li>
-              <Link to="/kategori/food" className="text-gray-800">Ushqim</Link>
-            </li>
-            <li>
-              <Link to="/kategori/all" className="text-gray-800">Të Gjitha</Link>
-            </li>
-          </ul>
+          <ul className="space-y-5 text-center overflow-auto hide-scrollbar">
+  <li className="relative group">
+    <Link to="/kategori/new" className="text-gray-800 group-hover:border-b-2 group-hover:border-violet-500">Të Rejat</Link>
+  </li>
+  <li className="relative group">
+    <Link to="/kategori/offers" className="text-gray-800 group-hover:border-b-2 group-hover:border-violet-500">Oferta</Link>
+  </li>
+  <li className="relative group">
+    <Link to="/kategori/ProduktePerFemije" className="text-gray-800 group-hover:border-b-2 group-hover:border-violet-500">Produkte për Fëmijë</Link>
+  </li>
+  <li className="relative group">
+    <Link to="/kategori/ElektronikeAksesore" className="text-gray-800 group-hover:border-b-2 group-hover:border-violet-500">Elektronikë dhe Aksesorë</Link>
+  </li>
+  <li className="relative group">
+    <Link to="/kategori/ShtepiJetese" className="text-gray-800 group-hover:border-b-2 group-hover:border-violet-500">Shtëpi dhe Jetesë</Link>
+  </li>
+  <li className="relative group">
+    <Link to="/kategori/ZyreTeknologji" className="text-gray-800 group-hover:border-b-2 group-hover:border-violet-500">Zyrë dhe Teknologji</Link>
+  </li>
+  <li className="relative group">
+    <Link to="/kategori/SportAktivitet" className="text-gray-800 group-hover:border-b-2 group-hover:border-violet-500">Sport dhe Aktivitete</Link>
+  </li>
+  {expanded && (
+    <>
+      <li className="relative group">
+        <Link to="/kategori/KuzhineUshqim" className="text-gray-800 group-hover:border-b-2 group-hover:border-violet-500">Kuzhinë dhe Ushqim</Link>
+      </li>
+      <li className="relative group">
+        <Link to="/kategori/FestaEvente" className="text-gray-800 group-hover:border-b-2 group-hover:border-violet-500">Festa dhe Evente</Link>
+      </li>
+      <li className="relative group">
+        <Link to="/kategori/Motorra" className="text-gray-800 group-hover:border-b-2 group-hover:border-violet-500">Motorra</Link>
+      </li>
+      <li className="relative group">
+        <Link to="/kategori/Kafshe" className="text-gray-800 group-hover:border-b-2 group-hover:border-violet-500">Kafshë</Link>
+      </li>
+      <li className="relative group">
+        <Link to="/kategori/all" className="text-gray-800 group-hover:border-b-2 group-hover:border-violet-500">Të Gjitha</Link>
+      </li>
+    </>
+  )}
+  <li>
+    <button
+      onClick={() => setExpanded(!expanded)}
+      className="text-violet-600 hover:text-violet-800"
+    >
+      {expanded ? 'Shfaq më pak' : 'Shfaq më shumë'}
+    </button>
+  </li>
+</ul>
+
         </div>
 
         {/* Të Rejat, Oferta, and Carousels */}
-        <div className="col-span-12 lg:col-span-10 md:col-span-8 pl-0 h-full">
+        <div className="col-span-12 lg:col-span-10 md:col-span-8 pl-0 h-full" ref={carouselRef}>
           {/* Two carousels for laptop and desktop (lg and above) */}
           <div className="hidden lg:flex space-x-4 h-full">
             {/* Left Carousel */}
@@ -125,7 +176,10 @@ const Home = () => {
 
       {/* WhatsApp Button that stays on the bottom-right corner */}
       <WhatsAppButton phoneNumber="+355683687387" />
+      <ScrollToTopButton />
     </div>
+
+    
   );
 };
 

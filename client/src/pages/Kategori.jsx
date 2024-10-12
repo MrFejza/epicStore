@@ -15,6 +15,7 @@ import Offers from '../assets/OfertaHero.png';
 import SearchImage from '../assets/Search.png'; // Import the Search image
 import WhatsAppButton from '../components/WhatsAppButton.jsx';
 import ServiceHighlights from '../components/ServiceHighlights.jsx';
+import ScrollToTopButton from '../components/ScrollToTopButton.jsx';
 
 const Kategori = () => {
   const { category } = useParams(); // Get the category from the URL params
@@ -135,12 +136,12 @@ const Kategori = () => {
   return (
     <div className="container mx-auto px-10 py-8">
       {loading && <div className="mx-auto text-xl">Loading products...</div>}
-      
+
       {/* Category or Search Image */}
       <div className="mb-8 text-center">
         <img
           src={categoryImage}
-          alt={query ? 'Search Results' : `Category: ${category}`}
+          alt={query ? 'Search Results' : `Category: ${category.toLocaleLowerCase()}`}
           className="max-h-[500px] w-full max-w-[80%] mx-auto"
         />
       </div>
@@ -180,10 +181,10 @@ const Kategori = () => {
 
                 <p
                   className={`text-center mb-4 font-bold ${
-                    product.stock === 'in_stock' ? 'text-green-600' : 'text-red-600'
+                    product.stock ? 'text-green-600' : 'text-red-600'
                   }`}
                 >
-                  {product.stock === 'in_stock' ? 'Ka stok' : 'Nuk ka stok'}
+                  {product.stock ? 'Ka stok' : 'Nuk ka stok'}
                 </p>
 
                 <p className="text-center mb-2 text-gray-700">
@@ -205,9 +206,9 @@ const Kategori = () => {
                 <button
                   onClick={() => handleAddToCartClick(product)}
                   className={`bg-violet-950 text-white font-bold py-2 px-6 rounded-md hover:bg-violet-800 transition-colors ${
-                    product.stock !== 'in_stock' && 'opacity-50 cursor-not-allowed'
+                    !product.stock && 'opacity-50 cursor-not-allowed'
                   }`}
-                  disabled={product.stock !== 'in_stock'}
+                  disabled={!product.stock}
                 >
                   Shto ne shporte
                 </button>
@@ -270,6 +271,7 @@ const Kategori = () => {
       />
 
       <WhatsAppButton phoneNumber="+355683687387" />
+      <ScrollToTopButton />
     </div>
   );
 };

@@ -9,7 +9,7 @@ import FacebookLogo from '../assets/Facebook-Logosu.png';
 import ShoppingCart from './ShoppingCart';
 import CheckoutModal from './CheckoutModal';
 import { useCart } from '../context/CartContext';
-import { useCheckoutModal } from '../context/CheckoutModalContext'; // Import CheckoutModalContext to trigger the modal
+import { useCheckoutModal } from '../context/CheckoutModalContext';
 
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -17,9 +17,8 @@ const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { cart, removeFromCart } = useCart();
-  const { openCheckoutModal } = useCheckoutModal(); // Get modal trigger function from context
+  const { openCheckoutModal } = useCheckoutModal();
   const [query, setQuery] = useState('');
- 
 
   const handleInputChange = (e) => {
     setQuery(e.target.value);
@@ -31,7 +30,6 @@ const Header = () => {
       navigate(`/kategori/search?query=${query}`);
     }
   };
-  
 
   const calculateTotalAmount = () => {
     return cart.reduce((total, item) => total + item.quantity * item.product.price, 0);
@@ -51,7 +49,6 @@ const Header = () => {
     if (isAuth && isAdmin) {
       return (
         <>
-          {/* Mobile View (small screens) */}
           <div className="md:hidden text-gray-800">
             <button
               onClick={handleLogout}
@@ -61,7 +58,6 @@ const Header = () => {
             </button>
           </div>
 
-          {/* Tablet and Laptop View (medium and larger screens) */}
           <div className="hidden md:flex">
             <button
               onClick={handleLogout}
@@ -76,17 +72,15 @@ const Header = () => {
     return null;
   };
 
-
-
   return (
     <>
       <Disclosure as="nav" className="bg-white border-b border-gray-200 z-10 relative">
         {({ open }) => (
           <>
-            <div className="max-w-[80%] mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="md:max-w-[80%] mx-auto px-4 sm:px-6 lg:px-8">
               <div className="hidden md:flex justify-between items-center pt-4 pb-2">
                 <Link to="/" className="flex-shrink-0">
-                  <img className="h-24 w-auto" src={EpicStoreLogo} alt="Epic Store Logo" />
+                  <img className="h-36 p-0 w-auto" src={EpicStoreLogo} alt="Epic Store Logo" />
                 </Link>
 
                 <div className="flex-1 flex justify-center px-auto ml-2">
@@ -97,7 +91,7 @@ const Header = () => {
                         id="search"
                         type="text"
                         value={query}
-                        onChange= {handleInputChange}
+                        onChange={handleInputChange}
                         placeholder="Kërko produkte..."
                         className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-600"
                       />
@@ -114,7 +108,7 @@ const Header = () => {
                 <div className="ml-4 mr-2">
                   <ShoppingCart
                     cartItems={cart}
-                    handleCheckout={() => openCheckoutModal(cart, calculateTotalAmount())} // Trigger checkout modal
+                    handleCheckout={() => openCheckoutModal(cart, calculateTotalAmount())}
                     removeFromCart={removeFromCart}
                   />
                 </div>
@@ -134,75 +128,80 @@ const Header = () => {
               </div>
 
               {/* Mobile View */}
-              <div className="flex md:hidden justify-between items-center py-4">
-                <Link to="/" className="flex-shrink-0">
-                  <img className="h-20 w-auto" src={EpicStoreLogo} alt="Epic Store Logo" />
-                </Link>
+{/* Mobile View */}
+<div className="flex md:hidden justify-between items-center pt-4">
+  <div className="flex items-center space-x-0"> {/* Remove space-x to eliminate the gap */}
+    <Disclosure.Button className="inline-flex items-center justify-center p-2 rounded-md text-black hover:text-violet-600 focus:outline-none">
+      <span className="sr-only">Open main menu</span>
+      {open ? (
+        <XMarkIcon className="block h-8 w-8" aria-hidden="true" />
+      ) : (
+        <Bars3Icon className="block h-8 w-8" aria-hidden="true" />
+      )}
+    </Disclosure.Button>
 
-                <div className="flex items-center space-x-12">
-                  <button
-                    onClick={() => setShowSearch(!showSearch)}
-                    className="text-4xl text-gray-800"
-                  >
-                    ⌕
-                  </button>
+    <Link to="/" className="flex-shrink-0">
+      <img className="h-24 w-auto" src={EpicStoreLogo} alt="Epic Store Logo" />
+    </Link>
+  </div>
 
-                  <ShoppingCart
-                    cartItems={cart}
-                    handleCheckout={() => openCheckoutModal(cart, calculateTotalAmount())} // Trigger checkout modal
-                    removeFromCart={removeFromCart}
-                  />
-                </div>
+  <div className="flex items-center space-x-10">
+    <button
+      onClick={() => setShowSearch(!showSearch)}
+      className="text-4xl text-gray-800"
+    >
+      ⌕
+    </button>
 
-                <div className="-mr-2 flex text-2xl">
-                  <Disclosure.Button className="inline-flex items-center justify-center p-2 rounded-md text-black hover:text-violet-600 focus:outline-none">
-                    <span className="sr-only">Open main menu</span>
-                    {open ? (
-                      <XMarkIcon className="block h-8 w-8" aria-hidden="true" />
-                    ) : (
-                      <Bars3Icon className="block h-8 w-8" aria-hidden="true" />
-                    )}
-                  </Disclosure.Button>
-                </div>
-              </div>
+    <ShoppingCart
+      cartItems={cart}
+      handleCheckout={() => openCheckoutModal(cart, calculateTotalAmount())}
+      removeFromCart={removeFromCart}
+    />
+  </div>
+</div>
+
 
               <Disclosure.Panel className="md:hidden">
                 {/* Mobile categories navigation */}
-                <div className="px-2 pt-2 pb-3 space-y-1">
+                <div className=" m-0 p-2 pt-2 pb-3 space-y-1">
                   <ul className="space-y-5 text-center">
                     <li>
-                    <Link to="/kategori/new" className="text-gray-800 ">Të Rejat</Link>
+                      <Link to="/kategori/new" className="text-gray-800">Të Rejat</Link>
                     </li>
                     <li>
-                    <Link to="/kategori/offers" className="text-gray-800 ">Oferta</Link>
+                      <Link to="/kategori/offers" className="text-gray-800">Oferta</Link>
                     </li>
                     <li>
-                      <Link to="/kategori/electronics" className="text-gray-800 ">Elektrike</Link>
+                      <Link to="/kategori/produkte-per-femije" className="text-gray-800">Produkte për Fëmijë</Link>
                     </li>
                     <li>
-                      <Link to="/kategori/clothing" className="text-gray-800 ">Rroba</Link>
+                      <Link to="/kategori/elektronike-aksesore" className="text-gray-800">Elektronikë dhe Aksesorë</Link>
                     </li>
                     <li>
-                      <Link to="/kategori/books" className="text-gray-800 ">Libra</Link>
+                      <Link to="/kategori/shtepi-jetese" className="text-gray-800">Shtëpi dhe Jetesë</Link>
                     </li>
                     <li>
-                      <Link to="/kategori/home" className="text-gray-800 ">Shtepi</Link>
+                      <Link to="/kategori/zyre-teknologji" className="text-gray-800">Zyrë dhe Teknologji</Link>
                     </li>
                     <li>
-                      <Link to="/kategori/beauty" className="text-gray-800 ">Beauty</Link>
+                      <Link to="/kategori/sport-aktivitet" className="text-gray-800">Sport dhe Aktivitet në Natyrë</Link>
                     </li>
                     <li>
-                      <Link to="/kategori/sports" className="text-gray-800 ">Sport</Link>
+                      <Link to="/kategori/kuzhine-ushqim" className="text-gray-800">Kuzhinë dhe Ushqim</Link>
                     </li>
                     <li>
-                      <Link to="/kategori/toys" className="text-gray-800 ">Lodra</Link>
+                      <Link to="/kategori/festa-evente" className="text-gray-800">Festa dhe Evente</Link>
                     </li>
                     <li>
-                      <Link to="/kategori/food" className="text-gray-800 ">Ushqim</Link>
+                      <Link to="/kategori/motorra" className="text-gray-800">Motorra</Link>
                     </li>
                     <li>
-    <Link to="/kategori/all" className="text-gray-800 ">Të Gjitha</Link>
-  </li>
+                      <Link to="/kategori/kafshe" className="text-gray-800">Kafshë</Link>
+                    </li>
+                    <li>
+                      <Link to="/kategori/all" className="text-gray-800">Të Gjitha</Link>
+                    </li>
                   </ul>
                 </div>
               </Disclosure.Panel>
@@ -233,85 +232,82 @@ const Header = () => {
             </div>
 
             {location && (
-  <div
-    className={`${
-      location.pathname === '/' ? 'md:hidden lg:hidden' : ''
-    } bg-violet-100 w-full mt-4 md:mt-0 max-w-[90%] mx-auto`}
-  >
-    <nav className="container mx-auto py-3">
-      <div className="flex justify-start items-start">
-        <div className="flex justify-start items-start">
-          {/* Show full navigation on non-home pages or mobile view on the home page */}
-          {location.pathname !== '/' ? (
-            // Full navigation for non-home pages
-            <div className="block">
-              <ul className="relative">
-                <li className="text-gray-800 relative group">
-                  <span className="cursor-pointer pl-6 py-3">Kategoritë</span>
-                  <ul className="absolute left-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg hidden group-hover:block space-y-1">
-                    <li className="px-4 py-2 hover:bg-gray-100">
-                      <Link to="/kategori/electronics" className="text-gray-800">Elektrike</Link>
-                    </li>
-                    <li className="px-4 py-2 hover:bg-gray-100">
-                      <Link to="/kategori/clothing" className="text-gray-800">Rroba</Link>
-                    </li>
-                    <li className="px-4 py-2 hover:bg-gray-100">
-                      <Link to="/kategori/books" className="text-gray-800">Libra</Link>
-                    </li>
-                    <li className="px-4 py-2 hover:bg-gray-100">
-                      <Link to="/kategori/home" className="text-gray-800">Shtepi</Link>
-                    </li>
-                    <li className="px-4 py-2 hover:bg-gray-100">
-                      <Link to="/kategori/beauty" className="text-gray-800">Beauty</Link>
-                    </li>
-                    <li className="px-4 py-2 hover:bg-gray-100">
-                      <Link to="/kategori/sports" className="text-gray-800">Sport</Link>
-                    </li>
-                    <li className="px-4 py-2 hover:bg-gray-100">
-                      <Link to="/kategori/toys" className="text-gray-800">Lodra</Link>
-                    </li>
-                    <li className="px-4 py-2 hover:bg-gray-100">
-                      <Link to="/kategori/food" className="text-gray-800">Ushqim</Link>
-                    </li>
-                    <li className="px-4 py-2 hover:bg-gray-100">
-                      <Link to="/kategori/all" className="text-gray-800 ">Të Gjitha</Link>
-                    </li>
-                  </ul>
-                </li>
-              </ul>
-            </div>
-          ) : (
-            // Show "Të Rejat", "Oferta", and "Logout" only on mobile when on the home page
-            <div className="block md:hidden">
-              <div className="flex space-x-6">
-                <Link to="/kategori/new" className="text-gray-800 pl-6">Të Rejat</Link>
-                <Link to="/kategori/offers" className="text-gray-800">Oferta</Link>
-                <LogoutButton />
-              </div>
-            </div>
-          )}
+              <div
+                className={`${
+                  location.pathname === '/' ? 'md:hidden lg:hidden' : ''
+                } bg-violet-100 w-full mt-4 md:mt-0 max-w-[90%] mx-auto`}
+              >
+                <nav className="container mx-auto py-3">
+                  <div className="flex justify-start items-start">
+                    <div className="flex justify-start items-start">
+                      {location.pathname !== '/' ? (
+                        <div className="block">
+                          <ul className="relative">
+                            <li className="text-gray-800 relative group">
+                              <span className="cursor-pointer pl-6 py-3">Kategoritë</span>
+                              <ul className="absolute left-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg hidden group-hover:block space-y-1">
+                                <li className="px-4 py-2 hover:bg-gray-100">
+                                  <Link to="/kategori/produkte-per-femije" className="text-gray-800">Produkte për Fëmijë</Link>
+                                </li>
+                                <li className="px-4 py-2 hover:bg-gray-100">
+                                  <Link to="/kategori/elektronike-aksesore" className="text-gray-800">Elektronikë dhe Aksesorë</Link>
+                                </li>
+                                <li className="px-4 py-2 hover:bg-gray-100">
+                                  <Link to="/kategori/shtepi-jetese" className="text-gray-800">Shtëpi dhe Jetesë</Link>
+                                </li>
+                                <li className="px-4 py-2 hover:bg-gray-100">
+                                  <Link to="/kategori/zyre-teknologji" className="text-gray-800">Zyrë dhe Teknologji</Link>
+                                </li>
+                                <li className="px-4 py-2 hover:bg-gray-100">
+                                  <Link to="/kategori/sport-aktivitet" className="text-gray-800">Sport dhe Aktivitet në Natyrë</Link>
+                                </li>
+                                <li className="px-4 py-2 hover:bg-gray-100">
+                                  <Link to="/kategori/kuzhine-ushqim" className="text-gray-800">Kuzhinë dhe Ushqim</Link>
+                                </li>
+                                <li className="px-4 py-2 hover:bg-gray-100">
+                                  <Link to="/kategori/festa-evente" className="text-gray-800">Festa dhe Evente</Link>
+                                </li>
+                                <li className="px-4 py-2 hover:bg-gray-100">
+                                  <Link to="/kategori/motorra" className="text-gray-800">Motorra</Link>
+                                </li>
+                                <li className="px-4 py-2 hover:bg-gray-100">
+                                  <Link to="/kategori/kafshe" className="text-gray-800">Kafshë</Link>
+                                </li>
+                                <li className="px-4 py-2 hover:bg-gray-100">
+                                  <Link to="/kategori/all" className="text-gray-800 ">Të Gjitha</Link>
+                                </li>
+                              </ul>
+                            </li>
+                          </ul>
+                        </div>
+                      ) : (
+                        <div className="block md:hidden">
+                          <div className="flex space-x-6">
+                            <Link to="/kategori/new" className="text-gray-800 pl-6">Të Rejat</Link>
+                            <Link to="/kategori/offers" className="text-gray-800">Oferta</Link>
+                            <LogoutButton />
+                          </div>
+                        </div>
+                      )}
 
-          {/* Always show "Të Rejat" and "Oferta" on other pages */}
-          {location.pathname !== '/' && (
-            <div className="flex space-x-6">
-              <Link to="/kategori/new" className="text-gray-800 pl-6">Të Rejat</Link>
-              <Link to="/kategori/offers" className="text-gray-800">Oferta</Link>
-              <div className="md:hidden">
-                <LogoutButton />
+                      {location.pathname !== '/' && (
+                        <div className="flex space-x-6">
+                          <Link to="/kategori/new" className="text-gray-800 pl-6">Të Rejat</Link>
+                          <Link to="/kategori/offers" className="text-gray-800">Oferta</Link>
+                          <div className="md:hidden">
+                            <LogoutButton />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </nav>
               </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </nav>
-  </div>
-)}
-
+            )}
           </>
         )}
       </Disclosure>
 
-      {/* We no longer need to pass isOpen prop */}
       <CheckoutModal />
     </>
   );

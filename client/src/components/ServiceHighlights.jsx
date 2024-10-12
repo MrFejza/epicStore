@@ -20,7 +20,7 @@ function ServiceHighlights() {
         <div className="flex flex-col items-center text-center px-4 min-w-[250px] mb-6 md:mb-0">
           <img src={Return} alt="Professional Support" className="max-w-28 h-auto mb-4" />
           <h3 className="text-lg font-semibold">Mundësi Kthimi</h3>
-          <p className="text-sm text-gray-600">Keni mundësinë për të kthyer produktin brenda 2 javësh, <br /> nëse nuk jeni të kënaqur.</p>
+          <p className="text-sm text-gray-600">Keni mundësinë për të kthyer produktin brenda 24 orësh,  nëse nuk jeni të kënaqur.</p>
         </div>
         <div className="flex flex-col items-center text-center px-4 min-w-[250px]">
           <img src={Delivery} alt="Fast Delivery" className="max-w-28 h-auto mb-4" />

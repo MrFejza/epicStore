@@ -9,8 +9,8 @@ const Edit = () => {
 
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
-  const [salePrice, setSalePrice] = useState(''); // New state for sale price
-  const [onSale, setOnSale] = useState(false);  // New state for onSale flag
+  const [salePrice, setSalePrice] = useState('');
+  const [onSale, setOnSale] = useState(false);
   const [description, setDescription] = useState('');
   const [stock, setStock] = useState('');
   const [category, setCategory] = useState('');
@@ -28,10 +28,10 @@ const Edit = () => {
         const product = res.data;
         setName(product.name);
         setPrice(product.price);
-        setSalePrice(product.salePrice || '');  // Load sale price
-        setOnSale(product.onSale || false);     // Load onSale flag
+        setSalePrice(product.salePrice || '');
+        setOnSale(product.onSale || false);
         setDescription(product.description);
-        setStock(product.stock);
+        setStock(product.stock ? 'in_stock' : 'out_of_stock');
         setCategory(product.category);
         setPopular(product.popular);
         setExistingImages(product.image || []);
@@ -61,21 +61,29 @@ const Edit = () => {
   // Submit form and send all images (both existing and new) to the backend
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Frontend validation for salePrice
+    if (onSale && (!salePrice || parseFloat(salePrice) >= parseFloat(price))) {
+      toast.error('Çmimi i ofertës duhet të jetë më i vogël se çmimi origjinal.');
+      return;
+    }
+
     try {
       const formData = new FormData();
 
-      // Append text fields
       formData.append('name', name);
       formData.append('price', price);
-      formData.append('salePrice', salePrice);  // Append sale price
-      formData.append('onSale', onSale);        // Append onSale flag
+      if (onSale && salePrice) {
+        formData.append('salePrice', salePrice);
+      }
+      formData.append('onSale', onSale);
       formData.append('description', description);
-      formData.append('stock', stock);
+      formData.append('stock', stock === 'in_stock');
       formData.append('category', category);
       formData.append('popular', popular);
 
+      // Append existing images and new images
       formData.append('existingImages', JSON.stringify(existingImages));
-
       newImages.forEach((file) => {
         formData.append('image', file);
       });
@@ -84,8 +92,8 @@ const Edit = () => {
       const config = { headers: { 'Content-Type': 'multipart/form-data' } };
       await axios.put(`/api/product/${_id}`, formData, config);
 
-      toast.success('Product updated successfully');
-      navigate('/products');
+      toast.success('Produkti u përditësua me sukses');
+      navigate(-1);  // Go back to the previous page
     } catch (error) {
       toast.error(error?.response?.data?.message || error.message);
     }
@@ -142,7 +150,7 @@ const Edit = () => {
 
             {/* Sale Price */}
             <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2">Në Shitje</label>
+              <label className="block text-gray-700 text-sm font-bold mb-2">Në Oferte</label>
               <input
                 type="checkbox"
                 checked={onSale}
@@ -154,7 +162,7 @@ const Edit = () => {
 
             {onSale && (
               <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2">Sale Price</label>
+                <label className="block text-gray-700 text-sm font-bold mb-2">Çmimi i Ofertës</label>
                 <input
                   type="number"
                   value={salePrice}
@@ -208,22 +216,21 @@ const Edit = () => {
                 checked={popular}
                 onChange={(e) => setPopular(e.target.checked)}
                 className="p-3 border rounded-md focus:outline-none focus:border-primary-deep"
-              />
-              <span className="ml-2 text-sm text-gray-700">Perzgjedhe si shume e shitur</span>
-            </div>
-
-            {/* Image upload and existing images display */}
-            <div className="mb-4">
-              <label className="block text-gray-700 text-sm font-bold mb-2">Imazhe</label>
-              <input
-                type="file"
-                onChange={handleFileChange}
-                multiple
-                className="w-full p-3 border rounded-md focus:outline-none focus:border-primary-deep mt-2"
-              />
-
-              {/* Display existing images only if no new images are uploaded */}
-              {newImages.length === 0 && (
+                />
+                <span className="ml-2 text-sm text-gray-700">Perzgjedhe si shume e shitur</span>
+              </div>
+  
+              {/* Image upload and existing images display */}
+              <div className="mb-4">
+                <label className="block text-gray-700 text-sm font-bold mb-2">Imazhe</label>
+                <input
+                  type="file"
+                  onChange={handleFileChange}
+                  multiple
+                  className="w-full p-3 border rounded-md focus:outline-none focus:border-primary-deep mt-2"
+                />
+  
+                {/* Display existing images */}
                 <div className="mt-2 grid grid-cols-3 gap-4">
                   {existingImages.map((img, index) => (
                     <div key={`existing-${index}`} className="relative">
@@ -245,51 +252,51 @@ const Edit = () => {
                     </div>
                   ))}
                 </div>
-              )}
-
-              {/* Display selected new images */}
-              <div className="mt-2 grid grid-cols-3 gap-4">
-                {newImages.map((file, index) => (
-                  <div key={`new-${index}`} className="relative">
-                    <img
-                      src={URL.createObjectURL(file)}
-                      className="w-full h-auto rounded-md border border-gray-300"
-                      alt={`New Product ${index}`}
-                    />
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleRemoveNewImage(index);
-                      }}
-                      className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                ))}
+  
+                {/* Display selected new images */}
+                <div className="mt-2 grid grid-cols-3 gap-4">
+                  {newImages.map((file, index) => (
+                    <div key={`new-${index}`} className="relative">
+                      <img
+                        src={URL.createObjectURL(file)}
+                        className="w-full h-auto rounded-md border border-gray-300"
+                        alt={`New Product ${index}`}
+                      />
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleRemoveNewImage(index);
+                        }}
+                        className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-
-            <div className="text-center">
-              <button
-                type="submit"
-                className="bg-gray-500 w-full text-white font-bold py-3 px-6 rounded-md hover:bg-primary-dark transition-colors"
-              >
-                Perditso Produktin
-              </button>
-              <Link
-                to="/dashboard/products"
-                className="bg-gray-500 w-full text-white font-bold py-3 px-6 rounded-md hover:bg-gray-700 transition-colors mt-2 inline-block"
-              >
-                Cancel
-              </Link>
-            </div>
-          </form>
+  
+              <div className="text-center">
+                <button
+                  type="submit"
+                  className="bg-gray-500 w-full text-white font-bold py-3 px-6 rounded-md hover:bg-primary-dark transition-colors"
+                >
+                  Perditso Produktin
+                </button>
+                <Link
+                  to="/dashboard/products"
+                  className="bg-gray-500 w-full text-white font-bold py-3 px-6 rounded-md hover:bg-gray-700 transition-colors mt-2 inline-block"
+                >
+                  Cancel
+                </Link>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
-    </div>
-  );
-};
-
-export default Edit;
+    );
+  };
+  
+  export default Edit;
+  

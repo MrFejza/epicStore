@@ -10,13 +10,13 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center md:text-left">
           {/* Column 1: Social Media Links (visible on all views) */}
           <div className="flex flex-col space-y-2">
-            <h3 className="font-bold text-lg">Follow Us</h3>
-            <div className="flex justify-center md:justify-start space-x-6">
+            <h3 className="font-bold text-lg">Na Ndiqni</h3>
+            <div className="flex justify-center md:justify-center space-x-6">
               <a href="https://www.facebook.com/EpicStoreAlbania?mibextid=LQQJ4d" target="_blank" rel="noopener noreferrer">
-                <img src={FacebookLogo} alt="Facebook" className="h-6 w-6" />
+                <img src={FacebookLogo} alt="Facebook" className="h-6 w-10" />
               </a>
               <a href="https://www.instagram.com/epic_store.al?igsh=MWVvOWFjNDRwb3NjcQ==" target="_blank" rel="noopener noreferrer">
-                <img src={InstagramLogo} alt="Instagram" className="h-6 w-6" />
+                <img src={InstagramLogo} alt="Instagram" className="h-6 w-12" />
               </a>
               <a href="https://www.tiktok.com/@epic_store.al?_t=8q7hz7mPsGr&_r=1" target="_blank" rel="noopener noreferrer">
                 <img src={TikTokLogo} alt="TikTok" className="h-6 w-6" />
@@ -26,9 +26,9 @@ const Footer = () => {
 
           {/* Column 2: Contact Information */}
           <div className="flex flex-col space-y-2">
-            <h3 className="font-bold text-lg">Contact Us</h3>
-            <p>📞 +355 69 123 4567</p>
-            <p>✉️ info@epicstore.al</p>
+            <h3 className="font-bold text-lg">Na Kontakton</h3>
+            <p>📞 +355 68 368 7387</p>
+            <p>✉️ epicstore2020.info@gmail.com</p>
             {/* No physical address since it's an online store */}
           </div>
 

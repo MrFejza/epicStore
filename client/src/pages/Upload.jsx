@@ -8,9 +8,9 @@ const Upload = () => {
   const navigate = useNavigate();
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
-  const [salePrice, setSalePrice] = useState(''); // State for sale price
-  const [onSale, setOnSale] = useState(false); // State for onSale
-  const [description, setDescription] = useState(''); // Keep line breaks in the description
+  const [salePrice, setSalePrice] = useState('');
+  const [onSale, setOnSale] = useState(false);
+  const [description, setDescription] = useState('');
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [stock, setStock] = useState('');
   const [category, setCategory] = useState('');
@@ -22,23 +22,36 @@ const Upload = () => {
     setSelectedFiles((prevFiles) => [...prevFiles, ...files]);
   };
 
-  // Handle form submission
   const handleProductCreation = async () => {
+    // Frontend validation for salePrice
+    if (onSale) {
+      if (!salePrice) {
+        toast.error('Ju lutemi vendosni çmimin e ofertës kur produkti është në ofertë.');
+        return;
+      }
+      if (parseFloat(salePrice) >= parseFloat(price)) {
+        toast.error('Çmimi i ofertës duhet të jetë më i vogël se çmimi origjinal.');
+        return;
+      }
+    }
+
     const formData = new FormData();
 
     formData.append('name', name);
     formData.append('price', price);
-    
-    // Only append salePrice if the product is on sale
+
     if (onSale && salePrice) {
       formData.append('salePrice', salePrice);
     }
-    
-    formData.append('onSale', onSale); // Append onSale as boolean
-    formData.append('description', description); // Append description with line breaks
-    formData.append('stock', stock);
+
+    formData.append('onSale', onSale);  // Ensures onSale is a boolean
+    formData.append('description', description);
+
+    // Convert stock to boolean
+    formData.append('stock', stock === 'in_stock');  // Ensures stock is true/false
+
     formData.append('category', category);
-    formData.append('popular', popular); // Send as boolean
+    formData.append('popular', popular);  // Ensures popular is a boolean
 
     selectedFiles.forEach((file) => {
       formData.append('image', file);
@@ -49,8 +62,8 @@ const Upload = () => {
         headers: { 'Content-Type': 'multipart/form-data' },
         withCredentials: true,
       });
-      toast.success(response.data.message || 'Product created successfully');
-      // Reset form after successful product creation
+      toast.success(response.data.message || 'Produkti u krijua me sukses');
+      // Reset the form after successful product creation
       setName('');
       setPrice('');
       setSalePrice('');
@@ -74,7 +87,7 @@ const Upload = () => {
 
   return (
     <>
-      <Meta title={`${name || "New Product"} - Epic Store`} />
+      <Meta title={`${name || 'New Product'} - Epic Store`} />
       <div className="flex justify-center items-center bg-gray-100 min-h-screen py-10">
         <div className="container mx-auto px-4 mb-8">
           <h1 className="text-4xl font-bold text-center text-primary-deep mb-8">Shto nje Produkt te ri</h1>
@@ -91,12 +104,13 @@ const Upload = () => {
                   required
                 />
               </div>
+
               <div className="mb-4">
                 <label className="block text-gray-700 text-sm font-bold mb-2">Pershkrimi</label>
                 <textarea
                   placeholder="Enter product description"
                   value={description}
-                  onChange={(e) => setDescription(e.target.value)} // No trimming for preserving new lines
+                  onChange={(e) => setDescription(e.target.value)}
                   className="w-full p-3 border rounded-md focus:outline-none focus:border-primary-deep"
                   rows="5"
                   required
@@ -115,7 +129,6 @@ const Upload = () => {
                 />
               </div>
 
-              {/* Sale Price Input */}
               <div className="mb-4">
                 <label className="block text-gray-700 text-sm font-bold mb-2">Në Oferte</label>
                 <input
@@ -129,14 +142,14 @@ const Upload = () => {
 
               {onSale && (
                 <div className="mb-4">
-                  <label className="block text-gray-700 text-sm font-bold mb-2">Sale Price</label>
+                  <label className="block text-gray-700 text-sm font-bold mb-2">Çmimi i Ofertës</label>
                   <input
-                    type="text"
-                    placeholder="Enter sale price"
+                    type="number"
+                    placeholder="Vendos çmimin e ofertës"
                     value={salePrice}
                     onChange={(e) => setSalePrice(e.target.value)}
                     className="w-full p-3 border rounded-md focus:outline-none focus:border-primary-deep"
-                    required={onSale} // Make required only if on sale
+                    required
                   />
                 </div>
               )}
@@ -206,7 +219,7 @@ const Upload = () => {
                       <div key={index} className="relative">
                         <img
                           src={URL.createObjectURL(file)}
-                          alt={`preview-${index}`}
+                          alt={`preview - ${index}`}
                           className="w-full h-auto rounded-md border border-gray-300"
                         />
                       </div>
@@ -216,10 +229,16 @@ const Upload = () => {
               )}
 
               <div className="text-center">
-                <button type="submit" className="bg-gray-500 w-full text-white font-bold py-3 px-6 rounded-md hover:bg-primary-dark transition-colors">
+                <button
+                  type="submit"
+                  className="bg-gray-500 w-full text-white font-bold py-3 px-6 rounded-md hover:bg-primary-dark transition-colors"
+                >
                   Shto Produktin
                 </button>
-                <Link to="/" className="bg-gray-500 w-full text-white font-bold py-3 px-6 rounded-md hover:bg-gray-700 transition-colors mt-2 inline-block">
+                <Link
+                  to="/"
+                  className="bg-gray-500 w-full text-white font-bold py-3 px-6 rounded-md hover:bg-gray-700 transition-colors mt-2 inline-block"
+                >
                   Cancel
                 </Link>
               </div>
@@ -230,5 +249,4 @@ const Upload = () => {
     </>
   );
 };
-
 export default Upload;

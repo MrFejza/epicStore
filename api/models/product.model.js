@@ -14,10 +14,14 @@ const productSchema = new mongoose.Schema({
     default: null,
     validate: {
       validator: function (value) {
-        return this.onSale ? value !== null && value < this.price : value === null;
+        // Only run validation when onSale is true
+        if (this.onSale) {
+          return value !== null && value < this.price;
+        }
+        return true; // Bypass validation if onSale is false
       },
       message: 'Sale price must be less than the original price when the product is on sale.',
-    },
+    }
   },
   description: {
     type: String,
@@ -66,4 +70,4 @@ productSchema.pre('save', function (next) {
 });
 
 const Product = mongoose.model('Product', productSchema);
-export default Product;
+export default Product;  
