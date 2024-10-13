@@ -12,7 +12,6 @@ import Orders from './pages/Orders';
 import Kategori from './pages/Kategori';
 import { CartProvider } from './context/CartContext'; 
 import { CheckoutModalProvider } from './context/CheckoutModalContext';
-import CheckoutModal from './components/CheckoutModal'; // Import the CheckoutModal
 import Footer from './components/Footer';
 
 function App() {
@@ -21,8 +20,7 @@ function App() {
       <CartProvider>
         <Router>
           <Header />
-          {/* Include the CheckoutModal so it's always available */}
-          <CheckoutModal />
+
           <Routes>
             {/* Home Route */}
             <Route path="/" element={<Home />} />

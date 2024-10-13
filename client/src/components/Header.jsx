@@ -108,7 +108,7 @@ const Header = () => {
                 <div className="ml-4 mr-2">
                   <ShoppingCart
                     cartItems={cart}
-                    handleCheckout={() => openCheckoutModal(cart, calculateTotalAmount())}
+                    handleCheckout={() => openCheckoutModal(cart)} // Only pass cart items, not totalAmount
                     removeFromCart={removeFromCart}
                   />
                 </div>
@@ -129,7 +129,7 @@ const Header = () => {
 
               {/* Mobile View */}
               <div className="flex md:hidden justify-between items-center pt-4">
-                <div className="flex items-center space-x-0"> 
+                <div className="flex items-center space-x-0">
                   <Disclosure.Button className="inline-flex items-center justify-center p-2 rounded-md text-black hover:text-violet-600 focus:outline-none">
                     <span className="sr-only">Open main menu</span>
                     {open ? (
@@ -154,7 +154,7 @@ const Header = () => {
 
                   <ShoppingCart
                     cartItems={cart}
-                    handleCheckout={() => openCheckoutModal(cart, calculateTotalAmount())}
+                    handleCheckout={() => openCheckoutModal(cart)} // Only pass cart items, not totalAmount
                     removeFromCart={removeFromCart}
                   />
                 </div>
@@ -163,9 +163,8 @@ const Header = () => {
 
             {location && (
               <div
-                className={`${
-                  location.pathname === '/' ? 'md:hidden lg:hidden' : ''
-                } bg-violet-100 w-full mt-4 md:mt-0 max-w-[90%] mx-auto`}
+                className={`${location.pathname === '/' ? 'md:hidden lg:hidden' : ''
+                  } bg-violet-100 w-full mt-4 md:mt-0 max-w-[90%] mx-auto`}
               >
                 <nav className="container mx-auto py-3">
                   <div className="flex justify-start items-start">

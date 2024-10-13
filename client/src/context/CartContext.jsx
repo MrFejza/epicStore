@@ -46,22 +46,25 @@ const clearCartIfExpired = () => {
 export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
 
-  // Load cart with timestamp when the app loads
+  // Load cart with timestamp when the app loads (runs only once)
   useEffect(() => {
     const savedCart = getCartWithTimestamp();
     if (savedCart) {
       setCart(savedCart);
     }
-  }, []);
+    console.log('Loaded cart from localStorage:', savedCart);
+  }, []); // Empty array ensures this runs only once on component mount
 
   // Save the cart and reset the timestamp every time the cart changes
   useEffect(() => {
     if (cart.length > 0) {
       saveCartWithTimestamp(cart); // Save cart and timestamp
+      console.log('Saving cart to localStorage:', cart);
     } else {
       localStorage.removeItem('cartItems'); // Remove cartItems token when cart is empty
+      console.log('Cart is empty, removing from localStorage');
     }
-  }, [cart]);
+  }, [cart]); // This runs only when `cart` changes
 
   // Add or update cart items with sale price if applicable
   const updateCart = (product, quantity) => {
@@ -99,7 +102,7 @@ export const CartProvider = ({ children }) => {
   useEffect(() => {
     const interval = setInterval(clearCartIfExpired, 60000); // Check every 1 minute
     return () => clearInterval(interval); // Cleanup on component unmount
-  }, []);
+  }, []); // Runs only once when component mounts
 
   return (
     <CartContext.Provider value={{ cart, updateCart, removeFromCart, clearCart }}>

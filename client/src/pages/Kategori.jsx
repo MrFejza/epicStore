@@ -13,9 +13,11 @@ import All from '../assets/TeGjitha.png';
 import New from '../assets/TeRejat.png';
 import Offers from '../assets/OfertaHero.png';
 import SearchImage from '../assets/Search.png'; // Import the Search image
+import EpicHero from '../assets/EpicHero.png';
 import WhatsAppButton from '../components/WhatsAppButton.jsx';
 import ServiceHighlights from '../components/ServiceHighlights.jsx';
 import ScrollToTopButton from '../components/ScrollToTopButton.jsx';
+
 
 const Kategori = () => {
   const { category } = useParams(); // Get the category from the URL params
@@ -43,8 +45,14 @@ const Kategori = () => {
     offers: Offers,
   };
 
-  // Ensure category match by applying toLowerCase and using a fallback (Home)
-  const categoryImage = query ? SearchImage : categoryImages[category] ; // Show Search image if query exists or fallback to 'Home'
+  // Ensure category match by applying toLowerCase and using a fallback (EpicHero)
+  // Use EpicHero for categories except 'all', 'new', 'offers', and 'search'
+  const categoryImage = query 
+    ? SearchImage 
+    : (category === 'all' || category === 'new' || category === 'offers') 
+      ? categoryImages[category] 
+      : EpicHero;
+
   const isAdmin = localStorage.getItem('isAdmin') === 'true'; // Check if user is an admin
 
   useEffect(() => {

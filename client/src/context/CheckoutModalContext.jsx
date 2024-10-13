@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 
 const CheckoutModalContext = createContext();
 
@@ -11,15 +11,24 @@ export const CheckoutModalProvider = ({ children }) => {
     email: '',
     phone: '',
     address: '',
-    cartItems: [],
+    cartItems: [], // Ensure cartItems is initialized as an empty array
+    totalAmount: 0, // Add totalAmount for consistency
   });
+
   const [errors, setErrors] = useState({});
-  
-  const openCheckoutModal = (cartItems) => {
-    setCheckoutData({ ...checkoutData, cartItems });
+
+  // Open the modal and set the cartItems and totalAmount
+  const openCheckoutModal = (cartItems = [], totalAmount = 0) => {
+    console.log('Opening checkout modal with:', { cartItems, totalAmount });
+    setCheckoutData({
+      ...checkoutData, // Preserve other data (name, email, etc.)
+      cartItems,       // Update cart items
+      totalAmount,     // Update total amount
+    });
     setIsCheckoutModalOpen(true);
   };
 
+  // Close the modal and reset the checkout data
   const closeCheckoutModal = () => {
     setIsCheckoutModalOpen(false);
     setCheckoutData({
@@ -27,11 +36,18 @@ export const CheckoutModalProvider = ({ children }) => {
       email: '',
       phone: '',
       address: '',
-      cartItems: [],
+      cartItems: [], // Reset cart items
+      totalAmount: 0, // Reset total amount
     });
     setErrors({});
   };
 
+  // Log the updated checkoutData for debugging
+  useEffect(() => {
+    console.log('Checkout data updated:', checkoutData);
+  }, [checkoutData]);
+
+  // Validate form fields before submitting
   const validateForm = () => {
     const newErrors = {};
     if (!checkoutData.name) newErrors.name = 'Emri është i detyrueshëm';
@@ -39,14 +55,16 @@ export const CheckoutModalProvider = ({ children }) => {
     if (!checkoutData.phone) newErrors.phone = 'Numri i telefonit është i detyrueshëm';
     if (!checkoutData.address) newErrors.address = 'Adresa është e detyrueshme';
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return Object.keys(newErrors).length === 0; // Return true if no errors
   };
 
+  // Handle form submission
   const handleSubmit = () => {
     if (validateForm()) {
-      // Add logic to handle submission
       console.log('Form is valid, processing checkout...');
-      // Notify Twilio or backend
+      // Add logic to send data to the backend (e.g., Twilio or your backend)
+    } else {
+      console.log('Form is invalid, cannot proceed to checkout.');
     }
   };
 

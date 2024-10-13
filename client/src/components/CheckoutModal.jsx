@@ -4,8 +4,9 @@ import { useState } from 'react';
 import axios from 'axios';
 
 const CheckoutModal = () => {
-  const { isModalOpen, closeCheckoutModal, cartItems, totalAmount } = useCheckoutModal();
+  const { isCheckoutModalOpen, closeCheckoutModal, checkoutData } = useCheckoutModal(); 
   const { clearCart } = useCart(); // Access clearCart from the cart context
+  const { cartItems, totalAmount } = checkoutData; // Destructure cartItems and totalAmount from checkoutData
   const [customerName, setCustomerName] = useState('');
   const [customerLastName, setCustomerLastName] = useState('');
   const [address, setAddress] = useState('');
@@ -68,20 +69,23 @@ const CheckoutModal = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
-
+  
     // Validate form before submitting
     if (!validateForm()) {
       setIsSubmitting(false);
       return;
     }
-
+  
+    // Ensure cartItems is a valid array before using .map
+    const validCartItems = Array.isArray(cartItems) ? cartItems : [];
+  
     const orderData = {
       customerName,
       customerLastName,
       address,
       phone: (prefix === 'AL' ? '+355' : '+383') + phone, // Apply Albania or Kosovo prefix
       email,
-      products: cartItems.map((item) => ({
+      products: validCartItems.map((item) => ({
         productId: item.product._id,
         productName: item.product.name,
         quantity: item.quantity,
@@ -90,17 +94,17 @@ const CheckoutModal = () => {
       })),
       totalAmount,
     };
-
+  
     try {
       // Submit the order to your backend
       await axios.post('/api/orders', orderData);
-
+  
       // Trigger WhatsApp message upon successful order submission
-      await axios.post('/api/send-whatsapp', orderData);
-
+      await axios.post('/api/whatsapp', orderData);
+  
       // Clear the cart after order submission
       clearCart();
-
+  
       // Reset the checkout modal inputs
       setCustomerName('');
       setCustomerLastName('');
@@ -108,7 +112,7 @@ const CheckoutModal = () => {
       setPhone('');
       setEmail('');
       setSuccessMessage('Porosia u vendos me sukses dhe njoftimi u dërgua!');
-
+  
       setIsSubmitting(false);
       closeCheckoutModal(); // Close the checkout modal
     } catch (error) {
@@ -118,7 +122,7 @@ const CheckoutModal = () => {
   };
 
   return (
-    isModalOpen && (
+    isCheckoutModalOpen && (
       <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
         <div
           className="bg-white w-11/12 md:w-1/3 p-6 rounded-lg shadow-lg relative"
@@ -135,11 +139,11 @@ const CheckoutModal = () => {
           {/* Cart Summary */}
           <div className="mb-4">
             <h3 className="text-xl font-semibold">Shporta Juaj</h3>
-            {cartItems.length === 0 ? (
+            {Array.isArray(cartItems) && cartItems.length === 0 ? (
               <p>Shporta është bosh.</p>
             ) : (
               <ul className="divide-y divide-gray-200">
-                {cartItems.map((item) => (
+                {Array.isArray(cartItems) && cartItems.map((item) => (
                   <li key={item.product._id} className="py-2">
                     {item.product.name} - {item.quantity} x 
                     {item.product.onSale && item.product.salePrice 
@@ -150,8 +154,9 @@ const CheckoutModal = () => {
                 ))}
               </ul>
             )}
+
             <div className="mt-4">
-              <h4 className="text-lg font-semibold">Total: {totalAmount} Lek</h4>
+              <h4 className="text-lg font-semibold">Total: {totalAmount ? `${totalAmount} Lek` : '0 Lek'}</h4>
             </div>
           </div>
 
@@ -202,28 +207,27 @@ const CheckoutModal = () => {
 
             {/* Phone Number with Prefix */}
             <div>
-  <label className="block text-sm font-medium text-gray-700">Numri i telefonit</label>
-  <div className="flex items-center space-x-2">
-    <select
-      value={prefix}
-      onChange={(e) => setPrefix(e.target.value)}
-      className="w-1/3 px-3 py-2 border rounded-l-md"
-    >
-      <option value="AL">AL (+355)</option>
-      <option value="KOS">KOS (+383)</option>
-    </select>
-    <input
-      type="text"
-      value={phone}
-      onChange={handlePhoneChange}
-      className="w-2/3 px-3 py-2 border rounded-r-md"
-      placeholder={prefix === 'AL' ? '+355 xx xxx xxxx' : '+383 xx xxx xxx'}
-      required
-    />
-  </div>
-  {errors.phone && <p className="text-red-600">{errors.phone}</p>}
-</div>
-
+              <label className="block text-sm font-medium text-gray-700">Numri i telefonit</label>
+              <div className="flex items-center space-x-2">
+                <select
+                  value={prefix}
+                  onChange={(e) => setPrefix(e.target.value)}
+                  className="w-1/3 px-3 py-2 border rounded-l-md"
+                >
+                  <option value="AL">AL (+355)</option>
+                  <option value="KOS">KOS (+383)</option>
+                </select>
+                <input
+                  type="text"
+                  value={phone}
+                  onChange={handlePhoneChange}
+                  className="w-2/3 px-3 py-2 border rounded-r-md"
+                  placeholder={prefix === 'AL' ? '+355 xx xxx xxxx' : '+383 xx xxx xxx'}
+                  required
+                />
+              </div>
+              {errors.phone && <p className="text-red-600">{errors.phone}</p>}
+            </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700">Email</label>
