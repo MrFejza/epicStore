@@ -227,7 +227,7 @@ const Information = () => {
 
         {/* Pass the product's category as a prop to RelatedProducts */}
         <div className="container mx-auto mt-5 p-6 max-w-[90%]">
-          <RelatedProducts category={product.category} />
+          <RelatedProducts category={product.category} currentProductId={product._id} />
         </div>
 
         <WhatsAppButton phoneNumber="+355683687387" />

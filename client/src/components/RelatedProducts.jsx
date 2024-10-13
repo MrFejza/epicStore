@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 
-const RelatedProducts = ({ category }) => {
+const RelatedProducts = ({ category, currentProductId }) => {
   const [relatedProducts, setRelatedProducts] = useState([]);
   const navigate = useNavigate();
 
@@ -10,11 +10,21 @@ const RelatedProducts = ({ category }) => {
     // Fetch products by category
     const fetchRelatedProducts = async () => {
       try {
-        const response = await axios.get(`/api/product?category=${category}`); // Fetch products from the same category
+        // Fetch products by the given category
+        const response = await axios.get(`/api/product?category=${category}`);
         const allProducts = response.data;
 
+        // Filter out the current product and products not in "Oferta" or "Të Rejat"
+        const filteredProducts = allProducts.filter(
+          (product) => 
+            product._id !== currentProductId && // Exclude the current product
+            product.category === category && 
+            product.category !== 'Oferta' && 
+            product.category !== 'Të Rejat'
+        );
+
         // Randomize the product list and pick 9 products
-        const shuffledProducts = allProducts.sort(() => 0.5 - Math.random());
+        const shuffledProducts = filteredProducts.sort(() => 0.5 - Math.random());
         setRelatedProducts(shuffledProducts.slice(0, 9)); // Show up to 9 related products
       } catch (error) {
         console.error('Error fetching related products:', error);
@@ -22,7 +32,7 @@ const RelatedProducts = ({ category }) => {
     };
 
     fetchRelatedProducts();
-  }, [category]);
+  }, [category, currentProductId]);
 
   const handleViewMore = () => {
     navigate(`/kategori/${category}`);
