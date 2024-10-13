@@ -34,29 +34,35 @@ const Upload = () => {
         return;
       }
     }
-
+  
+    // Ensure stock is selected
+    if (!stock) {
+      toast.error('Ju lutemi zgjidhni statusin e gjendjes për produktin.');
+      return;
+    }
+  
     const formData = new FormData();
-
+  
     formData.append('name', name);
     formData.append('price', price);
-
+  
     if (onSale && salePrice) {
       formData.append('salePrice', salePrice);
     }
-
+  
     formData.append('onSale', onSale);  // Ensures onSale is a boolean
     formData.append('description', description);
-
+  
     // Convert stock to boolean
     formData.append('stock', stock === 'in_stock');  // Ensures stock is true/false
-
+  
     formData.append('category', category);
     formData.append('popular', popular);  // Ensures popular is a boolean
-
+  
     selectedFiles.forEach((file) => {
       formData.append('image', file);
     });
-
+  
     try {
       const response = await axios.post('/api/product', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
@@ -69,7 +75,7 @@ const Upload = () => {
       setSalePrice('');
       setOnSale(false);
       setDescription('');
-      setStock('');
+      setStock('in_stock');  // Reset stock to default
       setCategory('');
       setPopular(false);
       setSelectedFiles([]);
@@ -78,6 +84,7 @@ const Upload = () => {
       toast.error(error?.response?.data?.message || error.message);
     }
   };
+  
 
   // Form submit handler
   const submitHandler = (e) => {
@@ -177,15 +184,15 @@ const Upload = () => {
                   required
                 >
                   <option value="">Zgjidh Kategorine</option>
-                  <option value="Electronics">Elektrike</option>
-                  <option value="Clothing">Rroba</option>
-                  <option value="Books">Libra</option>
-                  <option value="Home">Shtepi</option>
-                  <option value="Beauty">Beauty</option>
-                  <option value="Sports">Sport</option>
-                  <option value="Toys">Lodra</option>
-                  <option value="Food">Ushqim</option>
-                  <option value="Other">Tjeter</option>
+                  <option value="ProduktePerFemije">Produkte për Fëmijë</option>
+                  <option value="ElektronikeAksesore">Elektronikë dhe Aksesorë</option>
+                  <option value="ShtepiJetese">Shtëpi dhe Jetesë</option>
+                  <option value="ZyreTeknologji">Zyrë dhe Teknologji</option>
+                  <option value="SportAktivitet">Sport dhe Aktivitet në Natyrë</option>
+                  <option value="KuzhineUshqim">Kuzhinë dhe Ushqim</option>
+                  <option value="FestaEvente">Festa dhe Evente</option>
+                  <option value="Motorra">Motorra</option>
+                  <option value="Kafshë">Kafshë</option>
                 </select>
               </div>
 
@@ -249,4 +256,5 @@ const Upload = () => {
     </>
   );
 };
+
 export default Upload;

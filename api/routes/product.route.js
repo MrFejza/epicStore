@@ -144,7 +144,7 @@ router.put('/:id', upload, checkProductExists, async (req, res) => {
     product.price = price || product.price;
     product.description = description || product.description;
     product.image = images;
-    product.stock = stock === 'true' || product.stock;  // Convert stock to boolean
+    product.stock = stock === 'true' || stock === 'in_stock';  // Convert stock to boolean
     product.category = category || product.category;
     product.popular = popular !== undefined ? popular === 'true' : product.popular;
     product.onSale = onSale !== undefined ? onSale === 'true' : product.onSale;

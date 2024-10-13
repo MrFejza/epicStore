@@ -37,18 +37,18 @@ const Kategori = () => {
     home: Home,
     electronics: Elektronike,
     sports: Sport,
-    toys: Lodra,
+    produktePerFemije: Lodra,
     all: All,
     new: New,
     offers: Offers,
   };
 
   // Ensure category match by applying toLowerCase and using a fallback (Home)
-  const categoryImage = query ? SearchImage : categoryImages[category]; // Show Search image if query exists
+  const categoryImage = query ? SearchImage : categoryImages[category] ; // Show Search image if query exists or fallback to 'Home'
   const isAdmin = localStorage.getItem('isAdmin') === 'true'; // Check if user is an admin
 
   useEffect(() => {
-    // Fetch all products
+    // Fetch products by category
     const fetchProducts = async () => {
       try {
         const response = await axios.get('/api/product'); // Fetch all products
@@ -63,7 +63,7 @@ const Kategori = () => {
             product.description.toLowerCase().includes(query.toLowerCase())
           );
         } else if (category === 'offers') {
-          // Filter only products on sale
+          // Filter products that are on sale
           filteredProducts = allProducts.filter(product => product.onSale);
         } else if (category === 'new') {
           // Sort products by creation date (newest first)
@@ -71,10 +71,10 @@ const Kategori = () => {
             (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
           );
         } else if (category === 'all') {
-          // Randomize the products
+          // Display all products in a random order
           filteredProducts = allProducts.sort(() => 0.5 - Math.random());
         } else {
-          // For other categories, filter by the category name
+          // Filter by specific category from URL params
           filteredProducts = allProducts.filter(
             product => product.category.toLowerCase() === category.toLowerCase()
           );

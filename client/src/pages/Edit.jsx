@@ -59,18 +59,22 @@ const Edit = () => {
   };
 
   // Submit form and send all images (both existing and new) to the backend
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Frontend validation for salePrice
+  
+    // Frontend validation for salePrice and stock
     if (onSale && (!salePrice || parseFloat(salePrice) >= parseFloat(price))) {
       toast.error('Çmimi i ofertës duhet të jetë më i vogël se çmimi origjinal.');
       return;
     }
-
+    
+    if (!stock) {
+      toast.error('Ju lutemi zgjidhni statusin e gjendjes për produktin.');
+      return;
+    }
+  
     try {
       const formData = new FormData();
-
       formData.append('name', name);
       formData.append('price', price);
       if (onSale && salePrice) {
@@ -78,26 +82,27 @@ const Edit = () => {
       }
       formData.append('onSale', onSale);
       formData.append('description', description);
-      formData.append('stock', stock === 'in_stock');
+      formData.append('stock', stock === 'in_stock');  // Convert to boolean
       formData.append('category', category);
       formData.append('popular', popular);
-
-      // Append existing images and new images
+  
+      // Append images and send the request
       formData.append('existingImages', JSON.stringify(existingImages));
       newImages.forEach((file) => {
         formData.append('image', file);
       });
-
-      // Send request to update product
-      const config = { headers: { 'Content-Type': 'multipart/form-data' } };
-      await axios.put(`/api/product/${_id}`, formData, config);
-
+  
+      await axios.put(`/api/product/${_id}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+  
       toast.success('Produkti u përditësua me sukses');
       navigate(-1);  // Go back to the previous page
     } catch (error) {
       toast.error(error?.response?.data?.message || error.message);
     }
   };
+  
 
   if (loading) {
     return <div>Loading product data...</div>;
@@ -195,16 +200,16 @@ const Edit = () => {
                 onChange={(e) => setCategory(e.target.value)}
                 className="w-full p-3 border rounded-md"
               >
-                <option value="">Zgjidh Kategorine</option>
-                <option value="Electronics">Elektrike</option>
-                <option value="Clothing">Rroba</option>
-                <option value="Books">Libra</option>
-                <option value="Home">Shtepi</option>
-                <option value="Beauty">Beauty</option>
-                <option value="Sports">Sport</option>
-                <option value="Toys">Lodra</option>
-                <option value="Food">Ushqim</option>
-                <option value="Other">Tjeter</option>
+                  <option value="">Zgjidh Kategorine</option>
+                  <option value="ProduktePerFemije">Produkte për Fëmijë</option>
+                  <option value="ElektronikeAksesore">Elektronikë dhe Aksesorë</option>
+                  <option value="ShtepiJetese">Shtëpi dhe Jetesë</option>
+                  <option value="ZyreTeknologji">Zyrë dhe Teknologji</option>
+                  <option value="SportAktivitet">Sport dhe Aktivitet në Natyrë</option>
+                  <option value="KuzhineUshqim">Kuzhinë dhe Ushqim</option>
+                  <option value="FestaEvente">Festa dhe Evente</option>
+                  <option value="Motorra">Motorra</option>
+                  <option value="Kafshë">Kafshë</option>
               </select>
             </div>
 
@@ -285,7 +290,7 @@ const Edit = () => {
                   Perditso Produktin
                 </button>
                 <Link
-                  to="/dashboard/products"
+                  to=".."
                   className="bg-gray-500 w-full text-white font-bold py-3 px-6 rounded-md hover:bg-gray-700 transition-colors mt-2 inline-block"
                 >
                   Cancel

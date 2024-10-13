@@ -121,6 +121,7 @@ export const updateProduct = async (req, res) => {
       {
         ...req.body,
         image: [...updatedImages, ...newImages], // Combine new and existing images
+        stock: Boolean(req.body.stock), 
         onSale: Boolean(onSale), // Ensure onSale is treated as a boolean
         salePrice: onSale === 'true' || onSale === true ? salePrice : null, // Set salePrice to null if onSale is false
       },

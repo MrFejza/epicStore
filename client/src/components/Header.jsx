@@ -128,107 +128,37 @@ const Header = () => {
               </div>
 
               {/* Mobile View */}
-{/* Mobile View */}
-<div className="flex md:hidden justify-between items-center pt-4">
-  <div className="flex items-center space-x-0"> {/* Remove space-x to eliminate the gap */}
-    <Disclosure.Button className="inline-flex items-center justify-center p-2 rounded-md text-black hover:text-violet-600 focus:outline-none">
-      <span className="sr-only">Open main menu</span>
-      {open ? (
-        <XMarkIcon className="block h-8 w-8" aria-hidden="true" />
-      ) : (
-        <Bars3Icon className="block h-8 w-8" aria-hidden="true" />
-      )}
-    </Disclosure.Button>
+              <div className="flex md:hidden justify-between items-center pt-4">
+                <div className="flex items-center space-x-0"> 
+                  <Disclosure.Button className="inline-flex items-center justify-center p-2 rounded-md text-black hover:text-violet-600 focus:outline-none">
+                    <span className="sr-only">Open main menu</span>
+                    {open ? (
+                      <XMarkIcon className="block h-8 w-8" aria-hidden="true" />
+                    ) : (
+                      <Bars3Icon className="block h-8 w-8" aria-hidden="true" />
+                    )}
+                  </Disclosure.Button>
 
-    <Link to="/" className="flex-shrink-0">
-      <img className="h-24 w-auto" src={EpicStoreLogo} alt="Epic Store Logo" />
-    </Link>
-  </div>
-
-  <div className="flex items-center space-x-10">
-    <button
-      onClick={() => setShowSearch(!showSearch)}
-      className="text-4xl text-gray-800"
-    >
-      ⌕
-    </button>
-
-    <ShoppingCart
-      cartItems={cart}
-      handleCheckout={() => openCheckoutModal(cart, calculateTotalAmount())}
-      removeFromCart={removeFromCart}
-    />
-  </div>
-</div>
-
-
-              <Disclosure.Panel className="md:hidden">
-                {/* Mobile categories navigation */}
-                <div className=" m-0 p-2 pt-2 pb-3 space-y-1">
-                  <ul className="space-y-5 text-center">
-                    <li>
-                      <Link to="/kategori/new" className="text-gray-800">Të Rejat</Link>
-                    </li>
-                    <li>
-                      <Link to="/kategori/offers" className="text-gray-800">Oferta</Link>
-                    </li>
-                    <li>
-                      <Link to="/kategori/produkte-per-femije" className="text-gray-800">Produkte për Fëmijë</Link>
-                    </li>
-                    <li>
-                      <Link to="/kategori/elektronike-aksesore" className="text-gray-800">Elektronikë dhe Aksesorë</Link>
-                    </li>
-                    <li>
-                      <Link to="/kategori/shtepi-jetese" className="text-gray-800">Shtëpi dhe Jetesë</Link>
-                    </li>
-                    <li>
-                      <Link to="/kategori/zyre-teknologji" className="text-gray-800">Zyrë dhe Teknologji</Link>
-                    </li>
-                    <li>
-                      <Link to="/kategori/sport-aktivitet" className="text-gray-800">Sport dhe Aktivitet në Natyrë</Link>
-                    </li>
-                    <li>
-                      <Link to="/kategori/kuzhine-ushqim" className="text-gray-800">Kuzhinë dhe Ushqim</Link>
-                    </li>
-                    <li>
-                      <Link to="/kategori/festa-evente" className="text-gray-800">Festa dhe Evente</Link>
-                    </li>
-                    <li>
-                      <Link to="/kategori/motorra" className="text-gray-800">Motorra</Link>
-                    </li>
-                    <li>
-                      <Link to="/kategori/kafshe" className="text-gray-800">Kafshë</Link>
-                    </li>
-                    <li>
-                      <Link to="/kategori/all" className="text-gray-800">Të Gjitha</Link>
-                    </li>
-                  </ul>
+                  <Link to="/" className="flex-shrink-0">
+                    <img className="h-24 w-auto" src={EpicStoreLogo} alt="Epic Store Logo" />
+                  </Link>
                 </div>
-              </Disclosure.Panel>
 
-              {showSearch && (
-                <div className="flex justify-center items-center">
-                  <form onSubmit={handleSearch} className="w-full max-w-xs mt-2">
-                    <label htmlFor="mobile-search" className="sr-only">Search</label>
-                    <div className="relative">
-                      <input
-                        id="mobile-search"
-                        type="text"
-                        value={query}
-                        onChange={handleInputChange}
-                        placeholder="Kërko produkte..."
-                        className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-600"
-                      />
-                      <button onAbort={handleSearch}
-                        type="submit"
-                        className="absolute inset-y-0 pl-2 right-0 flex items-center pr-3 text-black bg-gray-200 hover:text-violet-600"
-                      >
-                        Kërko
-                      </button>
-                    </div>
-                  </form>
+                <div className="flex items-center space-x-10">
+                  <button
+                    onClick={() => setShowSearch(!showSearch)}
+                    className="text-4xl text-gray-800"
+                  >
+                    ⌕
+                  </button>
+
+                  <ShoppingCart
+                    cartItems={cart}
+                    handleCheckout={() => openCheckoutModal(cart, calculateTotalAmount())}
+                    removeFromCart={removeFromCart}
+                  />
                 </div>
-              )}
+              </div>
             </div>
 
             {location && (
@@ -247,31 +177,31 @@ const Header = () => {
                               <span className="cursor-pointer pl-6 py-3">Kategoritë</span>
                               <ul className="absolute left-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg hidden group-hover:block space-y-1">
                                 <li className="px-4 py-2 hover:bg-gray-100">
-                                  <Link to="/kategori/produkte-per-femije" className="text-gray-800">Produkte për Fëmijë</Link>
+                                  <Link to="/kategori/ProduktePerFemije" className="text-gray-800">Produkte për Fëmijë</Link>
                                 </li>
                                 <li className="px-4 py-2 hover:bg-gray-100">
-                                  <Link to="/kategori/elektronike-aksesore" className="text-gray-800">Elektronikë dhe Aksesorë</Link>
+                                  <Link to="/kategori/ElektronikeAksesore" className="text-gray-800">Elektronikë dhe Aksesorë</Link>
                                 </li>
                                 <li className="px-4 py-2 hover:bg-gray-100">
-                                  <Link to="/kategori/shtepi-jetese" className="text-gray-800">Shtëpi dhe Jetesë</Link>
+                                  <Link to="/kategori/ShtepiJetese" className="text-gray-800">Shtëpi dhe Jetesë</Link>
                                 </li>
                                 <li className="px-4 py-2 hover:bg-gray-100">
-                                  <Link to="/kategori/zyre-teknologji" className="text-gray-800">Zyrë dhe Teknologji</Link>
+                                  <Link to="/kategori/ZyreTeknologji" className="text-gray-800">Zyrë dhe Teknologji</Link>
                                 </li>
                                 <li className="px-4 py-2 hover:bg-gray-100">
-                                  <Link to="/kategori/sport-aktivitet" className="text-gray-800">Sport dhe Aktivitet në Natyrë</Link>
+                                  <Link to="/kategori/SportAktivitet" className="text-gray-800">Sport dhe Aktivitet në Natyrë</Link>
                                 </li>
                                 <li className="px-4 py-2 hover:bg-gray-100">
-                                  <Link to="/kategori/kuzhine-ushqim" className="text-gray-800">Kuzhinë dhe Ushqim</Link>
+                                  <Link to="/kategori/KuzhineUshqim" className="text-gray-800">Kuzhinë dhe Ushqim</Link>
                                 </li>
                                 <li className="px-4 py-2 hover:bg-gray-100">
-                                  <Link to="/kategori/festa-evente" className="text-gray-800">Festa dhe Evente</Link>
+                                  <Link to="/kategori/FestaEvente" className="text-gray-800">Festa dhe Evente</Link>
                                 </li>
                                 <li className="px-4 py-2 hover:bg-gray-100">
-                                  <Link to="/kategori/motorra" className="text-gray-800">Motorra</Link>
+                                  <Link to="/kategori/Motorra" className="text-gray-800">Motorra</Link>
                                 </li>
                                 <li className="px-4 py-2 hover:bg-gray-100">
-                                  <Link to="/kategori/kafshe" className="text-gray-800">Kafshë</Link>
+                                  <Link to="/kategori/Kafshe" className="text-gray-800">Kafshë</Link>
                                 </li>
                                 <li className="px-4 py-2 hover:bg-gray-100">
                                   <Link to="/kategori/all" className="text-gray-800 ">Të Gjitha</Link>

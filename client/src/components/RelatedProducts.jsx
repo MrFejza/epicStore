@@ -1,17 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const RelatedProducts = ({ category }) => {
   const [relatedProducts, setRelatedProducts] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Fetch products by category
     const fetchRelatedProducts = async () => {
       try {
-        const response = await axios.get(`/api/products?category=${category}`);
-        const shuffledProducts = response.data.sort(() => 0.5 - Math.random());
-        setRelatedProducts(shuffledProducts.slice(0, 9)); // Fetch up to 9 products
+        const response = await axios.get(`/api/product?category=${category}`); // Fetch products from the same category
+        const allProducts = response.data;
+
+        // Randomize the product list and pick 9 products
+        const shuffledProducts = allProducts.sort(() => 0.5 - Math.random());
+        setRelatedProducts(shuffledProducts.slice(0, 9)); // Show up to 9 related products
       } catch (error) {
         console.error('Error fetching related products:', error);
       }
@@ -33,22 +37,24 @@ const RelatedProducts = ({ category }) => {
       <h2 className="text-2xl font-bold mb-6">Produkte në të njëjtën kategori</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
         {relatedProducts.map((product) => (
-          <div key={product._id} className="border p-4 rounded-lg">
-            <img
-              src={`http://localhost:9000/${product.image}`}
-              alt={product.name}
-              className="w-full h-40 object-cover mb-2"
-            />
-            <h3 className="text-lg font-bold">{product.name}</h3>
-            {product.onSale ? (
-              <>
-                <span className="line-through text-red-600">{product.price} Lek</span>
-                <span className="text-green-600 ml-2">{product.salePrice} Lek</span>
-              </>
-            ) : (
-              <p>{product.price} Lek</p>
-            )}
-          </div>
+          <Link key={product._id} to={`/information/${product._id}`} className="border p-4 rounded-lg hover:shadow-lg transition-shadow">
+            <div>
+              <img
+                src={`http://localhost:9000/${product.image[0]}`}
+                alt={product.name}
+                className="w-full h-40 object-cover mb-2"
+              />
+              <h3 className="text-lg font-bold">{product.name}</h3>
+              {product.onSale ? (
+                <>
+                  <span className="line-through text-red-600">{product.price} Lek</span>
+                  <span className="text-green-600 ml-2">{product.salePrice} Lek</span>
+                </>
+              ) : (
+                <p>{product.price} Lek</p>
+              )}
+            </div>
+          </Link>
         ))}
       </div>
       <button
