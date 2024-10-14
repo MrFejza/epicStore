@@ -58,7 +58,7 @@ router.post('/', upload, async (req, res) => {
       });
     }
 
-    const { name, price, salePrice, description, stock, category, popular, onSale } = req.body;
+    const { name, price, salePrice, description, stock, category, popular, onSale, saleEndDate } = req.body;
     const filePaths = req.files.map(file => `uploads/${file.filename}`);
 
     // Validation: Sale price should be less than original price if on sale
@@ -78,7 +78,8 @@ router.post('/', upload, async (req, res) => {
       category,
       popular: popular === 'true',  // Ensure it's a boolean
       onSale: onSale === 'true',  // Ensure it's a boolean
-      salePrice: onSale === 'true' ? salePrice : null  // Set salePrice to null if not on sale
+      salePrice: onSale === 'true' ? salePrice : null,  // Set salePrice to null if not on sale
+      saleEndDate: onSale === 'true' && saleEndDate ? new Date(saleEndDate) : null  // Set saleEndDate if applicable
     });
 
     await newProduct.save();
@@ -96,10 +97,49 @@ router.post('/', upload, async (req, res) => {
 // Route to get all products
 router.get('/', async (req, res) => {
   try {
-    const products = await Product.find();
+    const { onSale, sort, order, random } = req.query;
+
+    let query = {};
+
+    // Filter by onSale if specified
+    if (onSale === 'true') {
+      query.onSale = true;
+    }
+
+    let productsQuery;
+
+    // Randomize products using MongoDB's $sample if random=true
+    if (random === 'true') {
+      productsQuery = await Product.aggregate([{ $sample: { size: 10 } }]); // Random 10 products
+    } else {
+      productsQuery = Product.find(query);
+
+      // Sorting by createdAt
+      if (sort === 'createdAt') {
+        const sortOrder = order === 'asc' ? 1 : -1;
+        productsQuery = productsQuery.sort({ createdAt: sortOrder });
+      }
+    }
+
+    // Fetch products from database
+    const products = await productsQuery;
+
+    // Check and update products with expired sales
+    const now = new Date();
+    products.forEach(async (product) => {
+      if (product.onSale && product.saleEndDate && new Date(product.saleEndDate) <= now) {
+        // Expired sale: update product to remove sale
+        product.onSale = false;
+        product.salePrice = null;
+        product.saleEndDate = null;
+        await product.save(); // Save the updated product to the database
+      }
+    });
+
     res.status(200).json(products);
   } catch (error) {
-    handleServerError(res, error, 'Error fetching products');
+    console.error('Error fetching products:', error.message, error.stack);
+    res.status(500).json({ message: 'Error fetching products', error: error.message });
   }
 });
 
@@ -123,7 +163,7 @@ router.get('/:id', async (req, res) => {
 router.put('/:id', upload, checkProductExists, async (req, res) => {
   try {
     const product = req.product;
-    const { name, price, salePrice, description, stock, category, popular, onSale } = req.body;
+    const { name, price, salePrice, description, stock, category, popular, onSale, saleEndDate } = req.body;
     
     const images = req.files && req.files.length > 0 ? req.files.map(file => `uploads/${file.filename}`) : product.image;
 
@@ -149,6 +189,7 @@ router.put('/:id', upload, checkProductExists, async (req, res) => {
     product.popular = popular !== undefined ? popular === 'true' : product.popular;
     product.onSale = onSale !== undefined ? onSale === 'true' : product.onSale;
     product.salePrice = onSale === 'true' ? salePrice : null;
+    product.saleEndDate = onSale === 'true' && saleEndDate ? new Date(saleEndDate) : null;
 
     await product.save();
 

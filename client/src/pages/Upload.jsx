@@ -10,6 +10,7 @@ const Upload = () => {
   const [price, setPrice] = useState('');
   const [salePrice, setSalePrice] = useState('');
   const [onSale, setOnSale] = useState(false);
+  const [saleEndDate, setSaleEndDate] = useState('');  // New state for sale end date
   const [description, setDescription] = useState('');
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [stock, setStock] = useState('');
@@ -31,6 +32,12 @@ const Upload = () => {
       }
       if (parseFloat(salePrice) >= parseFloat(price)) {
         toast.error('Çmimi i ofertës duhet të jetë më i vogël se çmimi origjinal.');
+        return;
+      }
+  
+      // Validate that saleEndDate is in the future
+      if (saleEndDate && new Date(saleEndDate) <= new Date()) {
+        toast.error('Data e përfundimit të ofertës duhet të jetë në të ardhmen.');
         return;
       }
     }
@@ -63,6 +70,11 @@ const Upload = () => {
       formData.append('image', file);
     });
   
+    // Append saleEndDate if the product is on sale and saleEndDate is set
+    if (onSale && saleEndDate) {
+      formData.append('saleEndDate', saleEndDate);
+    }
+  
     try {
       const response = await axios.post('/api/product', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
@@ -74,6 +86,7 @@ const Upload = () => {
       setPrice('');
       setSalePrice('');
       setOnSale(false);
+      setSaleEndDate('');  // Reset saleEndDate
       setDescription('');
       setStock('in_stock');  // Reset stock to default
       setCategory('');
@@ -85,7 +98,6 @@ const Upload = () => {
     }
   };
   
-
   // Form submit handler
   const submitHandler = (e) => {
     e.preventDefault();
@@ -148,17 +160,29 @@ const Upload = () => {
               </div>
 
               {onSale && (
-                <div className="mb-4">
-                  <label className="block text-gray-700 text-sm font-bold mb-2">Çmimi i Ofertës</label>
-                  <input
-                    type="number"
-                    placeholder="Vendos çmimin e ofertës"
-                    value={salePrice}
-                    onChange={(e) => setSalePrice(e.target.value)}
-                    className="w-full p-3 border rounded-md focus:outline-none focus:border-primary-deep"
-                    required
-                  />
-                </div>
+                <>
+                  <div className="mb-4">
+                    <label className="block text-gray-700 text-sm font-bold mb-2">Çmimi i Ofertës</label>
+                    <input
+                      type="number"
+                      placeholder="Vendos çmimin e ofertës"
+                      value={salePrice}
+                      onChange={(e) => setSalePrice(e.target.value)}
+                      className="w-full p-3 border rounded-md focus:outline-none focus:border-primary-deep"
+                      required
+                    />
+                  </div>
+
+                  <div className="mb-4">
+                    <label className="block text-gray-700 text-sm font-bold mb-2">Data dhe Ora e Përfundimit të Ofertës</label>
+                    <input
+                      type="datetime-local"
+                      value={saleEndDate}
+                      onChange={(e) => setSaleEndDate(e.target.value)}
+                      className="w-full p-3 border rounded-md focus:outline-none focus:border-primary-deep"
+                    />
+                  </div>
+                </>
               )}
 
               <div className="mb-4">

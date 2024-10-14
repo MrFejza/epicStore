@@ -14,11 +14,10 @@ const productSchema = new mongoose.Schema({
     default: null,
     validate: {
       validator: function (value) {
-        // Only run validation when onSale is true
         if (this.onSale) {
           return value !== null && value < this.price;
         }
-        return true; // Bypass validation if onSale is false
+        return true;
       },
       message: 'Sale price must be less than the original price when the product is on sale.',
     }
@@ -32,7 +31,7 @@ const productSchema = new mongoose.Schema({
     required: true,
     validate: {
       validator: function (value) {
-        return value.length > 0;  // Ensure the array has at least one image
+        return value.length > 0;
       },
       message: 'At least one image is required',
     },
@@ -41,7 +40,7 @@ const productSchema = new mongoose.Schema({
   stock: {
     type: Boolean,
     required: true,
-    default: true,  // Default to in stock
+    default: true,
   },
   category: {
     type: String,
@@ -57,6 +56,10 @@ const productSchema = new mongoose.Schema({
     required: true,
     default: false,
   },
+  saleEndDate: {
+    type: Date,
+    default: null,  // Optional, can be set for time-limited sales
+  },
 }, {
   timestamps: true,
 });
@@ -70,4 +73,4 @@ productSchema.pre('save', function (next) {
 });
 
 const Product = mongoose.model('Product', productSchema);
-export default Product;  
+export default Product;

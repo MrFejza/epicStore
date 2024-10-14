@@ -1,9 +1,10 @@
 import Product from '../models/product.model.js';
 
+
 // Create a new product
 export const createProduct = async (req, res) => {
   try {
-    const { name, price, description, stock, category, popular, onSale, salePrice } = req.body;
+    const { name, price, description, stock, category, popular, onSale, salePrice, saleEndDate } = req.body;
 
     // Ensure that the images are handled correctly if they exist
     const images = req.files ? req.files.map(file => `/uploads/${file.filename}`) : [];
@@ -23,6 +24,7 @@ export const createProduct = async (req, res) => {
       popular: popular === 'true',  // Ensure it's a boolean
       onSale: onSale === 'true',  // Ensure it's a boolean
       salePrice: onSale === 'true' && salePrice ? salePrice : null,  // Sale price if applicable
+      saleEndDate: onSale === 'true' && saleEndDate ? new Date(saleEndDate) : null  // Optional sale end date
     });
 
     await newProduct.save();
@@ -32,6 +34,7 @@ export const createProduct = async (req, res) => {
     res.status(500).json({ message: 'Error creating product', error: error.message });
   }
 };
+
 
 // Get all products, or filter by onSale, sort by createdAt, or randomize
 export const getProducts = async (req, res) => {
@@ -60,13 +63,28 @@ export const getProducts = async (req, res) => {
       }
     }
 
+    // Fetch products from database
     const products = await productsQuery;
+
+    // Check and update products with expired sales
+    const now = new Date();
+    products.forEach(async (product) => {
+      if (product.onSale && product.saleEndDate && new Date(product.saleEndDate) <= now) {
+        // Expired sale: update product to remove sale
+        product.onSale = false;
+        product.salePrice = null;
+        product.saleEndDate = null;
+        await product.save(); // Save the updated product to the database
+      }
+    });
+
     res.status(200).json(products);
   } catch (error) {
     console.error('Error fetching products:', error.message, error.stack);
     res.status(500).json({ message: 'Error fetching products', error: error.message });
   }
 };
+
 
 // Get products by category
 export const getProductsByCategory = async (req, res) => {
@@ -104,7 +122,7 @@ export const getProductById = async (req, res) => {
 // Update a product by ID
 export const updateProduct = async (req, res) => {
   try {
-    const { existingImages, removedImages = [], onSale, salePrice } = req.body;
+    const { existingImages, removedImages = [], onSale, salePrice, saleEndDate } = req.body;
     let newImages = [];
 
     // Handle new images
@@ -120,10 +138,11 @@ export const updateProduct = async (req, res) => {
       req.params.id,
       {
         ...req.body,
-        image: [...updatedImages, ...newImages], // Combine new and existing images
+        image: [...updatedImages, ...newImages],  // Combine new and existing images
         stock: Boolean(req.body.stock), 
-        onSale: Boolean(onSale), // Ensure onSale is treated as a boolean
-        salePrice: onSale === 'true' || onSale === true ? salePrice : null, // Set salePrice to null if onSale is false
+        onSale: Boolean(onSale),  // Ensure onSale is treated as a boolean
+        salePrice: onSale === 'true' || onSale === true ? salePrice : null,  // Set salePrice to null if onSale is false
+        saleEndDate: onSale === 'true' || onSale === true ? (saleEndDate ? new Date(saleEndDate) : null) : null,  // Set saleEndDate only if onSale is true
       },
       { new: true }
     );
@@ -152,3 +171,4 @@ export const deleteProduct = async (req, res) => {
     res.status(500).json({ message: 'Error deleting product', error: error.message });
   }
 };
+

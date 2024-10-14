@@ -10,6 +10,7 @@ import ElektronikaImage from '../assets/Elektronike.png';
 import WhatsAppButton from '../components/WhatsAppButton.jsx';
 import ServiceHighlights from '../components/ServiceHighlights.jsx';
 import ScrollToTopButton from '../components/ScrollToTopButton.jsx';
+import OfferSection from '../sections/OfferSection.jsx';
 
 const Carousel = ({ images, rtl = false }) => {
   const carouselSettings = {
@@ -95,55 +96,55 @@ const Home = () => {
         >
           {/* Hidden on phone, visible on small screens and larger */}
           <ul className="space-y-5 text-center overflow-auto hide-scrollbar">
-  <li className="relative group">
-    <Link to="/kategori/new" className="text-gray-800 group-hover:border-b-2 group-hover:border-violet-500">Të Rejat</Link>
-  </li>
-  <li className="relative group">
-    <Link to="/kategori/offers" className="text-gray-800 group-hover:border-b-2 group-hover:border-violet-500">Oferta</Link>
-  </li>
-  <li className="relative group">
-    <Link to="/kategori/ProduktePerFemije" className="text-gray-800 group-hover:border-b-2 group-hover:border-violet-500">Produkte për Fëmijë</Link>
-  </li>
-  <li className="relative group">
-    <Link to="/kategori/ElektronikeAksesore" className="text-gray-800 group-hover:border-b-2 group-hover:border-violet-500">Elektronikë dhe Aksesorë</Link>
-  </li>
-  <li className="relative group">
-    <Link to="/kategori/ShtepiJetese" className="text-gray-800 group-hover:border-b-2 group-hover:border-violet-500">Shtëpi dhe Jetesë</Link>
-  </li>
-  <li className="relative group">
-    <Link to="/kategori/ZyreTeknologji" className="text-gray-800 group-hover:border-b-2 group-hover:border-violet-500">Zyrë dhe Teknologji</Link>
-  </li>
-  <li className="relative group">
-    <Link to="/kategori/SportAktivitet" className="text-gray-800 group-hover:border-b-2 group-hover:border-violet-500">Sport dhe Aktivitete</Link>
-  </li>
-  {expanded && (
-    <>
-      <li className="relative group">
-        <Link to="/kategori/KuzhineUshqim" className="text-gray-800 group-hover:border-b-2 group-hover:border-violet-500">Kuzhinë dhe Ushqim</Link>
-      </li>
-      <li className="relative group">
-        <Link to="/kategori/FestaEvente" className="text-gray-800 group-hover:border-b-2 group-hover:border-violet-500">Festa dhe Evente</Link>
-      </li>
-      <li className="relative group">
-        <Link to="/kategori/Motorra" className="text-gray-800 group-hover:border-b-2 group-hover:border-violet-500">Motorra</Link>
-      </li>
-      <li className="relative group">
-        <Link to="/kategori/Kafshe" className="text-gray-800 group-hover:border-b-2 group-hover:border-violet-500">Kafshë</Link>
-      </li>
-      <li className="relative group">
-        <Link to="/kategori/all" className="text-gray-800 group-hover:border-b-2 group-hover:border-violet-500">Të Gjitha</Link>
-      </li>
-    </>
-  )}
-  <li>
-    <button
-      onClick={() => setExpanded(!expanded)}
-      className="text-violet-600 hover:text-violet-800"
-    >
-      {expanded ? 'Shfaq më pak' : 'Shfaq më shumë'}
-    </button>
-  </li>
-</ul>
+            <li className="relative group">
+              <Link to="/kategori/new" className="text-gray-800 group-hover:border-b-2 group-hover:border-violet-500">Të Rejat</Link>
+            </li>
+            <li className="relative group">
+              <Link to="/kategori/offers" className="text-gray-800 group-hover:border-b-2 group-hover:border-violet-500">Oferta</Link>
+            </li>
+            <li className="relative group">
+              <Link to="/kategori/ProduktePerFemije" className="text-gray-800 group-hover:border-b-2 group-hover:border-violet-500">Produkte për Fëmijë</Link>
+            </li>
+            <li className="relative group">
+              <Link to="/kategori/ElektronikeAksesore" className="text-gray-800 group-hover:border-b-2 group-hover:border-violet-500">Elektronikë dhe Aksesorë</Link>
+            </li>
+            <li className="relative group">
+              <Link to="/kategori/ShtepiJetese" className="text-gray-800 group-hover:border-b-2 group-hover:border-violet-500">Shtëpi dhe Jetesë</Link>
+            </li>
+            <li className="relative group">
+              <Link to="/kategori/ZyreTeknologji" className="text-gray-800 group-hover:border-b-2 group-hover:border-violet-500">Zyrë dhe Teknologji</Link>
+            </li>
+            <li className="relative group">
+              <Link to="/kategori/SportAktivitet" className="text-gray-800 group-hover:border-b-2 group-hover:border-violet-500">Sport dhe Aktivitete</Link>
+            </li>
+            {expanded && (
+              <>
+                <li className="relative group">
+                  <Link to="/kategori/KuzhineUshqim" className="text-gray-800 group-hover:border-b-2 group-hover:border-violet-500">Kuzhinë dhe Ushqim</Link>
+                </li>
+                <li className="relative group">
+                  <Link to="/kategori/FestaEvente" className="text-gray-800 group-hover:border-b-2 group-hover:border-violet-500">Festa dhe Evente</Link>
+                </li>
+                <li className="relative group">
+                  <Link to="/kategori/Motorra" className="text-gray-800 group-hover:border-b-2 group-hover:border-violet-500">Motorra</Link>
+                </li>
+                <li className="relative group">
+                  <Link to="/kategori/Kafshe" className="text-gray-800 group-hover:border-b-2 group-hover:border-violet-500">Kafshë</Link>
+                </li>
+                <li className="relative group">
+                  <Link to="/kategori/all" className="text-gray-800 group-hover:border-b-2 group-hover:border-violet-500">Të Gjitha</Link>
+                </li>
+              </>
+            )}
+            <li>
+              <button
+                onClick={() => setExpanded(!expanded)}
+                className="text-violet-600 hover:text-violet-800"
+              >
+                {expanded ? 'Shfaq më pak' : 'Shfaq më shumë'}
+              </button>
+            </li>
+          </ul>
 
         </div>
 
@@ -174,12 +175,15 @@ const Home = () => {
         <ServiceHighlights />
       </div>
 
+            <div>
+              <OfferSection /> 
+            </div>
       {/* WhatsApp Button that stays on the bottom-right corner */}
       <WhatsAppButton phoneNumber="+355683687387" />
       <ScrollToTopButton />
     </div>
 
-    
+
   );
 };
 

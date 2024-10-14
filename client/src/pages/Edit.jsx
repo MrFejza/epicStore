@@ -11,6 +11,7 @@ const Edit = () => {
   const [price, setPrice] = useState('');
   const [salePrice, setSalePrice] = useState('');
   const [onSale, setOnSale] = useState(false);
+  const [saleEndDate, setSaleEndDate] = useState(''); // New state for sale end date
   const [description, setDescription] = useState('');
   const [stock, setStock] = useState('');
   const [category, setCategory] = useState('');
@@ -30,6 +31,7 @@ const Edit = () => {
         setPrice(product.price);
         setSalePrice(product.salePrice || '');
         setOnSale(product.onSale || false);
+        setSaleEndDate(product.saleEndDate ? new Date(product.saleEndDate).toISOString().slice(0, 16) : ''); // Handle date formatting
         setDescription(product.description);
         setStock(product.stock ? 'in_stock' : 'out_of_stock');
         setCategory(product.category);
@@ -59,7 +61,7 @@ const Edit = () => {
   };
 
   // Submit form and send all images (both existing and new) to the backend
-const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
   
     // Frontend validation for salePrice and stock
@@ -67,7 +69,12 @@ const handleSubmit = async (e) => {
       toast.error('Çmimi i ofertës duhet të jetë më i vogël se çmimi origjinal.');
       return;
     }
-    
+  
+    if (onSale && saleEndDate && new Date(saleEndDate) <= new Date()) {
+      toast.error('Data e përfundimit të ofertës duhet të jetë në të ardhmen.');
+      return;
+    }
+  
     if (!stock) {
       toast.error('Ju lutemi zgjidhni statusin e gjendjes për produktin.');
       return;
@@ -85,6 +92,11 @@ const handleSubmit = async (e) => {
       formData.append('stock', stock === 'in_stock');  // Convert to boolean
       formData.append('category', category);
       formData.append('popular', popular);
+  
+      // Append saleEndDate if the product is on sale and saleEndDate is set
+      if (onSale && saleEndDate) {
+        formData.append('saleEndDate', saleEndDate);
+      }
   
       // Append images and send the request
       formData.append('existingImages', JSON.stringify(existingImages));
@@ -166,16 +178,28 @@ const handleSubmit = async (e) => {
             </div>
 
             {onSale && (
-              <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2">Çmimi i Ofertës</label>
-                <input
-                  type="number"
-                  value={salePrice}
-                  onChange={(e) => setSalePrice(e.target.value)}
-                  placeholder="Enter sale price"
-                  className="w-full p-3 border rounded-md focus:outline-none focus:border-primary-deep"
-                />
-              </div>
+              <>
+                <div className="mb-4">
+                  <label className="block text-gray-700 text-sm font-bold mb-2">Çmimi i Ofertës</label>
+                  <input
+                    type="number"
+                    value={salePrice}
+                    onChange={(e) => setSalePrice(e.target.value)}
+                    placeholder="Enter sale price"
+                    className="w-full p-3 border rounded-md focus:outline-none focus:border-primary-deep"
+                  />
+                </div>
+
+                <div className="mb-4">
+                  <label className="block text-gray-700 text-sm font-bold mb-2">Data dhe Ora e Përfundimit të Ofertës</label>
+                  <input
+                    type="datetime-local"
+                    value={saleEndDate}
+                    onChange={(e) => setSaleEndDate(e.target.value)}
+                    className="w-full p-3 border rounded-md focus:outline-none focus:border-primary-deep"
+                  />
+                </div>
+              </>
             )}
 
             {/* Stock */}
@@ -200,16 +224,16 @@ const handleSubmit = async (e) => {
                 onChange={(e) => setCategory(e.target.value)}
                 className="w-full p-3 border rounded-md"
               >
-                  <option value="">Zgjidh Kategorine</option>
-                  <option value="ProduktePerFemije">Produkte për Fëmijë</option>
-                  <option value="ElektronikeAksesore">Elektronikë dhe Aksesorë</option>
-                  <option value="ShtepiJetese">Shtëpi dhe Jetesë</option>
-                  <option value="ZyreTeknologji">Zyrë dhe Teknologji</option>
-                  <option value="SportAktivitet">Sport dhe Aktivitet në Natyrë</option>
-                  <option value="KuzhineUshqim">Kuzhinë dhe Ushqim</option>
-                  <option value="FestaEvente">Festa dhe Evente</option>
-                  <option value="Motorra">Motorra</option>
-                  <option value="Kafshë">Kafshë</option>
+                <option value="">Zgjidh Kategorine</option>
+                <option value="ProduktePerFemije">Produkte për Fëmijë</option>
+                <option value="ElektronikeAksesore">Elektronikë dhe Aksesorë</option>
+                <option value="ShtepiJetese">Shtëpi dhe Jetesë</option>
+                <option value="ZyreTeknologji">Zyrë dhe Teknologji</option>
+                <option value="SportAktivitet">Sport dhe Aktivitet në Natyrë</option>
+                <option value="KuzhineUshqim">Kuzhinë dhe Ushqim</option>
+                <option value="FestaEvente">Festa dhe Evente</option>
+                <option value="Motorra">Motorra</option>
+                <option value="Kafshë">Kafshë</option>
               </select>
             </div>
 
@@ -221,87 +245,86 @@ const handleSubmit = async (e) => {
                 checked={popular}
                 onChange={(e) => setPopular(e.target.checked)}
                 className="p-3 border rounded-md focus:outline-none focus:border-primary-deep"
-                />
-                <span className="ml-2 text-sm text-gray-700">Perzgjedhe si shume e shitur</span>
+              />
+              <span className="ml-2 text-sm text-gray-700">Perzgjedhe si shume e shitur</span>
+            </div>
+
+            {/* Image upload and existing images display */}
+            <div className="mb-4">
+              <label className="block text-gray-700 text-sm font-bold mb-2">Imazhe</label>
+              <input
+                type="file"
+                onChange={handleFileChange}
+                multiple
+                className="w-full p-3 border rounded-md focus:outline-none focus:border-primary-deep mt-2"
+              />
+
+              {/* Display existing images */}
+              <div className="mt-2 grid grid-cols-3 gap-4">
+                {existingImages.map((img, index) => (
+                  <div key={`existing-${index}`} className="relative">
+                    <img
+                      src={`http://localhost:9000/${img}`}
+                      className="w-full h-auto rounded-md border border-gray-300"
+                      alt={`Existing Product ${index}`}
+                    />
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleRemoveExistingImage(index);
+                      }}
+                      className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
               </div>
-  
-              {/* Image upload and existing images display */}
-              <div className="mb-4">
-                <label className="block text-gray-700 text-sm font-bold mb-2">Imazhe</label>
-                <input
-                  type="file"
-                  onChange={handleFileChange}
-                  multiple
-                  className="w-full p-3 border rounded-md focus:outline-none focus:border-primary-deep mt-2"
-                />
-  
-                {/* Display existing images */}
-                <div className="mt-2 grid grid-cols-3 gap-4">
-                  {existingImages.map((img, index) => (
-                    <div key={`existing-${index}`} className="relative">
-                      <img
-                        src={`http://localhost:9000/${img}`}
-                        className="w-full h-auto rounded-md border border-gray-300"
-                        alt={`Existing Product ${index}`}
-                      />
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleRemoveExistingImage(index);
-                        }}
-                        className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  ))}
-                </div>
-  
-                {/* Display selected new images */}
-                <div className="mt-2 grid grid-cols-3 gap-4">
-                  {newImages.map((file, index) => (
-                    <div key={`new-${index}`} className="relative">
-                      <img
-                        src={URL.createObjectURL(file)}
-                        className="w-full h-auto rounded-md border border-gray-300"
-                        alt={`New Product ${index}`}
-                      />
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleRemoveNewImage(index);
-                        }}
-                        className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  ))}
-                </div>
+
+              {/* Display selected new images */}
+              <div className="mt-2 grid grid-cols-3 gap-4">
+                {newImages.map((file, index) => (
+                  <div key={`new-${index}`} className="relative">
+                    <img
+                      src={URL.createObjectURL(file)}
+                      className="w-full h-auto rounded-md border border-gray-300"
+                      alt={`New Product ${index}`}
+                    />
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleRemoveNewImage(index);
+                      }}
+                      className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                ))}
               </div>
-  
-              <div className="text-center">
-                <button
-                  type="submit"
-                  className="bg-gray-500 w-full text-white font-bold py-3 px-6 rounded-md hover:bg-primary-dark transition-colors"
-                >
-                  Perditso Produktin
-                </button>
-                <Link
-                  to=".."
-                  className="bg-gray-500 w-full text-white font-bold py-3 px-6 rounded-md hover:bg-gray-700 transition-colors mt-2 inline-block"
-                >
-                  Cancel
-                </Link>
-              </div>
-            </form>
-          </div>
+            </div>
+
+            <div className="text-center">
+              <button
+                type="submit"
+                className="bg-gray-500 w-full text-white font-bold py-3 px-6 rounded-md hover:bg-primary-dark transition-colors"
+              >
+                Perditso Produktin
+              </button>
+              <Link
+                to=".."
+                className="bg-gray-500 w-full text-white font-bold py-3 px-6 rounded-md hover:bg-gray-700 transition-colors mt-2 inline-block"
+              >
+                Cancel
+              </Link>
+            </div>
+          </form>
         </div>
       </div>
-    );
-  };
-  
-  export default Edit;
-  
+    </div>
+  );
+};
+
+export default Edit;

@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import { useCart } from '../context/CartContext';
 
 const ProductModal = ({ product, onClose }) => {
@@ -6,18 +6,20 @@ const ProductModal = ({ product, onClose }) => {
   const [quantity, setQuantity] = useState(1);
 
   if (!product) {
-    // Return null or a loading indicator if product is not available
-    return null;
+    return null; // Return null or a loading indicator if product is not available
   }
 
   const handleAddToCart = () => {
-    updateCart(product, quantity);
+    const validQuantity = parseInt(quantity) > 0 ? parseInt(quantity) : 1; // Ensure the quantity is valid
+    updateCart(product, validQuantity); // Pass valid quantity to cart
     onClose(); // Close the modal after adding the product to the cart
   };
 
   const handleQuantityChange = (e) => {
-    const value = parseInt(e.target.value);
-    setQuantity(value > 0 ? value : 1); // Ensure quantity is always 1 or more
+    const value = e.target.value;
+    if (value === '' || parseInt(value) > 0) {
+      setQuantity(value); // Allow empty value but ensure it's a positive number
+    }
   };
 
   return (

@@ -38,7 +38,6 @@ const ShoppingCart = () => {
     console.log('Total Amount:', total);
     return total;
   };
-  
 
   // Proceed to checkout
   const proceedToCheckout = () => {
@@ -47,8 +46,6 @@ const ShoppingCart = () => {
     toggleCart(); // Close the cart modal
     openCheckoutModal(cart, totalAmount);  // Pass cart and total amount to the modal
   };
-  
-
 
   return (
     <div>
@@ -74,32 +71,45 @@ const ShoppingCart = () => {
             </button>
             <h2 className="text-2xl font-bold mb-4">Shporta juaj</h2>
             {cart.length === 0 ? (
-  <p className="text-gray-600">Shporta eshte bosh.</p>
-) : (
-  <ul className="divide-y divide-gray-200">
-    {cart.map((item) => (
-      <li key={item.product._id} className="py-4 flex justify-between items-center">
-        <div className="flex flex-col">
-          <span>{item.product.name}</span>
-          <div className="flex items-center mt-2">
-            {/* Buttons for increasing/decreasing quantity */}
-          </div>
-        </div>
-        <div className="flex flex-col items-end">
-          <span>
-            {(item.product.onSale && item.product.salePrice ? item.product.salePrice : item.product.price) * item.quantity} Lek
-          </span>
-          <button
-            onClick={() => removeFromCart(item.product._id)}
-            className="mt-2 bg-red-500 text-white px-2 py-1 rounded-md hover:bg-red-600"
-          >
-            Hiq nga Shporta
-          </button>
-        </div>
-      </li>
-    ))}
-  </ul>
-)}
+              <p className="text-gray-600">Shporta eshte bosh.</p>
+            ) : (
+              <ul className="divide-y divide-gray-200">
+                {cart.map((item) => (
+                  <li key={item.product._id} className="py-4 flex justify-between items-center">
+                    <div className="flex flex-col">
+                      <span>{item.product.name}</span>
+                      <div className="flex items-center mt-2">
+                        {/* Buttons for increasing/decreasing quantity */}
+                        <button
+                          onClick={() => decreaseQuantity(item.product._id)}
+                          className="bg-gray-300 text-black px-2 py-1 rounded-md hover:bg-gray-400"
+                        >
+                          -
+                        </button>
+                        <span className="mx-2">{item.quantity}</span>
+                        <button
+                          onClick={() => increaseQuantity(item.product._id)}
+                          className="bg-gray-300 text-black px-2 py-1 rounded-md hover:bg-gray-400"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                    <div className="flex flex-col items-end">
+                      <span>
+                        {(item.product.onSale && item.product.salePrice ? item.product.salePrice : item.product.price) * item.quantity} Lek
+                      </span>
+                      <button
+                        onClick={() => removeFromCart(item.product._id)}
+                        className="mt-2 bg-red-500 text-white px-2 py-1 rounded-md hover:bg-red-600"
+                      >
+                        Hiq nga Shporta
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
 
             <div className="mt-4 text-right">
               <h3 className="text-xl font-semibold">Totali: {getTotalAmount().toFixed(2)} Lek</h3>
