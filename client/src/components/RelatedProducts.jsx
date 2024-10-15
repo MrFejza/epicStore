@@ -17,7 +17,7 @@ const RelatedProducts = ({ category, currentProductId }) => {
         // Filter out the current product and products not in "Oferta" or "Të Rejat"
         const filteredProducts = allProducts.filter(
           (product) => 
-            product._id !== currentProductId && // Exclude the current product
+            product._id !== currentProductId && 
             product.category === category && 
             product.category !== 'Oferta' && 
             product.category !== 'Të Rejat'
@@ -69,7 +69,7 @@ const RelatedProducts = ({ category, currentProductId }) => {
       </div>
       <button
         onClick={handleViewMore}
-        className="mt-6 bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600"
+        className="mt-6 bg-violet-500 text-white py-2 px-4 rounded-lg hover:bg-violet-600"
       >
         Shiko më shumë
       </button>

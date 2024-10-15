@@ -163,7 +163,7 @@ const Header = () => {
 
             {location && (
               <div
-                className={`${location.pathname === '/' ? 'md:hidden lg:hidden' : ''
+                className={`${location.pathname === '/' || `/kategori/:category` ? 'md:hidden lg:hidden' : ''
                   } bg-violet-100 w-full mt-4 md:mt-0 max-w-[90%] mx-auto`}
               >
                 <nav className="container mx-auto py-3">

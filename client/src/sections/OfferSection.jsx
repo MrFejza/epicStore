@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import Background from '../assets/OfertaBg.png';
+import Background from '../assets/OfertaBg.jpg';
 
 const OfferSection = () => {
   const [offers, setOffers] = useState([]);
@@ -75,7 +75,7 @@ const OfferSection = () => {
       
       {/* First Div: "Kapni Oferten" and Button */}
       <div className="w-full text-left mb-8 mt-16 ml-5 md:ml-20 flex flex-col items-start">
-        <h1 className="text-3xl md:text-5xl text-gray-800 font-bold">Kapni Ofertën</h1>
+        <h1 className="text-3xl md:text-5xl text-gray-800 font-bold bg-white bg-opacity-50 rounded-2xl p-2">Kapni Ofertën</h1>
         <Link to="/kategori/offers" className="mt-4 bg-violet-800 hover:bg-violet-500 text-white px-4 py-2 rounded">
           Shiko më shumë
         </Link>

@@ -1,88 +1,67 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, Link, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import ProductModal from '../components/ProductModal';
 import { useCart } from '../context/CartContext';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
-import Sale from '../assets/SaleTag.png'; // Import the SaleTag image
-import Home from '../assets/HomeHero.png';
-import Elektronike from '../assets/ElektronikeHero.png';
-import Sport from '../assets/SportHero.png';
-import Lodra from '../assets/ToysHero.png';
-import All from '../assets/TeGjitha.png';
+import Sale from '../assets/SaleTag.png';
 import New from '../assets/TeRejat.png';
 import Offers from '../assets/OfertaHero.png';
-import SearchImage from '../assets/Search.png'; // Import the Search image
-import EpicHero from '../assets/EpicHero.png';
+import SearchImage from '../assets/Search.png';
 import WhatsAppButton from '../components/WhatsAppButton.jsx';
 import ServiceHighlights from '../components/ServiceHighlights.jsx';
 import ScrollToTopButton from '../components/ScrollToTopButton.jsx';
-
+import OtherCategoryCarousel from '../components/OtherCategoryCarousel'; // Import carousel
+import Navigation from '../components/Navigation'; // Import Navigation component
 
 const Kategori = () => {
-  const { category } = useParams(); // Get the category from the URL params
+  const { category } = useParams();
   const location = useLocation();
-  const navigate = useNavigate(); // For redirecting during edit
-  const { updateCart } = useCart(); // Context for updating the shopping cart
-  const [products, setProducts] = useState([]); // State for holding the fetched products
-  const [loading, setLoading] = useState(true); // State for loading indicator
-  const [selectedProduct, setSelectedProduct] = useState(null); // State for modal product
-  const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
-  const [currentPage, setCurrentPage] = useState(1); // State for pagination
-  const productsPerPage = 9; // Number of products per page
+  const navigate = useNavigate();
+  const { updateCart } = useCart();
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const productsPerPage = 9;
+  const [expanded, setExpanded] = useState(false); // State for expanded navigation
+  const [navHeight, setNavHeight] = useState('auto'); // State for navigation height
+  const carouselRef = useRef(null); // Ref for the carousel
 
-  // Get the search query from URL parameters (if any)
   const query = new URLSearchParams(location.search).get('query') || '';
+  const isAdmin = localStorage.getItem('isAdmin') === 'true';
 
-  // Map the categories to their respective images
   const categoryImages = {
-    home: Home,
-    electronics: Elektronike,
-    sports: Sport,
-    produktePerFemije: Lodra,
-    all: All,
     new: New,
     offers: Offers,
+    search: SearchImage,
   };
 
-  // Ensure category match by applying toLowerCase and using a fallback (EpicHero)
-  // Use EpicHero for categories except 'all', 'new', 'offers', and 'search'
-  const categoryImage = query 
-    ? SearchImage 
-    : (category === 'all' || category === 'new' || category === 'offers') 
-      ? categoryImages[category] 
-      : EpicHero;
-
-  const isAdmin = localStorage.getItem('isAdmin') === 'true'; // Check if user is an admin
+  const displayImage = query ? SearchImage : categoryImages[category];
 
   useEffect(() => {
-    // Fetch products by category
     const fetchProducts = async () => {
       try {
-        const response = await axios.get('/api/product'); // Fetch all products
+        const response = await axios.get('/api/product');
         const allProducts = response.data;
 
         let filteredProducts = allProducts;
 
         if (query) {
-          // If there's a search query, filter products based on name and description
           filteredProducts = allProducts.filter(product =>
             product.name.toLowerCase().includes(query.toLowerCase()) ||
             product.description.toLowerCase().includes(query.toLowerCase())
           );
         } else if (category === 'offers') {
-          // Filter products that are on sale
           filteredProducts = allProducts.filter(product => product.onSale);
         } else if (category === 'new') {
-          // Sort products by creation date (newest first)
           filteredProducts = allProducts.sort(
             (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
           );
         } else if (category === 'all') {
-          // Display all products in a random order
           filteredProducts = allProducts.sort(() => 0.5 - Math.random());
         } else {
-          // Filter by specific category from URL params
           filteredProducts = allProducts.filter(
             product => product.category.toLowerCase() === category.toLowerCase()
           );
@@ -99,59 +78,87 @@ const Kategori = () => {
     fetchProducts();
   }, [category, query]);
 
-  // Handle when the "Add to Cart" button is clicked
+  // Update navigation height based on the carousel height
+  useEffect(() => {
+    if (carouselRef.current) {
+      const carouselHeight = carouselRef.current.offsetHeight;
+      setNavHeight(`${carouselHeight}px`); // Set the navigation height to match the carousel
+    }
+  }, [expanded, products]); // Recalculate when expanded or products change
+
   const handleAddToCartClick = product => {
     setSelectedProduct(product);
     setIsModalOpen(true);
   };
 
-  // Handle closing the modal
+  useEffect(() => {
+    const styleTag = document.createElement('style');
+    styleTag.innerHTML = `
+      .hide-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+    `;
+    document.head.appendChild(styleTag);
+
+    return () => {
+      document.head.removeChild(styleTag);
+    };
+  }, []);
+
   const handleModalClose = () => {
     setIsModalOpen(false);
     setSelectedProduct(null);
   };
 
-  // Handle confirming the product addition to the cart from the modal
   const handleConfirmAddToCart = (product, quantity) => {
-    updateCart(product, quantity); // Update the cart context
-    handleModalClose(); // Close the modal after adding the product to the cart
+    updateCart(product, quantity);
+    handleModalClose();
   };
 
-  // Handle editing the product (for admins)
   const editProduct = product => {
-    navigate(`/edit/${product._id}`); // Navigate to the edit page for the product
+    navigate(`/edit/${product._id}`);
   };
 
-  // Handle deleting a product (for admins)
   const deleteProduct = async product => {
     const confirmDelete = window.confirm('Are you sure you want to delete this product?');
     if (confirmDelete) {
       try {
-        await axios.delete(`/api/product/${product._id}`); // Delete the product from the backend
-        setProducts(prevProducts => prevProducts.filter(p => p._id !== product._id)); // Remove the product from the state
+        await axios.delete(`/api/product/${product._id}`);
+        setProducts(prevProducts => prevProducts.filter(p => p._id !== product._id));
       } catch (error) {
         console.error('Error deleting product:', error);
       }
     }
   };
 
-  // Calculate pagination-related variables
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
-  const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct); // Slice the products for pagination
-  const totalPages = Math.ceil(products.length / productsPerPage); // Calculate the total number of pages
+  const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
+  const totalPages = Math.ceil(products.length / productsPerPage);
 
   return (
-    <div className="container mx-auto px-10 py-8">
+    <div className="container mx-auto px-10 py-8 max-w-[90%]">
       {loading && <div className="mx-auto text-xl">Loading products...</div>}
 
-      {/* Category or Search Image */}
-      <div className="mb-8 text-center">
-        <img
-          src={categoryImage}
-          alt={query ? 'Search Results' : `Category: ${category.toLocaleLowerCase()}`}
-          className="max-h-[500px] w-full max-w-[80%] mx-auto"
-        />
+      {/* Grid Layout for Navigation and Carousel */}
+      <div className="grid grid-cols-11 gap-4">
+        {/* Left Side Navigation */}
+        <Navigation expanded={expanded} setExpanded={setExpanded} navHeight={navHeight} />
+
+        {/* Right Side Carousel */}
+        <div className="col-span-9" ref={carouselRef}>
+          {displayImage ? (
+            <div className="mb-8 text-center">
+              <img
+                src={displayImage}
+                alt={query ? 'Search Results' : `Category: ${category}`}
+                className="max-h-[500px] w-full max-w-[80%] mx-auto"
+              />
+            </div>
+          ) : (
+            <OtherCategoryCarousel currentCategory={category.toLocaleLowerCase()} />
+          )}
+        </div>
       </div>
 
       <div>
@@ -166,10 +173,9 @@ const Kategori = () => {
               className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 relative"
             >
               <Link to={`/information/${product._id}`}>
-                {/* Sale tag on top-right if the product is on sale */}
                 {product.onSale && (
                   <img
-                    src={Sale} // SaleTag image
+                    src={Sale}
                     alt="Sale"
                     className="absolute top-0 right-0 h-36 w-36"
                   />
@@ -252,7 +258,7 @@ const Kategori = () => {
           {currentPage > 1 && (
             <button
               onClick={() => setCurrentPage(currentPage - 1)}
-              className="bg-gray-800 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-full mr-2"
+              className="bg-violet-950 hover:bg-violet-600 text-white font-bold py-2 px-4 rounded-full mr-2"
             >
               <ChevronLeftIcon className="h-6 w-6 text-white" />
             </button>
@@ -263,7 +269,7 @@ const Kategori = () => {
           {currentPage < totalPages && (
             <button
               onClick={() => setCurrentPage(currentPage + 1)}
-              className="bg-gray-800 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-full ml-2"
+              className="bg-violet-950 hover:bg-violet-600 text-white font-bold py-2 px-4 rounded-full ml-2"
             >
               <ChevronRightIcon className="h-6 w-6 text-white" />
             </button>
