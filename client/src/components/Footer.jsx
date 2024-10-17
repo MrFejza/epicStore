@@ -35,7 +35,7 @@ const Footer = () => {
           {/* Column 3: Footer Links */}
           <div className="flex flex-col space-y-2">
             <h3 className="font-bold text-lg">Quick Links</h3>
-            <a href="/about" className="hover:underline">About Us</a>
+            <a href="/faq" className="hover:underline">Pyetje dhe Përgjigje</a>
             <a href="/contact" className="hover:underline">Contact</a>
             <a href="/privacy-policy" className="hover:underline">Privacy Policy</a>
             <a href="/terms" className="hover:underline">Terms & Conditions</a>

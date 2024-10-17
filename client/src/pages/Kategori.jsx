@@ -11,8 +11,8 @@ import SearchImage from '../assets/Search.png';
 import WhatsAppButton from '../components/WhatsAppButton.jsx';
 import ServiceHighlights from '../components/ServiceHighlights.jsx';
 import ScrollToTopButton from '../components/ScrollToTopButton.jsx';
-import OtherCategoryCarousel from '../components/OtherCategoryCarousel'; // Import carousel
-import Navigation from '../components/Navigation'; // Import Navigation component
+import OtherCategoryCarousel from '../components/OtherCategoryCarousel'; 
+import Navigation from '../components/Navigation'; 
 
 const Kategori = () => {
   const { category } = useParams();
@@ -25,9 +25,10 @@ const Kategori = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 9;
-  const [expanded, setExpanded] = useState(false); // State for expanded navigation
-  const [navHeight, setNavHeight] = useState('auto'); // State for navigation height
-  const carouselRef = useRef(null); // Ref for the carousel
+  const [expanded, setExpanded] = useState(false); 
+  const [navHeight, setNavHeight] = useState('auto');
+  const carouselRef = useRef(null); 
+  const productSectionRef = useRef(null); // Ref to scroll to products section
 
   const query = new URLSearchParams(location.search).get('query') || '';
   const isAdmin = localStorage.getItem('isAdmin') === 'true';
@@ -40,6 +41,7 @@ const Kategori = () => {
 
   const displayImage = query ? SearchImage : categoryImages[category];
 
+  // Fetch products based on category or query
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -78,18 +80,19 @@ const Kategori = () => {
     fetchProducts();
   }, [category, query]);
 
-  // Update navigation height based on the carousel height
+  // Scroll to products section after ServiceHighlights when products change
+  useEffect(() => {
+    if (productSectionRef.current) {
+      productSectionRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [products]); // Only scroll when products change
+
   useEffect(() => {
     if (carouselRef.current) {
       const carouselHeight = carouselRef.current.offsetHeight;
-      setNavHeight(`${carouselHeight}px`); // Set the navigation height to match the carousel
+      setNavHeight(`${carouselHeight}px`);
     }
-  }, [expanded, products]); // Recalculate when expanded or products change
-
-  const handleAddToCartClick = product => {
-    setSelectedProduct(product);
-    setIsModalOpen(true);
-  };
+  }, [expanded, products]);
 
   useEffect(() => {
     const styleTag = document.createElement('style');
@@ -104,6 +107,11 @@ const Kategori = () => {
       document.head.removeChild(styleTag);
     };
   }, []);
+  
+  const handleAddToCartClick = product => {
+    setSelectedProduct(product);
+    setIsModalOpen(true);
+  };
 
   const handleModalClose = () => {
     setIsModalOpen(false);
@@ -142,11 +150,9 @@ const Kategori = () => {
 
       {/* Grid Layout for Navigation and Carousel */}
       <div className="grid grid-cols-11 gap-4">
-        {/* Left Side Navigation */}
         <Navigation expanded={expanded} setExpanded={setExpanded} navHeight={navHeight} />
 
-        {/* Right Side Carousel */}
-        <div className="col-span-9" ref={carouselRef}>
+        <div className="md:col-span-9 col-span-12" ref={carouselRef}>
           {displayImage ? (
             <div className="mb-8 text-center">
               <img
@@ -165,7 +171,8 @@ const Kategori = () => {
         <ServiceHighlights />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-[85%] mx-auto">
+      {/* Products Section with Ref */}
+      <div ref={productSectionRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-[85%] mx-auto">
         {currentProducts.length > 0 ? (
           currentProducts.map(product => (
             <div

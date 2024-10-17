@@ -12,6 +12,8 @@ import ServiceHighlights from '../components/ServiceHighlights.jsx';
 import ScrollToTopButton from '../components/ScrollToTopButton.jsx';
 import OfferSection from '../sections/OfferSection.jsx';
 import Navigation from '../components/Navigation'; // Import the Navigation component
+import ProduktePerFemijeSection from '../sections/ProduktePerFemijeSection.jsx';
+import ProdukteTeNdryshmeSection from '../sections/ProdukteTeNdryshmeSection.jsx';
 
 const Carousel = ({ images, rtl = false }) => {
   const carouselSettings = {
@@ -104,11 +106,18 @@ const Home = () => {
       <div className="w-full md:mt-16 mt-8">
         <ServiceHighlights />
       </div>
+      
+      <div>
+        <ProduktePerFemijeSection />
+      </div>
 
       <div>
         <OfferSection /> 
       </div>
 
+      <div>
+        <ProdukteTeNdryshmeSection />
+      </div>
       <WhatsAppButton phoneNumber="+355683687387" />
       <ScrollToTopButton />
     </div>

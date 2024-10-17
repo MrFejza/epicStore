@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react'; // Add useRef
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import '../index.css'; 
@@ -6,19 +6,24 @@ import Meta from '../components/Meta';
 import WhatsAppButton from '../components/WhatsAppButton.jsx';
 import { useCart } from '../context/CartContext';
 import RelatedProducts from '../components/RelatedProducts.jsx';
-import ProductModal from '../components/ProductModal'; // Import ProductModal
-import Sale from '../assets/SaleTag.png'; // SaleTag image
+import ProductModal from '../components/ProductModal'; 
+import Sale from '../assets/SaleTag.png'; 
 import ScrollToTopButton from '../components/ScrollToTopButton.jsx';
+import { useCheckoutModal } from '../context/CheckoutModalContext'; 
 
 const Information = () => {
   const navigate = useNavigate();
   const { _id } = useParams();
-  const [product, setProduct] = useState(null); // State for holding product data
-  const [isFullscreen, setIsFullscreen] = useState(false); // For fullscreen image viewing
-  const { updateCart } = useCart(); // Cart context for adding products to the cart
-  const [isModalOpen, setIsModalOpen] = useState(false); // State for modal visibility
-  const [selectedProduct, setSelectedProduct] = useState(null); // State for modal product
-  const [activeIndex, setActiveIndex] = useState(0); // State for active carousel slide
+  const [product, setProduct] = useState(null); 
+  const [isFullscreen, setIsFullscreen] = useState(false); 
+  const { updateCart } = useCart(); 
+  const [isModalOpen, setIsModalOpen] = useState(false); 
+  const [selectedProduct, setSelectedProduct] = useState(null); 
+  const [activeIndex, setActiveIndex] = useState(0); 
+  const { openCheckoutModal } = useCheckoutModal();
+  
+  // Reference for carousel
+  const carouselRef = useRef(null);
 
   // Fetch product data by its ID
   useEffect(() => {
@@ -33,35 +38,58 @@ const Information = () => {
     fetchProduct();
   }, [_id]);
 
-  // Toggle fullscreen for images
+  // Scroll to the carousel when product changes
+  useEffect(() => {
+    if (product && carouselRef.current) {
+      // Scroll to the carousel's position smoothly
+      window.scrollTo({
+        top: carouselRef.current.offsetTop,
+        behavior: 'smooth',
+      });
+    }
+  }, [product]); // Trigger when the product changes
+
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen);
   };
 
-  // Open the product modal when the "Shto në Shportë" button is clicked
   const handleAddToCartClick = (product) => {
     setSelectedProduct(product);
     setIsModalOpen(true);
   };
 
-  // Close the modal and reset selected product
   const handleModalClose = () => {
     setIsModalOpen(false);
     setSelectedProduct(null);
   };
 
-  // Handle confirming the product addition to the cart from the modal
   const handleConfirmAddToCart = (product, quantity) => {
     const productToAdd = {
-      _id: product._id, // Only include the necessary properties
+      _id: product._id, 
       name: product.name,
-      price: product.onSale && product.salePrice ? product.salePrice : product.price, // Use sale price if applicable
+      price: product.onSale && product.salePrice ? product.salePrice : product.price, 
     };
-    updateCart(productToAdd, quantity); // Pass only sanitized product data to the cart
+    updateCart(productToAdd, quantity); 
     handleModalClose();
   };
-  
-  // Navigate back
+
+  const handleOneClickOrder = (product) => {
+    const singleProductOrder = [
+      {
+        product: {
+          _id: product._id,
+          name: product.name,
+          price: product.onSale && product.salePrice ? product.salePrice : product.price,
+          onSale: product.onSale,
+          salePrice: product.salePrice,
+        },
+        quantity: 1, 
+      }
+    ];
+    const totalAmount = singleProductOrder[0].product.price;
+    openCheckoutModal(singleProductOrder, totalAmount); 
+  };
+
   const goBack = () => {
     navigate(-1);
   };
@@ -74,10 +102,10 @@ const Information = () => {
     <>
       <Meta title={`${product.name || "Product Information"} - Epic Store`} />
       <div className="container mx-auto mt-5 p-6 max-w-[90%]">
-        <h1 className="text-4xl font-bold mb-4 text-center">{product.name}</h1>
+        <h1 className="text-4xl font-bold mb-4 text-center"ref={carouselRef}>{product.name}</h1>
 
         <div className="flex flex-col md:flex-row gap-6">
-          <div className="w-full md:w-3/5">
+          <div className="w-full md:w-3/5" > {/* Add ref here */}
             <div
               id="carouselExampleControlsNoTouching"
               className="carousel slide"
@@ -172,10 +200,9 @@ const Information = () => {
           </div>
 
           <div className="w-full md:w-2/5 ml-10 flex flex-col justify-between">
-            {/* Sale Tag */}
             {product.onSale && (
               <img
-                src={Sale} // SaleTag image from the assets
+                src={Sale} 
                 alt="Sale"
                 className="absolute top-0 right-0 h-36 w-36"
               />
@@ -183,12 +210,10 @@ const Information = () => {
 
             <p className="my-10 whitespace-pre-wrap">{product.description}</p>
 
-            {/* Display stock status */}
             <p className={`text-lg mb-4 font-bold ${product.stock ? 'text-green-600' : 'text-red-600'}`}>
               {product.stock ? 'Ka stok' : 'Nuk ka stok'}
             </p>
 
-            {/* Display price */}
             <p className="text-lg">
               {product.onSale ? (
                 <>
@@ -204,17 +229,23 @@ const Information = () => {
               )}
             </p>
 
-            {/* Shto në Shport Button - Opens the modal */}
-            <div className='py-4 '>
+            <div className='py-4 flex space-x-4'>
               <button
-                onClick={() => handleAddToCartClick(product)}  // Pass the product to the modal
+                onClick={() => handleAddToCartClick(product)}  
                 className={`bg-violet-950 text-white font-bold py-2 px-6 rounded-md hover:bg-violet-800 transition-colors ${!product.stock && 'opacity-50 cursor-not-allowed '}`}
-                disabled={!product.stock} // Disable if out of stock
+                disabled={!product.stock} 
               >
                 Shto në Shportë
               </button>
-            </div>
 
+              <button
+                onClick={() => handleOneClickOrder(product)} 
+                className={`bg-green-600 text-white font-bold py-2 px-6 rounded-md hover:bg-green-500 transition-colors ${!product.stock && 'opacity-50 cursor-not-allowed '}`}
+                disabled={!product.stock} 
+              >
+                Porosit me një klik
+              </button>
+            </div>
 
             <button
               onClick={goBack}
@@ -222,7 +253,7 @@ const Information = () => {
             >
               Shko Pas
             </button>
-          </div>
+            </div>
         </div>
 
         {/* Pass the product's category as a prop to RelatedProducts */}
@@ -248,3 +279,4 @@ const Information = () => {
 };
 
 export default Information;
+  

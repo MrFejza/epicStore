@@ -13,6 +13,7 @@ import Kategori from './pages/Kategori';
 import { CartProvider } from './context/CartContext'; 
 import { CheckoutModalProvider } from './context/CheckoutModalContext';
 import Footer from './components/Footer';
+import FAQs from './pages/FAQs';
 
 function App() {
   return (
@@ -33,6 +34,8 @@ function App() {
 
             {/* Information Route */}
             <Route path="/information/:_id" element={<Information />} />
+            <Route path="/faq" element={<FAQs />} />
+
 
             {/* Admin and Other Pages */}
             <Route path="/admin" element={<Admin />} />

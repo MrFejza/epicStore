@@ -19,16 +19,27 @@ const OtherCategoryCarousel = ({ currentCategory }) => {
     autoplaySpeed: 3000,
   };
 
+  // Utility function to shuffle an array
+  const shuffleArray = (array) => {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  };
+
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await axios.get('/api/product');
         const allProducts = response.data;
 
+        // Filter products that are not in the current category
         const otherCategoryProducts = allProducts.filter(
           product => product.category.toLowerCase() !== currentCategory.toLowerCase()
         );
 
+        // Group products by category and keep only one product per category
         const groupedByCategory = otherCategoryProducts.reduce((acc, product) => {
           if (!acc[product.category]) {
             acc[product.category] = product;
@@ -37,7 +48,11 @@ const OtherCategoryCarousel = ({ currentCategory }) => {
         }, {});
 
         const selectedProducts = Object.values(groupedByCategory);
-        setProducts(selectedProducts);
+
+        // Shuffle the selected products to pick them randomly
+        const shuffledProducts = shuffleArray(selectedProducts);
+
+        setProducts(shuffledProducts);
         setLoading(false);
       } catch (error) {
         console.error('Error fetching products:', error);
@@ -66,7 +81,7 @@ const OtherCategoryCarousel = ({ currentCategory }) => {
                 }}
               >
                 <img
-                  src={`http://localhost:9000/${product.image[0]}`}
+                  src={`http://localhost:9000/${product.image[0]}`} // You can still pick a random image index if desired
                   alt={product.name}
                   className="d-block w-100"
                   style={{
@@ -82,7 +97,7 @@ const OtherCategoryCarousel = ({ currentCategory }) => {
                 {/* Shiko më shumë button */}
                 <Link
                   to={`/kategori/${product.category.toLowerCase()}`} // Link to the category
-                  className="absolute bottom-4 left-4 bg-white text-violet-900 font-bold py-2 px-4 rounded-lg hover:bg-violet-800 hover:text-white transition-colors"
+                  className="absolute bottom-4 left-4 bg-violet-800 text-white font-bold py-2 px-4 rounded-lg hover:bg-violet-500 transition-colors"
                 >
                   Shiko më shumë
                 </Link>
