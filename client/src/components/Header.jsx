@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Disclosure } from '@headlessui/react';
 import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import axios from 'axios';
 import EpicStoreLogo from '../assets/EpicStoreLogo.png';
 import TikTokLogo from '../assets/TIktokLogo.png';
 import InstagramLogo from '../assets/InstagramLogo.png';
@@ -10,6 +11,7 @@ import ShoppingCart from './ShoppingCart';
 import CheckoutModal from './CheckoutModal';
 import { useCart } from '../context/CartContext';
 import { useCheckoutModal } from '../context/CheckoutModalContext';
+import NavComponent from './NavComponent';
 
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -19,6 +21,26 @@ const Header = () => {
   const { cart, removeFromCart } = useCart();
   const { openCheckoutModal } = useCheckoutModal();
   const [query, setQuery] = useState('');
+
+  const [categories, setCategories] = useState([]); // Fetch categories for mobile menu
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    // Fetch categories from the backend
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get('/api/category');
+        setCategories(response.data);
+        setLoading(false);
+      } catch (err) {
+        setError('Failed to fetch categories');
+        setLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const handleInputChange = (e) => {
     setQuery(e.target.value);
@@ -75,12 +97,12 @@ const Header = () => {
   return (
     <>
       <Disclosure as="nav" className="bg-white border-b border-gray-200 z-10 relative">
-        {({ open }) => (
+        {({ open, close }) => ( // Access the `close` function to manually close the menu
           <>
             <div className="md:max-w-[80%] mx-auto px-4 sm:px-6 lg:px-8">
               <div className="hidden md:flex justify-between items-center pt-4 pb-2">
                 <Link to="/" className="flex-shrink-0">
-                  <img className="h-36 p-0 w-auto" src={EpicStoreLogo} alt="Epic Store Logo" />
+                  <img className="h-28 pb-1 w-auto" src={EpicStoreLogo} alt="Epic Store Logo" />
                 </Link>
 
                 <div className="flex-1 flex justify-center px-auto ml-2">
@@ -140,7 +162,7 @@ const Header = () => {
                   </Disclosure.Button>
 
                   <Link to="/" className="flex-shrink-0">
-                    <img className="h-24 w-auto" src={EpicStoreLogo} alt="Epic Store Logo" />
+                    <img className="h-24 w-auto pb-2" src={EpicStoreLogo} alt="Epic Store Logo" />
                   </Link>
                 </div>
 
@@ -159,80 +181,42 @@ const Header = () => {
                   />
                 </div>
               </div>
+              
+              <NavComponent/>
             </div>
 
-            {location && (
-              <div
-                className={`${location.pathname === '/' || `/kategori/:category` ? 'md:hidden lg:hidden' : ''
-                  } bg-violet-100 w-full mt-4 md:mt-0 max-w-[90%] mx-auto`}
-              >
-                <nav className="container mx-auto py-3">
-                  <div className="flex justify-start items-start">
-                    <div className="flex justify-start items-start">
-                      {location.pathname !== '/' ? (
-                        <div className="block">
-                          <ul className="relative">
-                            <li className="text-gray-800 relative group">
-                              <span className="cursor-pointer pl-6 py-3">Kategoritë</span>
-                              <ul className="absolute left-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg hidden group-hover:block space-y-1">
-                                <li className="px-4 py-2 hover:bg-gray-100">
-                                  <Link to="/kategori/ProduktePerFemije" className="text-gray-800">Produkte për Fëmijë</Link>
-                                </li>
-                                <li className="px-4 py-2 hover:bg-gray-100">
-                                  <Link to="/kategori/ElektronikeAksesore" className="text-gray-800">Elektronikë dhe Aksesorë</Link>
-                                </li>
-                                <li className="px-4 py-2 hover:bg-gray-100">
-                                  <Link to="/kategori/ShtepiJetese" className="text-gray-800">Shtëpi dhe Jetesë</Link>
-                                </li>
-                                <li className="px-4 py-2 hover:bg-gray-100">
-                                  <Link to="/kategori/ZyreTeknologji" className="text-gray-800">Zyrë dhe Teknologji</Link>
-                                </li>
-                                <li className="px-4 py-2 hover:bg-gray-100">
-                                  <Link to="/kategori/SportAktivitet" className="text-gray-800">Sport dhe Aktivitet në Natyrë</Link>
-                                </li>
-                                <li className="px-4 py-2 hover:bg-gray-100">
-                                  <Link to="/kategori/KuzhineUshqim" className="text-gray-800">Kuzhinë dhe Ushqim</Link>
-                                </li>
-                                <li className="px-4 py-2 hover:bg-gray-100">
-                                  <Link to="/kategori/FestaEvente" className="text-gray-800">Festa dhe Evente</Link>
-                                </li>
-                                <li className="px-4 py-2 hover:bg-gray-100">
-                                  <Link to="/kategori/Motorra" className="text-gray-800">Motorra</Link>
-                                </li>
-                                <li className="px-4 py-2 hover:bg-gray-100">
-                                  <Link to="/kategori/Kafshe" className="text-gray-800">Kafshë</Link>
-                                </li>
-                                <li className="px-4 py-2 hover:bg-gray-100">
-                                  <Link to="/kategori/all" className="text-gray-800 ">Të Gjitha</Link>
-                                </li>
-                              </ul>
-                            </li>
-                          </ul>
-                        </div>
-                      ) : (
-                        <div className="block md:hidden">
-                          <div className="flex space-x-6">
-                            <Link to="/kategori/new" className="text-gray-800 pl-6">Të Rejat</Link>
-                            <Link to="/kategori/offers" className="text-gray-800">Oferta</Link>
-                            <LogoutButton />
-                          </div>
-                        </div>
-                      )}
-
-                      {location.pathname !== '/' && (
-                        <div className="flex space-x-6">
-                          <Link to="/kategori/new" className="text-gray-800 pl-6">Të Rejat</Link>
-                          <Link to="/kategori/offers" className="text-gray-800">Oferta</Link>
-                          <div className="md:hidden">
-                            <LogoutButton />
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </nav>
+            {/* Mobile dropdown menu (categories) */}
+            <Disclosure.Panel className="md:hidden">
+              <div className="px-2 pt-2 pb-3 space-y-1">
+                
+                
+                {/* Dynamically fetched categories for mobile view */}
+                {loading ? (
+                  <p className="px-3 py-2">Loading categories...</p>
+                ) : error ? (
+                  <p className="px-3 py-2 text-red-500">{error}</p>
+                ) : (
+                  categories.map((category) => (
+                    <Link
+                      key={category._id}
+                      to={`/kategori/${category.slug}`}
+                      className="block px-3 py-2 rounded-md text-base font-medium text-gray-800"
+                      onClick={close} // Close menu on link click
+                    >
+                      {category.name}
+                    </Link>
+                  ))
+                )}
+                
+                <Link
+                  to="/kategori/all"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-800"
+                  onClick={close} // Close menu on link click
+                >
+                  Të Gjitha
+                </Link>
               </div>
-            )}
+            </Disclosure.Panel>
           </>
         )}
       </Disclosure>

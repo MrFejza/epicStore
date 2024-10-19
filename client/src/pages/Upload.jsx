@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
 import Meta from "../components/Meta";
@@ -16,6 +16,25 @@ const Upload = () => {
   const [stock, setStock] = useState('');
   const [category, setCategory] = useState('');
   const [popular, setPopular] = useState(false);
+  const [categories, setCategories] = useState([]);  // New state for storing fetched categories
+  const [loadingCategories, setLoadingCategories] = useState(true);  // Loading state for categories
+  const [errorCategories, setErrorCategories] = useState('');  // Error state for fetching categories
+
+  // Fetch categories from the backend
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get('/api/category');  // Update the API endpoint accordingly
+        setCategories(response.data);
+        setLoadingCategories(false);
+      } catch (error) {
+        setErrorCategories('Failed to load categories');
+        setLoadingCategories(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   // Handle file selection
   const handleFileChange = (e) => {
@@ -34,47 +53,47 @@ const Upload = () => {
         toast.error('Çmimi i ofertës duhet të jetë më i vogël se çmimi origjinal.');
         return;
       }
-  
+
       // Validate that saleEndDate is in the future
       if (saleEndDate && new Date(saleEndDate) <= new Date()) {
         toast.error('Data e përfundimit të ofertës duhet të jetë në të ardhmen.');
         return;
       }
     }
-  
+
     // Ensure stock is selected
     if (!stock) {
       toast.error('Ju lutemi zgjidhni statusin e gjendjes për produktin.');
       return;
     }
-  
+
     const formData = new FormData();
-  
+
     formData.append('name', name);
     formData.append('price', price);
-  
+
     if (onSale && salePrice) {
       formData.append('salePrice', salePrice);
     }
-  
+
     formData.append('onSale', onSale);  // Ensures onSale is a boolean
     formData.append('description', description);
-  
+
     // Convert stock to boolean
     formData.append('stock', stock === 'in_stock');  // Ensures stock is true/false
-  
+
     formData.append('category', category);
     formData.append('popular', popular);  // Ensures popular is a boolean
-  
+
     selectedFiles.forEach((file) => {
       formData.append('image', file);
     });
-  
+
     // Append saleEndDate if the product is on sale and saleEndDate is set
     if (onSale && saleEndDate) {
       formData.append('saleEndDate', saleEndDate);
     }
-  
+
     try {
       const response = await axios.post('/api/product', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
@@ -97,7 +116,7 @@ const Upload = () => {
       toast.error(error?.response?.data?.message || error.message);
     }
   };
-  
+
   // Form submit handler
   const submitHandler = (e) => {
     e.preventDefault();
@@ -208,15 +227,16 @@ const Upload = () => {
                   required
                 >
                   <option value="">Zgjidh Kategorine</option>
-                  <option value="ProduktePerFemije">Produkte për Fëmijë</option>
-                  <option value="ElektronikeAksesore">Elektronikë dhe Aksesorë</option>
-                  <option value="ShtepiJetese">Shtëpi dhe Jetesë</option>
-                  <option value="ZyreTeknologji">Zyrë dhe Teknologji</option>
-                  <option value="SportAktivitet">Sport dhe Aktivitet në Natyrë</option>
-                  <option value="KuzhineUshqim">Kuzhinë dhe Ushqim</option>
-                  <option value="FestaEvente">Festa dhe Evente</option>
-                  <option value="Motorra">Motorra</option>
-                  <option value="Kafshë">Kafshë</option>
+                  {/* Dynamically load categories */}
+                  {loadingCategories ? (
+                    <option value="">Loading categories...</option>
+                  ) : errorCategories ? (
+                    <option value="">{errorCategories}</option>
+                  ) : (
+                    categories.map((cat) => (
+                      <option key={cat._id} value={cat.slug}>{cat.name}</option>
+                    ))
+                  )}
                 </select>
               </div>
 

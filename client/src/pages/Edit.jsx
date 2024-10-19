@@ -11,7 +11,7 @@ const Edit = () => {
   const [price, setPrice] = useState('');
   const [salePrice, setSalePrice] = useState('');
   const [onSale, setOnSale] = useState(false);
-  const [saleEndDate, setSaleEndDate] = useState(''); // New state for sale end date
+  const [saleEndDate, setSaleEndDate] = useState(''); 
   const [description, setDescription] = useState('');
   const [stock, setStock] = useState('');
   const [category, setCategory] = useState('');
@@ -21,26 +21,50 @@ const Edit = () => {
   const [removedImages, setRemovedImages] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const [categories, setCategories] = useState([]);  // For dynamic category fetching
+  const [loadingCategories, setLoadingCategories] = useState(true);
+  const [errorCategories, setErrorCategories] = useState(null);
+
   // Fetch product data by ID
   useEffect(() => {
-    axios
-      .get(`/api/product/${_id}`)
-      .then((res) => {
+    const fetchProduct = async () => {
+      try {
+        const res = await axios.get(`/api/product/${_id}`);
         const product = res.data;
         setName(product.name);
         setPrice(product.price);
         setSalePrice(product.salePrice || '');
         setOnSale(product.onSale || false);
-        setSaleEndDate(product.saleEndDate ? new Date(product.saleEndDate).toISOString().slice(0, 16) : ''); // Handle date formatting
+        setSaleEndDate(product.saleEndDate ? new Date(product.saleEndDate).toISOString().slice(0, 16) : '');
         setDescription(product.description);
         setStock(product.stock ? 'in_stock' : 'out_of_stock');
         setCategory(product.category);
         setPopular(product.popular);
         setExistingImages(product.image || []);
         setLoading(false);
-      })
-      .catch((err) => console.log('Error fetching product:', err));
+      } catch (err) {
+        toast.error('Error fetching product data.');
+        setLoading(false);
+      }
+    };
+    
+    fetchProduct();
   }, [_id]);
+
+  // Fetch categories for the dropdown
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await axios.get('/api/category');
+        setCategories(res.data);
+        setLoadingCategories(false);
+      } catch (err) {
+        setErrorCategories('Error loading categories.');
+        setLoadingCategories(false);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   // Handle file input for new images
   const handleFileChange = (e) => {
@@ -63,23 +87,22 @@ const Edit = () => {
   // Submit form and send all images (both existing and new) to the backend
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    // Frontend validation for salePrice and stock
+
     if (onSale && (!salePrice || parseFloat(salePrice) >= parseFloat(price))) {
       toast.error('Çmimi i ofertës duhet të jetë më i vogël se çmimi origjinal.');
       return;
     }
-  
+
     if (onSale && saleEndDate && new Date(saleEndDate) <= new Date()) {
       toast.error('Data e përfundimit të ofertës duhet të jetë në të ardhmen.');
       return;
     }
-  
+
     if (!stock) {
       toast.error('Ju lutemi zgjidhni statusin e gjendjes për produktin.');
       return;
     }
-  
+
     try {
       const formData = new FormData();
       formData.append('name', name);
@@ -89,33 +112,31 @@ const Edit = () => {
       }
       formData.append('onSale', onSale);
       formData.append('description', description);
-      formData.append('stock', stock === 'in_stock');  // Convert to boolean
+      formData.append('stock', stock === 'in_stock');
       formData.append('category', category);
       formData.append('popular', popular);
-  
-      // Append saleEndDate if the product is on sale and saleEndDate is set
+
       if (onSale && saleEndDate) {
         formData.append('saleEndDate', saleEndDate);
       }
-  
-      // Append images and send the request
+
       formData.append('existingImages', JSON.stringify(existingImages));
       newImages.forEach((file) => {
         formData.append('image', file);
       });
-  
+
       await axios.put(`/api/product/${_id}`, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
-  
+
       toast.success('Produkti u përditësua me sukses');
-      navigate(-1);  // Go back to the previous page
+      navigate(-1);  // Navigate to a meaningful page
     } catch (error) {
       toast.error(error?.response?.data?.message || error.message);
     }
   };
-  
 
+  
   if (loading) {
     return <div>Loading product data...</div>;
   }
@@ -216,25 +237,28 @@ const Edit = () => {
               </select>
             </div>
 
-            {/* Category */}
+            {/* Category (dynamically fetched) */}
             <div className="mb-4">
               <label className="block text-gray-700 text-sm font-bold mb-2">Kategoria</label>
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="w-full p-3 border rounded-md"
-              >
-                <option value="">Zgjidh Kategorine</option>
-                <option value="ProduktePerFemije">Produkte për Fëmijë</option>
-                <option value="ElektronikeAksesore">Elektronikë dhe Aksesorë</option>
-                <option value="ShtepiJetese">Shtëpi dhe Jetesë</option>
-                <option value="ZyreTeknologji">Zyrë dhe Teknologji</option>
-                <option value="SportAktivitet">Sport dhe Aktivitet në Natyrë</option>
-                <option value="KuzhineUshqim">Kuzhinë dhe Ushqim</option>
-                <option value="FestaEvente">Festa dhe Evente</option>
-                <option value="Motorra">Motorra</option>
-                <option value="Kafshë">Kafshë</option>
-              </select>
+              {loadingCategories ? (
+                <p>Loading categories...</p>
+              ) : errorCategories ? (
+                <p>{errorCategories}</p>
+              ) : (
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="w-full p-3 border rounded-md"
+                  required
+                >
+                  <option value="">Zgjidh Kategorine</option>
+                  {categories.map((cat) => (
+                    <option key={cat._id} value={cat.slug}>
+                      {cat.name}
+                    </option>
+                  ))}
+                </select>
+              )}
             </div>
 
             {/* Popular */}
@@ -314,7 +338,7 @@ const Edit = () => {
                 Perditso Produktin
               </button>
               <Link
-                to=".."
+                to="/"
                 className="bg-gray-500 w-full text-white font-bold py-3 px-6 rounded-md hover:bg-gray-700 transition-colors mt-2 inline-block"
               >
                 Cancel

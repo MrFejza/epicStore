@@ -14,7 +14,7 @@ import OfferSection from '../sections/OfferSection.jsx';
 import Navigation from '../components/Navigation'; // Import the Navigation component
 import ProduktePerFemijeSection from '../sections/ProduktePerFemijeSection.jsx';
 import ProdukteTeNdryshmeSection from '../sections/ProdukteTeNdryshmeSection.jsx';
-
+import Header from '../components/Header.jsx';
 const Carousel = ({ images, rtl = false }) => {
   const carouselSettings = {
     dots: false,
@@ -81,6 +81,8 @@ const Home = () => {
   const combinedImages = [...firstCarouselImages, ...secondCarouselImages];
 
   return (
+    <>
+    <Header />`
     <div className="container lg:max-w-[80%] mx-auto py-4">
       <div className="grid grid-cols-12 gap-4">
         {/* Kategoritë section */}
@@ -121,7 +123,9 @@ const Home = () => {
       <WhatsAppButton phoneNumber="+355683687387" />
       <ScrollToTopButton />
     </div>
-  );
-};
+  
 
+    </>
+    );
+};
 export default Home;

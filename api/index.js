@@ -4,6 +4,7 @@ import authRoutes from './routes/auth.route.js';
 import productRoutes from './routes/product.route.js';
 import orderRoutes from './routes/order.route.js'
 import whatsappRoutes from './routes/whatsapp.js';
+import categoryRoutes from './routes/category.route.js';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -31,6 +32,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/product', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/whatsapp', whatsappRoutes);
+app.use('/api/category', categoryRoutes);
 
 
 app.get('/', (req, res) => {

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Header from "../components/Header";
 
 const Admin = () => {
   const [error, setError] = useState(null);
@@ -64,6 +65,8 @@ const Admin = () => {
   };
 
   return (
+    <>
+    <Header />
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl text-center font-semibold my-7">Sign In</h1>
 
@@ -95,6 +98,8 @@ const Admin = () => {
 
       {error && <p className="text-red-500 mt-4">{error}</p>}
     </div>
+    </>
+    
   );
 };
 

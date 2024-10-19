@@ -22,7 +22,7 @@ const ProduktePerFemijeSection = () => {
         const allProducts = response.data;
 
         const filteredProducts = allProducts
-          .filter(product => product.category === 'ProduktePerFemije')
+          .filter(product => product.category === 'produkte-për-fëmijë')
           .sort(() => 0.5 - Math.random())
           .slice(0, 6);
 

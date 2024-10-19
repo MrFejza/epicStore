@@ -45,6 +45,7 @@ const OfferSection = () => {
     if (difference > 0) {
       return {
         status: 'active',
+        days: Math.floor(difference / (1000 * 60 * 60 * 24)),
         hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
         minutes: Math.floor((difference / 1000 / 60) % 60),
         seconds: Math.floor((difference / 1000) % 60),
@@ -102,7 +103,7 @@ const OfferSection = () => {
                   <span className="text-green-600 ml-2">{offer.salePrice} Lek</span>
                 </p>
                 {timeLeft.status === 'active' ? (
-                  <p className="text-red-500 text-sm">Përfundon për: {timeLeft.hours} orë, {timeLeft.minutes} min</p>
+                  <p className="text-red-500 text-sm">Përfundon për: {timeLeft.days} ditë, {timeLeft.hours} orë, {timeLeft.minutes} min</p>
                 ) : (
                   <p className="text-orange-500 text-sm">Ka kaluar {timeLeft.hours} orë</p>
                 )}

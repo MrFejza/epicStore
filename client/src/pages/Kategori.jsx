@@ -13,6 +13,7 @@ import ServiceHighlights from '../components/ServiceHighlights.jsx';
 import ScrollToTopButton from '../components/ScrollToTopButton.jsx';
 import OtherCategoryCarousel from '../components/OtherCategoryCarousel'; 
 import Navigation from '../components/Navigation'; 
+import Header from '../components/Header.jsx';
 
 const Kategori = () => {
   const { category } = useParams();
@@ -145,7 +146,9 @@ const Kategori = () => {
   const totalPages = Math.ceil(products.length / productsPerPage);
 
   return (
-    <div className="container mx-auto px-10 py-8 max-w-[90%]">
+    <>
+    <Header/>
+     <div className="container mx-auto px-10 py-8 max-w-[90%]">
       {loading && <div className="mx-auto text-xl">Loading products...</div>}
 
       {/* Grid Layout for Navigation and Carousel */}
@@ -294,6 +297,8 @@ const Kategori = () => {
       <WhatsAppButton phoneNumber="+355683687387" />
       <ScrollToTopButton />
     </div>
+    </>
+   
   );
 };
 

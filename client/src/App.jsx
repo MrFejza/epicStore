@@ -14,13 +14,14 @@ import { CartProvider } from './context/CartContext';
 import { CheckoutModalProvider } from './context/CheckoutModalContext';
 import Footer from './components/Footer';
 import FAQs from './pages/FAQs';
+import CategoryManagement from './pages/CategoryManagement';
 
 function App() {
   return (
     <CheckoutModalProvider>
       <CartProvider>
         <Router>
-          <Header />
+          
 
           <Routes>
             {/* Home Route */}
@@ -35,7 +36,7 @@ function App() {
             {/* Information Route */}
             <Route path="/information/:_id" element={<Information />} />
             <Route path="/faq" element={<FAQs />} />
-
+            <Route path='/menaxhimi-i-kategorive' element={<CategoryManagement />} />
 
             {/* Admin and Other Pages */}
             <Route path="/admin" element={<Admin />} />

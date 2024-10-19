@@ -10,6 +10,7 @@ import ProductModal from '../components/ProductModal';
 import Sale from '../assets/SaleTag.png'; 
 import ScrollToTopButton from '../components/ScrollToTopButton.jsx';
 import { useCheckoutModal } from '../context/CheckoutModalContext'; 
+import Header from '../components/Header.jsx';
 
 const Information = () => {
   const navigate = useNavigate();
@@ -100,6 +101,7 @@ const Information = () => {
 
   return (
     <>
+    <Header/>
       <Meta title={`${product.name || "Product Information"} - Epic Store`} />
       <div className="container mx-auto mt-5 p-6 max-w-[90%]">
         <h1 className="text-4xl font-bold mb-4 text-center"ref={carouselRef}>{product.name}</h1>
