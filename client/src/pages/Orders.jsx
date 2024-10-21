@@ -75,7 +75,7 @@ const Orders = () => {
                   <td className="py-2 px-4 border-b">{order.phone}</td>
                   <td className="py-2 px-4 border-b">{order.email || 'N/A'}</td>
                   <td className="py-2 px-4 border-b">{order.address || 'N/A'}</td> {/* Display address */}
-                  <td className="py-2 px-4 border-b">${order.totalAmount.toFixed(2)}</td>
+                  <td className="py-2 px-4 border-b">{order.totalAmount.toFixed(2)} Lek</td>
                   <td className="py-2 px-4 border-b">
                     {order.products.map((product) => (
                       <ProductInfo key={product.productId} product={product} />
@@ -125,11 +125,11 @@ const ProductInfo = ({ product }) => {
   return (
     <div className="mb-2">
       {/* Display product name */}
-      <p><strong>Product Name:</strong> {productName}</p>
+      <p><strong>Emri i Produktit:</strong> {productName}</p>
       {/* Display quantity and price */}
       <p>
-        <strong>Quantity:</strong> {product.quantity}, 
-        <strong> Price:</strong> ${product.price.toFixed(2)}
+        <strong>Sasia:</strong> {product.quantity}, 
+        <strong> Cmimi:</strong> {product.price.toFixed(2)} Lek
       </p>
       {/* Link to the product information page */}
       <Link 

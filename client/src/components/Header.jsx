@@ -68,7 +68,7 @@ const Header = () => {
   const isAdmin = localStorage.getItem('isAdmin');
 
   const LogoutButton = () => {
-    if (isAuth && isAdmin) {
+    if (isAuth || isAdmin) {
       return (
         <>
           <div className="md:hidden text-gray-800">

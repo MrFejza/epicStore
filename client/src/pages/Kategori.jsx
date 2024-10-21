@@ -124,21 +124,7 @@ const Kategori = () => {
     handleModalClose();
   };
 
-  const editProduct = product => {
-    navigate(`/edit/${product._id}`);
-  };
 
-  const deleteProduct = async product => {
-    const confirmDelete = window.confirm('Are you sure you want to delete this product?');
-    if (confirmDelete) {
-      try {
-        await axios.delete(`/api/product/${product._id}`);
-        setProducts(prevProducts => prevProducts.filter(p => p._id !== product._id));
-      } catch (error) {
-        console.error('Error deleting product:', error);
-      }
-    }
-  };
 
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
@@ -237,23 +223,6 @@ const Kategori = () => {
                   Shto ne shporte
                 </button>
               </div>
-
-              {isAdmin && (
-                <div className="mt-4 flex justify-center">
-                  <button
-                    onClick={() => editProduct(product)}
-                    className="bg-black text-white font-bold py-2 px-4 rounded-md mr-4 hover:bg-gray-800"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => deleteProduct(product)}
-                    className="bg-red-600 text-white font-bold py-2 px-4 rounded-md hover:bg-red-700"
-                  >
-                    Delete
-                  </button>
-                </div>
-              )}
             </div>
           ))
         ) : (

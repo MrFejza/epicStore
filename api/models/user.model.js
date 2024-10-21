@@ -13,15 +13,22 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true,
+    // Conditionally required: only required if the user does not have a social login
+    required: function () {
+      return !( this.googleId);
+    },
+  },
+  googleId: {
+    type: String,
+    unique: true,
+    sparse: true,  // Ensures only non-null values are treated as unique
   },
   isAdmin: {
     type: Boolean,
     default: false,
   }
-},
-{
-  timestamps: true
+}, {
+  timestamps: true  // Automatically add createdAt and updatedAt fields
 });
 
 const User = mongoose.model("User", userSchema);

@@ -56,7 +56,7 @@ const Admin = () => {
       setError(null);
 
       // Redirect to the upload page after successful sign-in
-      navigate("/upload");
+      navigate("/menaxhimi-i-produkteve");
 
     } catch (error) {
       setLoading(false);
