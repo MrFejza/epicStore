@@ -1,10 +1,15 @@
 import react from 'react';
+import Header from '../components/Header';
 
 const LogariaIme = () => {
   return (
-    <div>
+    <>
+    <Header />
+      <div>
       <h1>LogariaIme</h1>
     </div>
+    </>
+
   );
 }
 

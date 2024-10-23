@@ -16,6 +16,11 @@ import FAQs from './pages/FAQs';
 import CategoryManagement from './pages/CategoryManagement';
 import ManageProducts from './pages/ManageProducts';
 import LogariaIme from './pages/LogariaIme';
+import Contact from './pages/Contact';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsAndConditions from './pages/TermsAndConditions';
+import GoogleCallbackHandler from './components/GoogleCallbackHandler';
+import Unauthorized from './pages/Unauthorized';
 
 
 function App() {
@@ -38,17 +43,25 @@ function App() {
             {/* Information Route */}
             <Route path="/information/:_id" element={<Information />} />
             <Route path="/faq" element={<FAQs />} />
-           
-            
-            
+            <Route path='/contact' element={<Contact />} />
+            <Route path='/privacy-policy' element={<PrivacyPolicy />} />
+            <Route path='/terms' element={<TermsAndConditions />} />
+
+
+
 
             {/* Admin and Other Pages */}
             <Route path="/sign-in" element={<Admin />} />
             <Route path="/sign-up" element={<Shemsia />} />
+            
 
-          
+
+            {/* Private routes for users */}
+            <Route element={<PrivateRoutes userOnly={true} />}>
               <Route path='/llogaria-ime' element={<LogariaIme />} />
-           
+            </Route>
+
+
 
             {/* Private routes */}
             <Route element={<PrivateRoutes adminOnly={true} />}>
@@ -56,11 +69,11 @@ function App() {
               <Route path="/edit/:_id" element={<Edit />} />
               <Route path="/upload" element={<Upload />} />
               <Route path='/menaxhimi-i-produkteve' element={<ManageProducts />} />
-               <Route path='/menaxhimi-i-kategorive' element={<CategoryManagement />} />
+              <Route path='/menaxhimi-i-kategorive' element={<CategoryManagement />} />
             </Route>
 
             {/* Unauthorized route */}
-            <Route path="/unauthorized" element={<h1>Unauthorized</h1>} />
+            <Route path="/unauthorized" element={<Unauthorized/>} />
 
             {/* Catch-all route for undefined routes */}
             <Route path="*" element={<Navigate to="/sign-in" replace />} />

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import AdminHeader from '../components/AdminHeader';
 
 const Orders = () => {
   const [orders, setOrders] = useState([]);
@@ -49,7 +50,9 @@ const Orders = () => {
   if (error) return <p>{error}</p>;
 
   return (
-    <div className="container mx-auto p-4">
+    <>
+    <AdminHeader />
+        <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">All Orders</h1>
       {orders.length === 0 ? (
         <p>No orders found</p>
@@ -97,6 +100,8 @@ const Orders = () => {
         </div>
       )}
     </div>
+    </>
+
   );
 };
 
@@ -123,6 +128,7 @@ const ProductInfo = ({ product }) => {
   };
 
   return (
+    
     <div className="mb-2">
       {/* Display product name */}
       <p><strong>Emri i Produktit:</strong> {productName}</p>

@@ -181,15 +181,39 @@ const Header = () => {
                   />
                 </div>
               </div>
-              
-              <NavComponent/>
+              {showSearch && (
+                <div className="flex justify-center mt-2">
+                  <form onSubmit={handleSearch} className="w-full max-w-lg">
+                    <label htmlFor="mobile-search" className="sr-only">Search</label>
+                    <div className="relative pb-2">
+                      <input
+                        id="mobile-search"
+                        type="text"
+                        value={query}
+                        onChange={handleInputChange}
+                        placeholder="Kërko produkte..."
+                        className="w-full pl-4 pr-10 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-violet-600"
+                      />
+                      <button
+                        onClick={handleSearch}
+                        type="submit"
+                        className="absolute inset-y-0 right-0 text-3xl flex items-center pr-3  text-gray-500 hover:text-violet-600"
+                      >
+                        ⌕
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              )}
+
+              <NavComponent />
             </div>
 
             {/* Mobile dropdown menu (categories) */}
             <Disclosure.Panel className="md:hidden">
               <div className="px-2 pt-2 pb-3 space-y-1">
-                
-                
+
+
                 {/* Dynamically fetched categories for mobile view */}
                 {loading ? (
                   <p className="px-3 py-2">Loading categories...</p>
@@ -207,7 +231,7 @@ const Header = () => {
                     </Link>
                   ))
                 )}
-                
+
                 <Link
                   to="/kategori/all"
                   className="block px-3 py-2 rounded-md text-base font-medium text-gray-800"

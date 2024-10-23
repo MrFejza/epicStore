@@ -287,7 +287,7 @@ const Upload = () => {
                   Shto Produktin
                 </button>
                 <Link
-                  to="/"
+                  to="/menaxhimi-i-produkteve"
                   className="bg-gray-500 w-full text-white font-bold py-3 px-6 rounded-md hover:bg-gray-700 transition-colors mt-2 inline-block"
                 >
                   Cancel

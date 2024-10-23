@@ -19,7 +19,7 @@ export const CheckoutModalProvider = ({ children }) => {
 
   // Open the modal and set the cartItems and totalAmount
   const openCheckoutModal = (cartItems = [], totalAmount = 0) => {
-    console.log('Opening checkout modal with:', { cartItems, totalAmount });
+
     setCheckoutData({
       ...checkoutData, // Preserve other data (name, email, etc.)
       cartItems,       // Update cart items
@@ -42,10 +42,7 @@ export const CheckoutModalProvider = ({ children }) => {
     setErrors({});
   };
 
-  // Log the updated checkoutData for debugging
-  useEffect(() => {
-    console.log('Checkout data updated:', checkoutData);
-  }, [checkoutData]);
+
 
   // Validate form fields before submitting
   const validateForm = () => {

@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
@@ -10,13 +9,13 @@ const Shemsia = () => {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
-    // console.log(formData);
+    
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("/api/auth/signup", {  // Updated endpoint
+      const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -26,7 +25,8 @@ const Shemsia = () => {
   
       const data = await res.json();
       if (data.success) {
-        navigate("/signin"); // Redirect to home or any other page
+        localStorage.setItem("token", data.token); // Store token
+        navigate("/llogaria-ime"); // Redirect to account page
       } else {
         setError(data.message);
       }
@@ -34,7 +34,7 @@ const Shemsia = () => {
       setError("An error occurred. Please try again.");
     }
   };
-
+  
   return (
     <>
     <Header />
@@ -74,7 +74,6 @@ const Shemsia = () => {
       {error && <p className="text-red-500 mt-4">{error}</p>}
     </div>
     </>
-   
   );
 };
 

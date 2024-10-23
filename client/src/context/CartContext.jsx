@@ -52,17 +52,17 @@ export const CartProvider = ({ children }) => {
     if (savedCart) {
       setCart(savedCart);
     }
-    console.log('Loaded cart from localStorage:', savedCart);
+   
   }, []); // Empty array ensures this runs only once on component mount
 
   // Save the cart and reset the timestamp every time the cart changes
   useEffect(() => {
     if (cart.length > 0) {
       saveCartWithTimestamp(cart); // Save cart and timestamp
-      console.log('Saving cart to localStorage:', cart);
+      
     } else {
       localStorage.removeItem('cartItems'); // Remove cartItems token when cart is empty
-      console.log('Cart is empty, removing from localStorage');
+      
     }
   }, [cart]); // This runs only when `cart` changes
 

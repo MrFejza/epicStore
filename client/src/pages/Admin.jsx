@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import Header from "../components/Header";
 
 const Admin = () => {
@@ -17,7 +17,7 @@ const Admin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
       setLoading(true);
       const res = await fetch("/api/auth/signin", {
@@ -27,46 +27,42 @@ const Admin = () => {
         },
         body: JSON.stringify(formData),
       });
-
+  
       const data = await res.json();
       console.log("Sign-in response:", data);
-
+  
       if (!data.success) {
         setLoading(false);
         setError(data.message);
         return;
       }
-
-      // Check if the user is an admin
-      if (!data.isAdmin) {
-        setLoading(false);
-        setError("Access Denied: You do not have admin privileges.");
-        return;
-      }
-
-      console.log(data)
-
+  
       // Store user info and token
       localStorage.setItem('isAuth', 'true');
-      localStorage.setItem('isAdmin', 'true');
       localStorage.setItem('jwt', data.access_token);
-      // document.cookie = `access_token=${data.token}; path=/;`;
-
+  
+      // Redirect based on user role
+      if (data.isAdmin) {
+        localStorage.setItem('isAdmin', 'true');
+        navigate("/menaxhimi-i-produkteve");  // Redirect to admin page
+      } else {
+        localStorage.setItem('isAdmin', 'false');
+        navigate("/llogaria-ime");  // Redirect to user page
+      }
+  
       setLoading(false);
       setError(null);
-
-      // Redirect to the upload page after successful sign-in
-      navigate("/menaxhimi-i-produkteve");
-
+  
     } catch (error) {
       setLoading(false);
       setError("An error occurred: " + error.message);
     }
   };
+  
 
   return (
     <>
-    <Header />
+         <Header />
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl text-center font-semibold my-7">Sign In</h1>
 
@@ -97,9 +93,13 @@ const Admin = () => {
       </form>
 
       {error && <p className="text-red-500 mt-4">{error}</p>}
-    </div>
+
+        {/* Add the sign-up message */}
+        <p className="text-start mt-2 pb-10">
+          Nuk keni një account akoma? <Link to="/sign-up" className="text-blue-500 underline">Krijo një tani</Link>
+        </p>
+      </div>
     </>
-    
   );
 };
 
