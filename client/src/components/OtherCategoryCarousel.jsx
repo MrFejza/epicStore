@@ -97,7 +97,7 @@ const OtherCategoryCarousel = ({ currentCategory }) => {
                 {/* Shiko më shumë button */}
                 <Link
                   to={`/information/${product._id}`} // Link to the category
-                  className="absolute bottom-4 left-4 bg-violet-800 text-white font-bold py-2 px-4 rounded-lg hover:bg-violet-500 transition-colors"
+                  className="absolute bottom-4 left-4 bg-violet-800 text-xs w-28 text-white font-bold py-2 px-2 rounded-lg hover:bg-violet-500 transition-colors"
                 >
                   Shiko më shumë
                 </Link>

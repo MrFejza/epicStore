@@ -25,7 +25,7 @@ const Kategori = () => {
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 9;
+  const [productsPerPage, setProductsPerPage] = useState(9); // Default to 9
   const [expanded, setExpanded] = useState(false); 
   const [navHeight, setNavHeight] = useState('auto');
   const carouselRef = useRef(null); 
@@ -41,6 +41,22 @@ const Kategori = () => {
   };
 
   const displayImage = query ? SearchImage : categoryImages[category];
+
+  // Dynamically adjust productsPerPage based on screen size
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth <= 640) {
+        setProductsPerPage(8); // Fetch 8 products for mobile view
+      } else {
+        setProductsPerPage(9); // Fetch 9 products for larger screens
+      }
+    };
+
+    handleResize(); // Set initial value based on current screen size
+    window.addEventListener('resize', handleResize);
+
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Fetch products based on category or query
   useEffect(() => {
@@ -124,8 +140,6 @@ const Kategori = () => {
     handleModalClose();
   };
 
-
-
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
   const currentProducts = products.slice(indexOfFirstProduct, indexOfLastProduct);
@@ -134,7 +148,7 @@ const Kategori = () => {
   return (
     <>
     <Header/>
-     <div className="container mx-auto px-10 py-8 max-w-[90%]">
+     <div className="container mx-auto px-0 md:px-10 py-8 max-w-[90%]">
       {loading && <div className="mx-auto text-xl">Loading products...</div>}
 
       {/* Grid Layout for Navigation and Carousel */}
@@ -161,22 +175,22 @@ const Kategori = () => {
       </div>
 
       {/* Products Section with Ref */}
-      <div ref={productSectionRef} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-[85%] mx-auto">
+      <div ref={productSectionRef} className="grid  grid-cols-2 lg:grid-cols-3  gap-x-2 gap-y-8   max-w-[100%] md:max-w-[85%] py-2 mx-auto ">
         {currentProducts.length > 0 ? (
           currentProducts.map(product => (
             <div
               key={product._id}
-              className="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 relative"
+              className="bg-white p-3 md:p-6 rounded-lg shadow-lg hover:shadow-xl md:mx-4 space-y-4 md:py-4 transition-shadow duration-300 relative flex flex-col justify-between h-full"
             >
               <Link to={`/information/${product._id}`}>
                 {product.onSale && (
                   <img
                     src={Sale}
                     alt="Sale"
-                    className="absolute top-0 right-0 h-36 w-36"
+                    className="absolute top-0 right-0 h-20 w-20 md:h-36 md:w-36"
                   />
                 )}
-                <div className="h-64 overflow-hidden flex justify-center items-center mb-4">
+                <div className="md:h-64 h-24 overflow-hidden flex justify-center items-center mb-4">
                   <img
                     src={
                       product.image && product.image.length > 0
@@ -190,7 +204,7 @@ const Kategori = () => {
                 <h2 className="text-xl font-bold mb-2 text-center">{product.name}</h2>
 
                 <p
-                  className={`text-center mb-4 font-bold ${
+                  className={`text-center md:mb-4 mb-1 font-bold ${
                     product.stock ? 'text-green-600' : 'text-red-600'
                   }`}
                 >
@@ -212,7 +226,7 @@ const Kategori = () => {
                 </p>
               </Link>
 
-              <div className="flex justify-center mt-4">
+              <div className="flex md:justify-center md:mt-4 mt-1  ">
                 <button
                   onClick={() => handleAddToCartClick(product)}
                   className={`bg-violet-950 text-white font-bold py-2 px-6 rounded-md hover:bg-violet-800 transition-colors ${
@@ -223,6 +237,7 @@ const Kategori = () => {
                   Shto ne shporte
                 </button>
               </div>
+
             </div>
           ))
         ) : (
@@ -267,7 +282,6 @@ const Kategori = () => {
       <ScrollToTopButton />
     </div>
     </>
-   
   );
 };
 

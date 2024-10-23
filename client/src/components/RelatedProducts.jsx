@@ -44,8 +44,8 @@ const RelatedProducts = ({ category, currentProductId }) => {
 
   return (
     <div className="mt-8">
-      <h2 className="text-2xl font-bold mb-6">Produkte në të njëjtën kategori</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6">
+      <h2 className="text-2xl font-bold mb-6 w-full">Produkte në të njëjtën kategori</h2>
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3  md:mx-4 gap-x-2 gap-y-6">
         {relatedProducts.map((product) => (
           <Link key={product._id} to={`/information/${product._id}`} className="border p-4 rounded-lg hover:shadow-lg transition-shadow">
             <div>

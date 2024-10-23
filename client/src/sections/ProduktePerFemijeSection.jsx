@@ -69,18 +69,18 @@ const ProduktePerFemijeSection = () => {
   return (
     <div className="my-8">
       <h2 className="text-4xl font-bold text-left mb-6 mt-10">Produkte për Fëmijë</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-2 gap-y-8">
         {products.map(product => (
           <Link to={`/information/${product._id}`} key={product._id}>
             <div
-              className={`bg-white p-4 rounded-lg shadow-lg transition-all duration-300 relative group ${
-                hoveredProduct === product._id ? 'h-[370px] z-10' : 'h-[310px]'
+              className={`bg-white p-4 md:mx-4 rounded-lg shadow-lg transition-all duration-300 relative group ${
+                hoveredProduct === product._id ? 'h-[370px] z-10' : 'md:h-[310px] h-[360px]'
               }`} // Initial height and increased height on hover
               onMouseEnter={() => handleMouseEnter(product._id)}
               onMouseLeave={handleMouseLeave}
             >
               {product.onSale && (
-                <img src={SaleTag} alt="Sale" className="absolute top-0 right-0 h-32 w-32" />
+                <img src={SaleTag} alt="Sale" className="absolute top-0 right-0 md:h-32 md:w-32 h-24 w-24" />
               )}
               <div className="h-48 overflow-hidden flex justify-center items-center mb-4">
                 <img

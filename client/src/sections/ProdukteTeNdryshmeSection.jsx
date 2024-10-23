@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'; 
 import axios from 'axios';
 import SaleTag from '../assets/SaleTag.png';
 import { useCart } from '../context/CartContext';
@@ -19,8 +19,11 @@ const ProdukteTeNdryshmeSection = () => {
         const response = await axios.get('/api/product');
         const allProducts = response.data;
 
-        // Get 9 random products
-        const randomProducts = allProducts.sort(() => 0.5 - Math.random()).slice(0, 9);
+        // Determine the number of products to fetch based on screen size
+        const productsToFetch = window.innerWidth <= 640 ? 8 : 9; // 8 for mobile, 9 for larger screens
+
+        // Get random products based on screen size
+        const randomProducts = allProducts.sort(() => 0.5 - Math.random()).slice(0, productsToFetch);
 
         setProducts(randomProducts);
         setLoading(false);
@@ -31,6 +34,17 @@ const ProdukteTeNdryshmeSection = () => {
     };
 
     fetchProdukteTeNdryshme();
+
+    // Optional: Add an event listener for resizing (if you want to refetch on window resize)
+    const handleResize = () => {
+      fetchProdukteTeNdryshme();
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
   const handleAddToCart = (product) => {
@@ -63,12 +77,12 @@ const ProdukteTeNdryshmeSection = () => {
   return (
     <div className="my-12">
       <h2 className="text-4xl font-bold text-center m-6">Produkte të Ndryshme</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
         {products.map(product => (
           <Link to={`/information/${product._id}`} key={product._id}>
             <div
               className={`bg-white p-4 rounded-lg shadow-lg transition-all duration-300 relative group ${
-                hoveredProduct === product._id ? 'h-[370px] z-10' : 'h-[310px]'
+                hoveredProduct === product._id ? 'h-[370px] z-10' : 'md:h-[310px] h-[360px]'
               }`} // Initial height and increased height on hover
               onMouseEnter={() => handleMouseEnter(product._id)}
               onMouseLeave={handleMouseLeave}

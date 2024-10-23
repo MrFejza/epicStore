@@ -83,12 +83,12 @@ const OfferSection = () => {
       </div>
 
       {/* Second Div: Responsive offer cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 px-4 md:px-10">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-8 px-4 md:px-10">
         {/* Display 3 cards for mobile, and 6 cards for larger screens */}
         {offersToShow.map((offer) => {
           const timeLeft = calculateTimeLeft(offer.saleEndDate);
           return (
-            <div key={offer._id} className="bg-white p-4 shadow-lg w-full h-72">
+            <div key={offer._id} className="bg-white p-4 shadow-lg w-full md:h-72 h-auto">
               <Link to={`/information/${offer._id}`}>
                 <div className="h-36 xl:h-48 mb-2">
                   <img

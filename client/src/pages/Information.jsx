@@ -107,7 +107,7 @@ const Information = () => {
         <h1 className="text-4xl font-bold mb-4 text-center"ref={carouselRef}>{product.name}</h1>
 
         <div className="flex flex-col md:flex-row gap-6">
-          <div className="w-full md:w-3/5" > {/* Add ref here */}
+          <div className="w-full md:w-3/5 " > {/* Add ref here */}
             <div
               id="carouselExampleControlsNoTouching"
               className="carousel slide"
@@ -201,7 +201,7 @@ const Information = () => {
             </div>
           </div>
 
-          <div className="w-full md:w-2/5 ml-10 flex flex-col justify-between">
+          <div className="w-full md:w-2/5 md:ml-10 flex flex-col justify-between">
             {product.onSale && (
               <img
                 src={Sale} 
@@ -259,7 +259,7 @@ const Information = () => {
         </div>
 
         {/* Pass the product's category as a prop to RelatedProducts */}
-        <div className="container mx-auto mt-5 p-6 max-w-[90%]">
+        <div className="container mx-auto mt-5 md:p-6 md:max-w-[90%]">
           <RelatedProducts category={product.category} currentProductId={product._id} />
         </div>
 
