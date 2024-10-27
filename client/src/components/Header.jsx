@@ -12,6 +12,7 @@ import CheckoutModal from './CheckoutModal';
 import { useCart } from '../context/CartContext';
 import { useCheckoutModal } from '../context/CheckoutModalContext';
 import NavComponent from './NavComponent';
+import UserButton from './UserButton';
 
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -126,27 +127,20 @@ const Header = () => {
                     </div>
                   </form>
                 </div>
-
-                <div className="ml-4 mr-2">
+                
+                <div className="ml-4 mr-2 pr-10">
                   <ShoppingCart
                     cartItems={cart}
                     handleCheckout={() => openCheckoutModal(cart)} // Only pass cart items, not totalAmount
                     removeFromCart={removeFromCart}
                   />
                 </div>
-
-                <div className="flex items-center space-x-4">
-                  <a href="https://www.instagram.com/epic_store.al?igsh=MWVvOWFjNDRwb3NjcQ==" target="_blank" rel="noopener noreferrer">
-                    <img src={InstagramLogo} alt="Instagram" className="h-8 w-16" />
-                  </a>
-                  <a href="https://www.tiktok.com/@epic_store.al?_t=8q7hz7mPsGr&_r=1" target="_blank" rel="noopener noreferrer">
-                    <img src={TikTokLogo} alt="TikTok" className="h-8 w-8" />
-                  </a>
-                  <a href="https://www.facebook.com/EpicStoreAlbania?mibextid=LQQJ4d" target="_blank" rel="noopener noreferrer">
-                    <img src={FacebookLogo} alt="Facebook" className="h-8 w-14" />
-                  </a>
+                <div className='mr-8'>
+                <UserButton/>
                 </div>
-                <LogoutButton />
+                
+
+                <LogoutButton  />
               </div>
 
               {/* Mobile View */}
@@ -166,19 +160,24 @@ const Header = () => {
                   </Link>
                 </div>
 
-                <div className="flex items-center space-x-10">
+                <div className="flex items-center space-x-6">
                   <button
                     onClick={() => setShowSearch(!showSearch)}
-                    className="text-4xl text-gray-800"
+                    className="text-4xl text-violet-600"
                   >
                     ⌕
                   </button>
+                  
+                  <div className='block md:hidden'>
+                <UserButton/>
+              </div>
 
                   <ShoppingCart
                     cartItems={cart}
                     handleCheckout={() => openCheckoutModal(cart)} // Only pass cart items, not totalAmount
                     removeFromCart={removeFromCart}
                   />
+                  
                 </div>
               </div>
               {showSearch && (
@@ -205,6 +204,9 @@ const Header = () => {
                   </form>
                 </div>
               )}
+
+
+              
 
               <NavComponent />
             </div>

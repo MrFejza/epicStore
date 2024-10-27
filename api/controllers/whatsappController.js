@@ -12,11 +12,11 @@ const client = twilio(accountSid, authToken);
 const specificClientNumber = process.env.OWNER_PHONE_NUMBER || 'whatsapp:+355688697389';
 
 export const sendWhatsAppMessage = async (req, res) => {
-  const { customerName, customerLastName, phone, email, address, products, totalAmount } = req.body;
+  const { customerName, customerLastName, phone, email, qyteti, rruga, products, totalAmount } = req.body;
 
   try {
     // Ensure all required fields are present
-    if (!customerName || !customerLastName || !phone || !address || !products || !totalAmount) {
+    if (!customerName || !customerLastName || !phone || !qyteti || !rruga || !products || !totalAmount) {
       return res.status(400).json({ success: false, message: 'Missing required fields' });
     }
 
@@ -31,8 +31,9 @@ export const sendWhatsAppMessage = async (req, res) => {
       - Customer: ${customerName} ${customerLastName}
       - Phone: ${phone}
       - Email: ${email || 'N/A'}
-      - Address: ${address}
-      - Total: $${totalAmount.toFixed(2)}
+      - Qyteti: ${qyteti}
+      - Rruga: ${rruga}
+      - Total: ${totalAmount.toFixed(2)} Lek
       - Products: ${productDetails}
     `;
 

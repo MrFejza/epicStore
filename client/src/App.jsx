@@ -21,6 +21,7 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsAndConditions from './pages/TermsAndConditions';
 import GoogleCallbackHandler from './components/GoogleCallbackHandler';
 import Unauthorized from './pages/Unauthorized';
+import Kasa from './pages/Kasa';
 
 
 function App() {
@@ -39,6 +40,8 @@ function App() {
 
             {/* Category Route */}
             <Route path="/kategori/:category" element={<Kategori />} />
+
+            <Route path='/kasa' element={<Kasa />} />
 
             {/* Information Route */}
             <Route path="/information/:_id" element={<Information />} />

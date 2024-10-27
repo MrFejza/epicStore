@@ -123,7 +123,7 @@ const ProduktePerFemijeSection = () => {
 
       <div className="flex justify-center mt-8">
         <Link
-          to="/kategori/ProduktePerFemije"
+          to="/kategori/produkte-për-fëmijë"
           className="bg-violet-950 text-white font-bold py-2 px-6 rounded-md hover:bg-violet-800"
         >
           Shiko më shumë

@@ -11,6 +11,8 @@ const PrivateRoutes = ({ adminOnly, userOnly }) => {
   const isAdmin = localStorage.getItem('isAdmin') === 'true';
   const hasToken = getToken();
 
+  console.log("PrivateRoutes check: ", { isAuth, isAdmin, hasToken, adminOnly, userOnly });
+
   if (isAuth && hasToken) {
     if (adminOnly && !isAdmin) {
       console.log('Redirecting to /unauthorized because user is not admin');
@@ -21,6 +23,7 @@ const PrivateRoutes = ({ adminOnly, userOnly }) => {
       return <Navigate to='/unauthorized' />;
     }
     // If the user meets the required conditions, render the protected route
+    console.log("User meets required conditions, rendering Outlet.");
     return <Outlet />;
   }
 

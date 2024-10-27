@@ -1,5 +1,5 @@
 import express from 'express';
-import { createOrder, getOrders, deleteOrder } from '../controllers/order.controller.js';
+import { createOrder, getOrders, updateOrderStatus } from '../controllers/order.controller.js';
 
 const router = express.Router();
 
@@ -10,6 +10,6 @@ router.post('/', createOrder);
 router.get('/', getOrders);
 
 // DELETE /api/orders/:id - Delete an order by ID
-router.delete('/:id', deleteOrder);
+router.put('/:id', updateOrderStatus);
 
 export default router;

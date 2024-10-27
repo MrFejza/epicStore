@@ -187,7 +187,7 @@ const Kategori = () => {
                   <img
                     src={Sale}
                     alt="Sale"
-                    className="absolute top-0 right-0 h-20 w-20 md:h-36 md:w-36"
+                    className="absolute md:top-[-10px] top-[0] right-0 h-20 w-20 md:h-36 md:w-36"
                   />
                 )}
                 <div className="md:h-64 h-24 overflow-hidden flex justify-center items-center mb-4">

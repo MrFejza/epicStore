@@ -251,7 +251,7 @@ const Edit = () => {
                   className="w-full p-3 border rounded-md"
                   required
                 >
-                  <option value="">Zgjidh Kategorine</option>
+                  <option value={category}>Zgjidh Kategorine</option>
                   {categories.map((cat) => (
                     <option key={cat._id} value={cat.slug}>
                       {cat.name}

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import Header from "../components/Header";
 
 const Shemsia = () => {
@@ -9,7 +9,6 @@ const Shemsia = () => {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
-    
   };
 
   const handleSubmit = async (e) => {
@@ -24,11 +23,13 @@ const Shemsia = () => {
       });
   
       const data = await res.json();
-      if (data.success) {
+      
+      if (res.ok) { // Check if the response is OK
         localStorage.setItem("token", data.token); // Store token
+        localStorage.setItem("userId", data.userId); // Store userId (assuming the backend returns it)
         navigate("/llogaria-ime"); // Redirect to account page
       } else {
-        setError(data.message);
+        setError(data.message || "Something went wrong. Please try again."); // Handle errors better
       }
     } catch (err) {
       setError("An error occurred. Please try again.");
@@ -72,6 +73,9 @@ const Shemsia = () => {
         </button>
       </form>
       {error && <p className="text-red-500 mt-4">{error}</p>}
+      <p className="text-start mt-2 pb-10">
+          E keni një account? <Link to="/sign-in" className="text-blue-500 underline">Vazhdo tek Sign In</Link>
+        </p>
     </div>
     </>
   );

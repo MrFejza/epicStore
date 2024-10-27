@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { useCart } from '../context/CartContext';
-import { useCheckoutModal } from '../context/CheckoutModalContext'; // Import useCheckoutModal to control the checkout modal
+import { useNavigate } from 'react-router-dom';
+import Cart from '../assets/Cart.png';
 
 const ShoppingCart = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { cart, updateCart, removeFromCart } = useCart(); // Use Cart Context
-  const { openCheckoutModal } = useCheckoutModal(); // Access the modal context
+  const navigate = useNavigate();
 
-  // Toggle cart modal visibility
+  // Toggle cart visibility
   const toggleCart = () => {
     setIsOpen(!isOpen);
   };
@@ -28,38 +29,37 @@ const ShoppingCart = () => {
     }
   };
 
-  // Get total amount of cart items, considering sale price if applicable
+  // Get total amount of cart items
   const getTotalAmount = () => {
-    const total = cart.reduce((sum, item) => {
+    return cart.reduce((sum, item) => {
       const itemPrice = item.product.onSale && item.product.salePrice ? item.product.salePrice : item.product.price;
-      console.log(`Product: ${item.product.name}, Price: ${itemPrice}, Quantity: ${item.quantity}`);
       return sum + item.quantity * itemPrice;
     }, 0);
-    console.log('Total Amount:', total);
-    return total;
   };
 
-  // Proceed to checkout
+  // Redirect to checkout page
   const proceedToCheckout = () => {
-    const totalAmount = getTotalAmount();  // Calculate total
-    console.log('Proceeding to checkout with cart items:', cart, 'Total amount:', totalAmount);
-    toggleCart(); // Close the cart modal
-    openCheckoutModal(cart, totalAmount);  // Pass cart and total amount to the modal
+    navigate('/kasa');
   };
 
   return (
     <div>
       {/* Shopping Cart Icon */}
-      <div className="relative cursor-pointer" onClick={toggleCart}>
-        <span className="text-2xl">🛒</span>
-        {cart.length > 0 && (
-          <span className="absolute -top-2 -right-2 bg-red-600 text-white rounded-full px-2 text-xs">
-            {cart.length}
+      <div className="flex items-center space-x-1 cursor-pointer" onClick={toggleCart}>
+        <div className="relative">
+          <span>
+            <img src={Cart} alt="Shopping Cart" className="w-14" />
           </span>
-        )}
+          {cart.length > 0 && (
+            <span className="absolute -top-1 right-0 bg-red-600 text-white rounded-full px-2 text-xs">
+              {cart.length}
+            </span>
+          )}
+        </div>
+        <span className="text-gray-700 hidden md:block">Shporta</span>
       </div>
 
-      {/* Modal for Cart */}
+      {/* Cart Summary Dropdown */}
       {isOpen && (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white w-11/12 md:w-1/3 p-6 rounded-lg shadow-lg relative">
@@ -71,7 +71,7 @@ const ShoppingCart = () => {
             </button>
             <h2 className="text-2xl font-bold mb-4">Shporta juaj</h2>
             {cart.length === 0 ? (
-              <p className="text-gray-600">Shporta eshte bosh.</p>
+              <p className="text-gray-600">Shporta është bosh.</p>
             ) : (
               <ul className="divide-y divide-gray-200">
                 {cart.map((item) => (
@@ -79,7 +79,6 @@ const ShoppingCart = () => {
                     <div className="flex flex-col">
                       <span>{item.product.name}</span>
                       <div className="flex items-center mt-2">
-                        {/* Buttons for increasing/decreasing quantity */}
                         <button
                           onClick={() => decreaseQuantity(item.product._id)}
                           className="bg-gray-300 text-black px-2 py-1 rounded-md hover:bg-gray-400"
@@ -97,7 +96,9 @@ const ShoppingCart = () => {
                     </div>
                     <div className="flex flex-col items-end">
                       <span>
-                        {(item.product.onSale && item.product.salePrice ? item.product.salePrice : item.product.price) * item.quantity} Lek
+                        {(item.product.onSale && item.product.salePrice ? item.product.salePrice : item.product.price) *
+                          item.quantity}{' '}
+                        Lek
                       </span>
                       <button
                         onClick={() => removeFromCart(item.product._id)}

@@ -1,6 +1,11 @@
 import mongoose from 'mongoose';
 
 const orderSchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: false,  // Optional for guest orders
+  },
   customerName: {
     type: String,
     required: true,
@@ -9,28 +14,31 @@ const orderSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  address: {
-    type: String,
+  qyteti: {
+    type: String,  // City
+    required: true,
+  },
+  rruga: {
+    type: String,  // Street
     required: true,
   },
   phone: {
     type: String,
     required: true,
     validate: {
-      validator: function(v) {
+      validator: function (v) {
         return /\d{10}/.test(v);
       },
-      message: props => `${props.value} is not a valid phone number!`,
+      message: (props) => `${props.value} is not a valid phone number!`,
     },
   },
   email: {
     type: String,
-    required: false,
     validate: {
-      validator: function(v) {
+      validator: function (v) {
         return !v || /\S+@\S+\.\S+/.test(v);
       },
-      message: props => `${props.value} is not a valid email address!`,
+      message: (props) => `${props.value} is not a valid email address!`,
     },
   },
   products: [
@@ -45,7 +53,7 @@ const orderSchema = new mongoose.Schema({
         required: true,
       },
       price: {
-        type: Number,  // Ensure that the price field is present
+        type: Number,
         required: true,
       },
     },
@@ -54,17 +62,17 @@ const orderSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
-  orderStatus: {
+  status: {
     type: String,
-    enum: ['Pending', 'Processed', 'Shipped', 'Delivered', 'Canceled'],
+    enum: ['Pending', 'Delivered'],
     default: 'Pending',
   },
-}, {  
+}, {
   timestamps: true,
 });
 
 // Pre-save hook to calculate totalAmount
-orderSchema.pre('save', function(next) {
+orderSchema.pre('save', function (next) {
   const order = this;
   order.totalAmount = order.products.reduce((acc, product) => {
     return acc + product.quantity * product.price;

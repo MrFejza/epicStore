@@ -27,14 +27,15 @@ function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) r
 
 // Function to handle user signup
 var signup = function signup(req, res, next) {
-  var _req$body, username, email, password, isAdmin, hashedPassword, newUser;
+  var _req$body, username, email, password, firstName, lastName, qyteti, rruga, isAdmin, hashedPassword, newUser;
 
   return regeneratorRuntime.async(function signup$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
         case 0:
-          _req$body = req.body, username = _req$body.username, email = _req$body.email, password = _req$body.password, isAdmin = _req$body.isAdmin;
+          _req$body = req.body, username = _req$body.username, email = _req$body.email, password = _req$body.password, firstName = _req$body.firstName, lastName = _req$body.lastName, qyteti = _req$body.qyteti, rruga = _req$body.rruga, isAdmin = _req$body.isAdmin;
           console.log('Request Body:', req.body); // Log the request body
+          // Validate required fields
 
           if (!(!username || !email || !password)) {
             _context.next = 4;
@@ -48,13 +49,21 @@ var signup = function signup(req, res, next) {
 
         case 4:
           _context.prev = 4;
-          hashedPassword = _bcryptjs["default"].hashSync(password, 10);
+          // Hash the password before storing it
+          hashedPassword = _bcryptjs["default"].hashSync(password, 10); // Create a new user with the provided details
+
           newUser = new _userModel["default"]({
             username: username,
             email: email,
             password: hashedPassword,
+            firstName: firstName,
+            // Optional fields
+            lastName: lastName,
+            qyteti: qyteti,
+            rruga: rruga,
             isAdmin: isAdmin
-          });
+          }); // Save the new user in the database
+
           _context.next = 9;
           return regeneratorRuntime.awrap(newUser.save());
 
