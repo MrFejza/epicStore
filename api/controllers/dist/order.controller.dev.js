@@ -3,7 +3,7 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.updateOrderStatus = exports.getOrders = exports.createOrder = void 0;
+exports.getUserOrders = exports.updateOrderStatus = exports.getOrders = exports.createOrder = void 0;
 
 var _orderModel = _interopRequireDefault(require("../models/order.model.js"));
 
@@ -17,20 +17,36 @@ var createOrder = function createOrder(req, res) {
     while (1) {
       switch (_context.prev = _context.next) {
         case 0:
-          _req$body = req.body, customerName = _req$body.customerName, customerLastName = _req$body.customerLastName, qyteti = _req$body.qyteti, rruga = _req$body.rruga, phone = _req$body.phone, email = _req$body.email, products = _req$body.products, totalAmount = _req$body.totalAmount; // Ensure all required fields are provided
+          console.log("User ID from request:", req.user ? req.user.id : "No user ID"); // Log the incoming request body to verify the received data
+
+          _req$body = req.body, customerName = _req$body.customerName, customerLastName = _req$body.customerLastName, qyteti = _req$body.qyteti, rruga = _req$body.rruga, phone = _req$body.phone, email = _req$body.email, products = _req$body.products, totalAmount = _req$body.totalAmount;
+          console.log("Request body:", req.body); // Ensure all required fields are provided
 
           if (!(!customerName || !customerLastName || !qyteti || !rruga || !phone || !products || !totalAmount)) {
-            _context.next = 3;
+            _context.next = 6;
             break;
           }
 
+          console.error("Missing required fields:", {
+            customerName: customerName,
+            customerLastName: customerLastName,
+            qyteti: qyteti,
+            rruga: rruga,
+            phone: phone,
+            products: products,
+            totalAmount: totalAmount
+          });
           return _context.abrupt("return", res.status(400).json({
             message: 'Please provide all required fields'
           }));
 
-        case 3:
-          _context.prev = 3;
-          // Create an order, adding userId if the user is logged in
+        case 6:
+          _context.prev = 6;
+          // Log each product to verify structure and content
+          products.forEach(function (product, index) {
+            return console.log("Product ".concat(index + 1, ":"), product);
+          }); // Create an order, adding userId if the user is logged in
+
           newOrder = new _orderModel["default"]({
             customerName: customerName,
             customerLastName: customerLastName,
@@ -44,29 +60,32 @@ var createOrder = function createOrder(req, res) {
 
           }); // Save the new order in the database
 
-          _context.next = 7;
+          _context.next = 11;
           return regeneratorRuntime.awrap(newOrder.save());
 
-        case 7:
+        case 11:
           savedOrder = _context.sent;
+          console.log("Order successfully created:", savedOrder);
           res.status(201).json(savedOrder);
-          _context.next = 14;
+          _context.next = 21;
           break;
 
-        case 11:
-          _context.prev = 11;
-          _context.t0 = _context["catch"](3);
+        case 16:
+          _context.prev = 16;
+          _context.t0 = _context["catch"](6);
+          console.error("Error creating order:", _context.t0.message);
+          console.error("Full error details:", _context.t0);
           res.status(500).json({
             message: 'Error creating order',
-            error: _context.t0
+            error: _context.t0.message
           });
 
-        case 14:
+        case 21:
         case "end":
           return _context.stop();
       }
     }
-  }, null, null, [[3, 11]]);
+  }, null, null, [[6, 16]]);
 }; // Controller to get orders - separate for user and admin
 
 
@@ -171,3 +190,43 @@ var updateOrderStatus = function updateOrderStatus(req, res) {
 };
 
 exports.updateOrderStatus = updateOrderStatus;
+
+var getUserOrders = function getUserOrders(req, res) {
+  var userOrders;
+  return regeneratorRuntime.async(function getUserOrders$(_context4) {
+    while (1) {
+      switch (_context4.prev = _context4.next) {
+        case 0:
+          _context4.prev = 0;
+          _context4.next = 3;
+          return regeneratorRuntime.awrap(_orderModel["default"].find({
+            userId: req.user.id
+          }).sort({
+            createdAt: -1
+          }));
+
+        case 3:
+          userOrders = _context4.sent;
+          // Sorted by most recent
+          res.status(200).json(userOrders);
+          _context4.next = 11;
+          break;
+
+        case 7:
+          _context4.prev = 7;
+          _context4.t0 = _context4["catch"](0);
+          console.error('Error fetching user orders:', _context4.t0);
+          res.status(500).json({
+            message: 'Error fetching user orders',
+            error: _context4.t0
+          });
+
+        case 11:
+        case "end":
+          return _context4.stop();
+      }
+    }
+  }, null, null, [[0, 7]]);
+};
+
+exports.getUserOrders = getUserOrders;

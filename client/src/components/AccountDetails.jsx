@@ -3,19 +3,19 @@ import axios from 'axios';
 
 function AccountDetails() {
   const [user, setUser] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     qyteti: '',
     rruga: '',
+    phone: '',
   });
+  const [editedField, setEditedField] = useState(null); // Track which field is being edited
 
-  // Fetch user data when component mounts
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const token = localStorage.getItem('jwt'); // Retrieve token from local storage
+        const token = localStorage.getItem('jwt');
         const response = await axios.get('/api/auth/me', {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -27,6 +27,7 @@ function AccountDetails() {
           lastName: response.data.lastName || '',
           qyteti: response.data.homeAddress?.qyteti || '',
           rruga: response.data.homeAddress?.rruga || '',
+          phone: response.data.phone || '',
         });
       } catch (error) {
         console.error('Error fetching user data:', error);
@@ -35,17 +36,16 @@ function AccountDetails() {
     fetchUserData();
   }, []);
 
-  // Handle form changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
     }));
+    setEditedField(name); // Set the edited field to show the "Ruaj" button
   };
 
-  // Save updated user details
-  const handleSave = async () => {
+  const handleSave = async (field) => {
     try {
       const token = localStorage.getItem('jwt');
       await axios.put('/api/auth/update-profile', formData, {
@@ -55,16 +55,15 @@ function AccountDetails() {
       });
       setUser((prevUser) => ({
         ...prevUser,
-        firstName: formData.firstName,
-        lastName: formData.lastName,
+        [field]: formData[field],
         homeAddress: {
           qyteti: formData.qyteti,
           rruga: formData.rruga,
         },
       }));
-      setIsEditing(false); // Exit edit mode
+      setEditedField(null); // Hide the "Ruaj" button after saving
     } catch (error) {
-      console.error('Error updating user details:', error);
+      console.error(`Error updating ${field}:`, error);
     }
   };
 
@@ -73,77 +72,45 @@ function AccountDetails() {
       <h2 className="text-2xl font-semibold mb-6">Detajet e Llogarisë</h2>
       {user ? (
         <div>
-          {/* Display read-only fields for Username and Email */}
+          {/* Display Username as read-only */}
           <div className="mb-4">
             <label className="block font-semibold text-gray-700">Username:</label>
             <p className="border border-gray-300 rounded p-2 bg-gray-100">{user.username}</p>
           </div>
+
+          {/* Display Email as read-only */}
           <div className="mb-4">
             <label className="block font-semibold text-gray-700">Email:</label>
             <p className="border border-gray-300 rounded p-2 bg-gray-100">{user.email}</p>
           </div>
 
-          {/* Editable Fields for Account Details */}
-          {isEditing ? (
-            <>
-              <div className="mb-4">
-                <label className="block font-semibold text-gray-700">Emri:</label>
-                <input
-                  type="text"
-                  name="firstName"
-                  value={formData.firstName}
-                  onChange={handleChange}
-                  className="border border-gray-300 rounded p-2 w-full"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block font-semibold text-gray-700">Mbiemri:</label>
-                <input
-                  type="text"
-                  name="lastName"
-                  value={formData.lastName}
-                  onChange={handleChange}
-                  className="border border-gray-300 rounded p-2 w-full"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block font-semibold text-gray-700">Qyteti:</label>
-                <input
-                  type="text"
-                  name="qyteti"
-                  value={formData.qyteti}
-                  onChange={handleChange}
-                  className="border border-gray-300 rounded p-2 w-full"
-                />
-              </div>
-              <div className="mb-4">
-                <label className="block font-semibold text-gray-700">Rruga:</label>
-                <input
-                  type="text"
-                  name="rruga"
-                  value={formData.rruga}
-                  onChange={handleChange}
-                  className="border border-gray-300 rounded p-2 w-full"
-                />
-              </div>
-              <button onClick={handleSave} className="bg-blue-500 text-white px-4 py-2 rounded">
-                Save
-              </button>
-              <button onClick={() => setIsEditing(false)} className="ml-2 bg-gray-400 text-white px-4 py-2 rounded">
-                Cancel
-              </button>
-            </>
-          ) : (
-            <>
-              <p className="mb-2"><span className="font-semibold">Emri:</span> {user.firstName}</p>
-              <p className="mb-2"><span className="font-semibold">Mbiemri:</span> {user.lastName}</p>
-              <p className="mb-2"><span className="font-semibold">Qyteti:</span> {user.homeAddress?.qyteti}</p>
-              <p className="mb-2"><span className="font-semibold">Rruga:</span> {user.homeAddress?.rruga}</p>
-              <button onClick={() => setIsEditing(true)} className="bg-blue-500 text-white px-4 py-2 rounded mt-4">
-                Edit
-              </button>
-            </>
-          )}
+          {/* Editable fields for each profile detail */}
+          {['firstName', 'lastName', 'qyteti', 'rruga', 'phone'].map((field) => (
+            <div key={field} className="mb-4">
+              <label className="block font-semibold text-gray-700">
+                {field === 'firstName' ? 'Emri' :
+                 field === 'lastName' ? 'Mbiemri' :
+                 field === 'qyteti' ? 'Qyteti' :
+                 field === 'rruga' ? 'Rruga' :
+                 'Telefoni'}
+              </label>
+              <input
+                type="text"
+                name={field}
+                value={formData[field]}
+                onChange={handleChange}
+                className="border border-gray-300 rounded p-2 w-full"
+              />
+              {editedField === field && (
+                <button
+                  onClick={() => handleSave(field)}
+                  className="bg-blue-500 text-white px-4 py-2 rounded mt-2"
+                >
+                  Ruaj
+                </button>
+              )}
+            </div>
+          ))}
         </div>
       ) : (
         <p>Loading user data...</p>

@@ -10,17 +10,14 @@ function OrdersUser() {
     const fetchOrders = async () => {
       try {
         const token = localStorage.getItem('jwt');
-        const response = await axios.get('/api/orders', {
+        const response = await axios.get('/api/orders/user', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
         
-        const sortedOrders = response.data.sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-        );
-        
-        setOrders(sortedOrders);
+        // Orders are already sorted in the backend, no need to re-sort
+        setOrders(response.data);
       } catch (error) {
         console.error('Error fetching orders:', error);
       } finally {
@@ -47,9 +44,9 @@ function OrdersUser() {
 
             <h4 className="mt-4 font-semibold">Products:</h4>
             <ul className="list-disc list-inside">
-            {order.products.map((product) => (
-                        <ProductInfo key={product.productId} product={product} />
-                      ))}
+              {order.products.map((product) => (
+                <ProductInfo key={product.productId} product={product} />
+              ))}
             </ul>
           </div>
         ))
@@ -74,7 +71,7 @@ const ProductInfo = ({ product }) => {
   const fetchProductName = async (productId) => {
     try {
       const response = await axios.get(`/api/product/${productId}`);
-      return response.data.name; // Assuming the product name is returned as { name: 'Product Name' }
+      return response.data.name;
     } catch (error) {
       console.error('Failed to fetch product name:', error);
       return 'Unknown Product';
@@ -91,6 +88,5 @@ const ProductInfo = ({ product }) => {
     </div>
   );
 };
-
 
 export default OrdersUser;

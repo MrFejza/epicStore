@@ -77,7 +77,13 @@ const Kasa = () => {
     };
 
     try {
-      await axios.post('/api/orders', orderData);
+      const token = localStorage.getItem('jwt'); // Make sure 'jwt' is the correct key
+await axios.post('/api/orders', orderData, {
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
+
       await axios.post('/api/whatsapp', orderData);
 
       clearCart();

@@ -15,48 +15,49 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
 
 // Ensure User model is imported
 // Protect routes
-var protect = (0, _asyncHandler["default"])(function _callee(request, response, next) {
+var protect = (0, _asyncHandler["default"])(function _callee(req, res, next) {
   var token, decoded;
   return regeneratorRuntime.async(function _callee$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
         case 0:
-          // Read the JWT from the cookie
-          token = request.cookies.jwt;
+          token = req.cookies.jwt || req.headers.authorization && req.headers.authorization.split(" ")[1];
 
           if (!token) {
-            _context.next = 17;
+            _context.next = 16;
             break;
           }
 
           _context.prev = 2;
-          decoded = _jsonwebtoken["default"].verify(token, process.env.JWT_SECRET); // Use 'decoded.id' (not 'decoded.userId') to match what is stored in the token
-
+          decoded = _jsonwebtoken["default"].verify(token, process.env.JWT_SECRET);
           _context.next = 6;
           return regeneratorRuntime.awrap(_userModel["default"].findById(decoded.id).select('-password'));
 
         case 6:
-          request.user = _context.sent;
+          req.user = _context.sent;
+          // Attach user object to `req.user`
           next();
-          _context.next = 15;
+          _context.next = 14;
           break;
 
         case 10:
           _context.prev = 10;
           _context.t0 = _context["catch"](2);
-          console.error(_context.t0);
-          response.status(401);
-          throw new Error('Not authorized, token failed');
+          console.error('Token verification failed:', _context.t0);
+          res.status(401).json({
+            message: 'Not authorized, token failed'
+          });
 
-        case 15:
-          _context.next = 19;
+        case 14:
+          _context.next = 17;
           break;
 
-        case 17:
-          response.status(401);
-          throw new Error('Not authorized, no token');
+        case 16:
+          res.status(401).json({
+            message: 'Not authorized, no token'
+          });
 
-        case 19:
+        case 17:
         case "end":
           return _context.stop();
       }

@@ -30,5 +30,6 @@ router.get('/me', _authMiddleware.verifyToken, function (req, res) {
 router.post('/create', _authMiddleware.verifyToken, _orderController.createOrder);
 router.get('/', _authMiddleware.verifyToken, _orderController.getOrders);
 router.patch('/:id/status', _authMiddleware.verifyToken, _orderController.updateOrderStatus);
+router.put('/update-profile', _authMiddleware.verifyToken, _authController.updateUserProfile);
 var _default = router;
 exports["default"] = _default;

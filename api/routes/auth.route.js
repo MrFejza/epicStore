@@ -1,5 +1,5 @@
 import express from 'express';
-import { signin, signup, checkAdmin, getUserProfile } from '../controllers/auth.controller.js';
+import { signin, signup, checkAdmin, getUserProfile, updateUserProfile } from '../controllers/auth.controller.js';
 import { createOrder, getOrders, updateOrderStatus } from '../controllers/order.controller.js';
 import { verifyToken } from '../middleware/authMiddleware.js';
 
@@ -16,5 +16,7 @@ router.get('/me', verifyToken, (req, res) => {
 router.post('/create', verifyToken, createOrder);
 router.get('/', verifyToken, getOrders);
 router.patch('/:id/status', verifyToken, updateOrderStatus);
+
+router.put('/update-profile', verifyToken, updateUserProfile);
 
 export default router;

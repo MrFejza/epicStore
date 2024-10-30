@@ -17,8 +17,14 @@ var userSchema = new _mongoose["default"].Schema({
   },
   email: {
     type: String,
-    required: true,
-    unique: true
+    validate: {
+      validator: function validator(v) {
+        return !v || /\S+@\S+\.\S+/.test(v);
+      },
+      message: function message(props) {
+        return "".concat(props.value, " is not a valid email address!");
+      }
+    }
   },
   password: {
     type: String,
@@ -33,6 +39,18 @@ var userSchema = new _mongoose["default"].Schema({
   },
   lastName: {
     type: String
+  },
+  phone: {
+    type: String,
+    required: true,
+    validate: {
+      validator: function validator(v) {
+        return /\d{10}/.test(v);
+      },
+      message: function message(props) {
+        return "".concat(props.value, " is not a valid phone number!");
+      }
+    }
   },
   homeAddress: {
     // Nested address object

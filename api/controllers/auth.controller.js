@@ -108,3 +108,48 @@ export const getUserProfile = async (req, res, next) => {
     next(errorHandler(500, 'Error fetching user profile'));
   }
 };
+
+// Function to update user profile
+export const updateUserProfile = async (req, res, next) => {
+  const { firstName, lastName, qyteti, rruga, phone } = req.body;
+
+  // Create an update object dynamically based on provided fields, excluding email
+  const updateFields = {};
+  if (firstName) updateFields.firstName = firstName;
+  if (lastName) updateFields.lastName = lastName;
+  if (phone) updateFields.phone = phone;
+
+  // Handle partial updates to homeAddress fields without overwriting the whole object
+  if (qyteti) updateFields['homeAddress.qyteti'] = qyteti;
+  if (rruga) updateFields['homeAddress.rruga'] = rruga;
+
+  try {
+    // Update user profile based on req.user.id
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.id,
+      { $set: updateFields }, // Use $set to prevent conflicts
+      { new: true, runValidators: true }
+    ).select('-password'); // Exclude password from returned data
+
+    if (!updatedUser) return res.status(404).json({ message: "User not found" });
+
+    res.status(200).json({
+      success: true,
+      message: 'Profile updated successfully',
+      user: {
+        userId: updatedUser._id,
+        username: updatedUser.username,
+        email: updatedUser.email, // Email remains unchanged
+        phone: updatedUser.phone,
+        firstName: updatedUser.firstName,
+        lastName: updatedUser.lastName,
+        homeAddress: updatedUser.homeAddress,
+      },
+    });
+  } catch (error) {
+    console.error('Error updating user profile:', error);
+    next(errorHandler(500, 'Error updating profile'));
+  }
+};
+
+

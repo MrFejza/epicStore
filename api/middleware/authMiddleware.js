@@ -3,27 +3,20 @@ import asyncHandler from './asyncHandler.js';
 import User from '../models/user.model.js'; // Ensure User model is imported
 
 // Protect routes
-const protect = asyncHandler(async (request, response, next) => {
-    let token;
+const protect = asyncHandler(async (req, res, next) => {
+    let token = req.cookies.jwt || (req.headers.authorization && req.headers.authorization.split(" ")[1]);
 
-    // Read the JWT from the cookie
-    token = request.cookies.jwt;
     if (token) {
         try {
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
-            
-            // Use 'decoded.id' (not 'decoded.userId') to match what is stored in the token
-            request.user = await User.findById(decoded.id).select('-password');
-            
+            req.user = await User.findById(decoded.id).select('-password'); // Attach user object to `req.user`
             next();
         } catch (error) {
-            console.error(error);
-            response.status(401);
-            throw new Error('Not authorized, token failed');
+            console.error('Token verification failed:', error);
+            res.status(401).json({ message: 'Not authorized, token failed' });
         }
     } else {
-        response.status(401);
-        throw new Error('Not authorized, no token');
+        res.status(401).json({ message: 'Not authorized, no token' });
     }
 });
 
