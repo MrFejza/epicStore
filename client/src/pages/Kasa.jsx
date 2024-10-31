@@ -70,7 +70,7 @@ const Kasa = () => {
     else if (field === 'phone') setPhone(value.replace(prefix === 'AL' ? '+355' : '+383', ''));
   };
 
-  const handleSaveToPanel = async () => {
+const handleSaveToPanel = async () => {
     try {
       const token = localStorage.getItem('jwt');
       const saveData = {};
@@ -248,22 +248,19 @@ const Kasa = () => {
                 required
               />
             </div>
-            {userData && userData.phone && (
-              <p
-                onClick={() => handleFillFromPanel('phone', userData.phone)}
-                className="text-blue-500 text-sm cursor-pointer mt-1"
-              >
-                Ploteso nga paneli
-              </p>
-            )}
-            {errors.phone && <p className="text-red-600">{errors.phone}</p>}
+
+            <div>
+  <label className="block text-sm font-medium text-gray-700 pt-3">Email</label>
+  <input
+    type="email"
+    value={email}
+    onChange={(e) => setEmail(e.target.value)}
+    className="w-full px-3 py-2 border border-gray-300 rounded-md"
+    required
+  />
+</div>
           </div>
 
-          {/* Non-editable email field */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Email</label>
-            <p className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100">{email}</p>
-          </div>
 
           {/* Save/Update panel data button */}
           <div className="mt-6">

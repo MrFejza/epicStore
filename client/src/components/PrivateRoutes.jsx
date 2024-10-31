@@ -24,7 +24,7 @@ const PrivateRoutes = ({ adminOnly = false, userOnly = false }) => {
         });
         const data = await res.json();
 
-        console.log("Admin check response:", data); // Confirm response from backend
+       
         if (!res.ok) throw new Error(data.message || 'Failed to verify admin status');
 
         setIsAuth(true);
@@ -38,7 +38,7 @@ const PrivateRoutes = ({ adminOnly = false, userOnly = false }) => {
     checkAdminStatus();
   }, [hasToken]);
 
-  console.log("Rendering PrivateRoutes:", { isAuth, isAdmin, adminOnly, userOnly });
+  
 
   if (loading) return <p>Loading...</p>;
 

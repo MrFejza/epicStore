@@ -32,7 +32,7 @@ const LogariaIme = () => {
         });
     
         const data = await res.json();
-        console.log("JWT Token in Llogaria ime:", token);
+       
         
         
         if (res.ok) {

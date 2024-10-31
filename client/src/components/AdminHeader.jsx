@@ -7,9 +7,7 @@ const Header = () => {
 
   // Logout logic
   const handleLogout = () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('isAuth');
-    localStorage.removeItem('isAdmin');
+    localStorage.clear();
     navigate('/');  // Redirect to home or login page after logout
   };
 
