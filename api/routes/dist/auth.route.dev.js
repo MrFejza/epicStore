@@ -15,21 +15,26 @@ var _authMiddleware = require("../middleware/authMiddleware.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-var router = _express["default"].Router();
+var router = _express["default"].Router(); // Public routes
+
 
 router.post('/signup', _authController.signup);
-router.post('/signin', _authController.signin);
-router.post('/check-admin', _authController.checkAdmin, function (req, res) {
+router.post('/signin', _authController.signin); // Protected routes
+
+router.post('/check-admin', _authMiddleware.protect, function (req, res) {
   res.json({
     isAdmin: req.user.isAdmin
   });
-});
-router.get('/me', _authMiddleware.verifyToken, function (req, res) {
-  (0, _authController.getUserProfile)(req, res);
-});
+}); // Use 'protect' for full user data in getUserProfile and updateUserProfile
+
+router.get('/me', _authMiddleware.protect, _authController.getUserProfile);
+router.put('/update-profile', _authMiddleware.protect, _authController.updateUserProfile);
+router.put('/update-kasa', _authMiddleware.protect, _authController.updateUserKasa); // Use verifyToken if only token validation is needed, e.g., for order creation
+
 router.post('/create', _authMiddleware.verifyToken, _orderController.createOrder);
-router.get('/', _authMiddleware.verifyToken, _orderController.getOrders);
-router.patch('/:id/status', _authMiddleware.verifyToken, _orderController.updateOrderStatus);
-router.put('/update-profile', _authMiddleware.verifyToken, _authController.updateUserProfile);
+router.get('/', _authMiddleware.protect, _orderController.getOrders); // Using protect since getOrders may need user data
+
+router.patch('/:id/status', _authMiddleware.protect, _orderController.updateOrderStatus); // Using protect for user-specific status updates
+
 var _default = router;
 exports["default"] = _default;

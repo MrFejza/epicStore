@@ -4,7 +4,7 @@ const userSchema = new mongoose.Schema({
   username: {
     type: String,
     required: true,
-    unique: true,
+    unique: false,
   },
   email: {
     type: String,
@@ -34,17 +34,18 @@ const userSchema = new mongoose.Schema({
     required: true,
     validate: {
       validator: function (v) {
-        return /\d{10}/.test(v);
+        // Allow +355 with 9 digits or +383 with 8 digits
+        return /^(\+355\d{9}|\+383\d{8})$/.test(v);
       },
       message: (props) => `${props.value} is not a valid phone number!`,
     },
   },
-  homeAddress: {  // Nested address object
+  homeAddress: {
     qyteti: {
-      type: String,  // City
+      type: String,
     },
     rruga: {
-      type: String,  // Street
+      type: String,
     }
   }
 }, {

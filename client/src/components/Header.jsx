@@ -4,9 +4,6 @@ import { Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import EpicStoreLogo from '../assets/EpicStoreLogo.png';
-import TikTokLogo from '../assets/TIktokLogo.png';
-import InstagramLogo from '../assets/InstagramLogo.png';
-import FacebookLogo from '../assets/Facebook-Logosu.png';
 import ShoppingCart from './ShoppingCart';
 import CheckoutModal from './CheckoutModal';
 import { useCart } from '../context/CartContext';
@@ -59,11 +56,11 @@ const Header = () => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('isAuth');
-    localStorage.removeItem('isAdmin');
+    localStorage.clear(); // Clears all local storage
     navigate('/');
   };
+  
+  
 
   const isAuth = localStorage.getItem('isAuth');
   const isAdmin = localStorage.getItem('isAdmin');

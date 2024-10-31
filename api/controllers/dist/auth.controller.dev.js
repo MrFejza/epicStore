@@ -3,207 +3,195 @@
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.checkAdmin = exports.signin = exports.signup = void 0;
-
-var _userModel = _interopRequireDefault(require("../models/user.model.js"));
-
-var _bcryptjs = _interopRequireDefault(require("bcryptjs"));
-
-var _jsonwebtoken = _interopRequireDefault(require("jsonwebtoken"));
-
-var _error = require("../utils/error.js");
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
-
-function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
-
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(source, true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-function _objectWithoutProperties(source, excluded) { if (source == null) return {}; var target = _objectWithoutPropertiesLoose(source, excluded); var key, i; if (Object.getOwnPropertySymbols) { var sourceSymbolKeys = Object.getOwnPropertySymbols(source); for (i = 0; i < sourceSymbolKeys.length; i++) { key = sourceSymbolKeys[i]; if (excluded.indexOf(key) >= 0) continue; if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue; target[key] = source[key]; } } return target; }
-
-function _objectWithoutPropertiesLoose(source, excluded) { if (source == null) return {}; var target = {}; var sourceKeys = Object.keys(source); var key, i; for (i = 0; i < sourceKeys.length; i++) { key = sourceKeys[i]; if (excluded.indexOf(key) >= 0) continue; target[key] = source[key]; } return target; }
-
-// Function to handle user signup
-var signup = function signup(req, res, next) {
-  var _req$body, username, email, password, firstName, lastName, qyteti, rruga, isAdmin, hashedPassword, newUser;
-
-  return regeneratorRuntime.async(function signup$(_context) {
+exports.updateUserProfile = exports.updateUserKasa = exports.getUserProfile = void 0;
+var getUserProfile = asyncHandler(function _callee(req, res) {
+  return regeneratorRuntime.async(function _callee$(_context) {
     while (1) {
       switch (_context.prev = _context.next) {
         case 0:
-          _req$body = req.body, username = _req$body.username, email = _req$body.email, password = _req$body.password, firstName = _req$body.firstName, lastName = _req$body.lastName, qyteti = _req$body.qyteti, rruga = _req$body.rruga, isAdmin = _req$body.isAdmin;
-          console.log('Request Body:', req.body); // Log the request body
-          // Validate required fields
-
-          if (!(!username || !email || !password)) {
-            _context.next = 4;
+          if (req.user) {
+            _context.next = 2;
             break;
           }
 
-          return _context.abrupt("return", res.status(400).json({
-            success: false,
-            message: 'Missing required fields'
+          return _context.abrupt("return", res.status(401).json({
+            message: 'User not found'
           }));
 
-        case 4:
-          _context.prev = 4;
-          // Hash the password before storing it
-          hashedPassword = _bcryptjs["default"].hashSync(password, 10); // Create a new user with the provided details
-
-          newUser = new _userModel["default"]({
-            username: username,
-            email: email,
-            password: hashedPassword,
-            firstName: firstName,
-            // Optional fields
-            lastName: lastName,
-            qyteti: qyteti,
-            rruga: rruga,
-            isAdmin: isAdmin
-          }); // Save the new user in the database
-
-          _context.next = 9;
-          return regeneratorRuntime.awrap(newUser.save());
-
-        case 9:
-          res.status(201).json({
-            success: true,
-            message: 'User created successfully'
+        case 2:
+          res.status(200).json({
+            userId: req.user._id,
+            username: req.user.username,
+            email: req.user.email,
+            firstName: req.user.firstName,
+            lastName: req.user.lastName,
+            phone: req.user.phone,
+            homeAddress: req.user.homeAddress || null,
+            isAdmin: req.user.isAdmin
           });
-          _context.next = 16;
-          break;
 
-        case 12:
-          _context.prev = 12;
-          _context.t0 = _context["catch"](4);
-          console.error('Signup error:', _context.t0);
-          next((0, _error.errorHandler)(500, 'Error creating user'));
-
-        case 16:
+        case 3:
         case "end":
           return _context.stop();
       }
     }
-  }, null, null, [[4, 12]]);
-}; // Function to handle user signin
+  });
+}); // Common function to handle phone formatting with prefix
+
+exports.getUserProfile = getUserProfile;
+
+var formatPhoneWithPrefix = function formatPhoneWithPrefix(phone, prefix) {
+  var phonePrefix = prefix === 'KOS' ? '+383' : '+355';
+  return phone.startsWith('+') ? phone : phonePrefix + phone;
+}; // Kasa Controller
 
 
-exports.signup = signup;
+var updateUserKasa = function updateUserKasa(req, res, next) {
+  var _req$body, firstName, lastName, qyteti, rruga, phone, _req$body$prefix, prefix, updateFields, updatedUser;
 
-var signin = function signin(req, res, next) {
-  var _req$body2, email, password, validUser, validPassword, token, _validUser$_doc, pass, userWithoutPassword;
-
-  return regeneratorRuntime.async(function signin$(_context2) {
+  return regeneratorRuntime.async(function updateUserKasa$(_context2) {
     while (1) {
       switch (_context2.prev = _context2.next) {
         case 0:
-          _req$body2 = req.body, email = _req$body2.email, password = _req$body2.password;
-          _context2.prev = 1;
-          _context2.next = 4;
-          return regeneratorRuntime.awrap(_userModel["default"].findOne({
-            email: email
+          _req$body = req.body, firstName = _req$body.firstName, lastName = _req$body.lastName, qyteti = _req$body.qyteti, rruga = _req$body.rruga, phone = _req$body.phone, _req$body$prefix = _req$body.prefix, prefix = _req$body$prefix === void 0 ? 'AL' : _req$body$prefix;
+          updateFields = {};
+          if (firstName) updateFields.firstName = firstName;
+          if (lastName) updateFields.lastName = lastName;
+          if (phone) updateFields.phone = formatPhoneWithPrefix(phone, prefix);
+          if (qyteti) updateFields['homeAddress.qyteti'] = qyteti;
+          if (rruga) updateFields['homeAddress.rruga'] = rruga;
+          console.log("User ID:", req.user.id); // Log user ID
+
+          console.log("Request Body:", req.body); // Log request body
+
+          console.log("Update Fields:", updateFields); // Log update fields
+
+          _context2.prev = 10;
+          _context2.next = 13;
+          return regeneratorRuntime.awrap(User.findByIdAndUpdate(req.user.id, {
+            $set: updateFields
+          }, {
+            "new": true,
+            runValidators: true
+          }).select('-password'));
+
+        case 13:
+          updatedUser = _context2.sent;
+
+          if (updatedUser) {
+            _context2.next = 16;
+            break;
+          }
+
+          return _context2.abrupt("return", res.status(404).json({
+            message: "User not found"
           }));
 
-        case 4:
-          validUser = _context2.sent;
-
-          if (validUser) {
-            _context2.next = 7;
-            break;
-          }
-
-          return _context2.abrupt("return", next((0, _error.errorHandler)(404, "User not found")));
-
-        case 7:
-          validPassword = _bcryptjs["default"].compareSync(password, validUser.password);
-
-          if (validPassword) {
-            _context2.next = 10;
-            break;
-          }
-
-          return _context2.abrupt("return", next((0, _error.errorHandler)(401, "Invalid credentials")));
-
-        case 10:
-          token = _jsonwebtoken["default"].sign({
-            id: validUser._id,
-            isAdmin: validUser.isAdmin
-          }, process.env.JWT_SECRET, {
-            expiresIn: '1h'
+        case 16:
+          res.status(200).json({
+            success: true,
+            message: 'Profile updated successfully from Kasa',
+            user: updatedUser
           });
-          _validUser$_doc = validUser._doc, pass = _validUser$_doc.password, userWithoutPassword = _objectWithoutProperties(_validUser$_doc, ["password"]);
-          res.status(200).json(_objectSpread({
-            access_token: token,
-            success: true
-          }, userWithoutPassword));
-          _context2.next = 19;
+          _context2.next = 23;
           break;
 
-        case 15:
-          _context2.prev = 15;
-          _context2.t0 = _context2["catch"](1);
-          console.error("Signin error:", _context2.t0);
-          next((0, _error.errorHandler)(500, 'Error signing in'));
-
         case 19:
+          _context2.prev = 19;
+          _context2.t0 = _context2["catch"](10);
+          console.error('Error updating Kasa profile:', _context2.t0.message, _context2.t0.stack);
+          next(errorHandler(500, 'Error updating Kasa profile'));
+
+        case 23:
         case "end":
           return _context2.stop();
       }
     }
-  }, null, null, [[1, 15]]);
-}; // Function to check if the user is an admin
+  }, null, null, [[10, 19]]);
+}; // Account Controller
 
 
-exports.signin = signin;
+exports.updateUserKasa = updateUserKasa;
 
-var checkAdmin = function checkAdmin(req, res, next) {
-  var email, user;
-  return regeneratorRuntime.async(function checkAdmin$(_context3) {
+var updateUserProfile = function updateUserProfile(req, res, next) {
+  var _req$body2, firstName, lastName, qyteti, rruga, phone, prefix, updateFields, formattedPhone, phoneRegex, updatedUser;
+
+  return regeneratorRuntime.async(function updateUserProfile$(_context3) {
     while (1) {
       switch (_context3.prev = _context3.next) {
         case 0:
-          email = req.body.email;
-          _context3.prev = 1;
-          _context3.next = 4;
-          return regeneratorRuntime.awrap(_userModel["default"].findOne({
-            email: email
-          }));
+          _req$body2 = req.body, firstName = _req$body2.firstName, lastName = _req$body2.lastName, qyteti = _req$body2.qyteti, rruga = _req$body2.rruga, phone = _req$body2.phone, prefix = _req$body2.prefix;
+          updateFields = {}; // Only add fields to updateFields if they are provided in the request
 
-        case 4:
-          user = _context3.sent;
+          if (firstName !== undefined) updateFields.firstName = firstName;
+          if (lastName !== undefined) updateFields.lastName = lastName; // Process and validate phone if provided
 
-          if (!user) {
+          if (!(phone !== undefined)) {
+            _context3.next = 10;
+            break;
+          }
+
+          formattedPhone = formatPhoneWithPrefix(phone, prefix || 'AL');
+          phoneRegex = /^(\+355\d{9}|\+383\d{8})$/;
+
+          if (phoneRegex.test(formattedPhone)) {
             _context3.next = 9;
             break;
           }
 
-          return _context3.abrupt("return", res.json({
-            isAdmin: user.isAdmin
+          return _context3.abrupt("return", res.status(400).json({
+            message: "Invalid phone number format"
           }));
 
         case 9:
-          return _context3.abrupt("return", res.json({
-            isAdmin: false
-          }));
+          updateFields.phone = formattedPhone;
 
         case 10:
-          _context3.next = 16;
+          // Update homeAddress fields if provided
+          if (qyteti !== undefined) updateFields['homeAddress.qyteti'] = qyteti;
+          if (rruga !== undefined) updateFields['homeAddress.rruga'] = rruga;
+          _context3.prev = 12;
+          _context3.next = 15;
+          return regeneratorRuntime.awrap(User.findByIdAndUpdate(req.user.id, {
+            $set: updateFields
+          }, {
+            "new": true,
+            runValidators: true
+          }).select('-password'));
+
+        case 15:
+          updatedUser = _context3.sent;
+
+          if (updatedUser) {
+            _context3.next = 18;
+            break;
+          }
+
+          return _context3.abrupt("return", res.status(404).json({
+            message: "User not found"
+          }));
+
+        case 18:
+          res.status(200).json({
+            success: true,
+            message: 'Profile updated successfully',
+            user: updatedUser
+          });
+          _context3.next = 25;
           break;
 
-        case 12:
-          _context3.prev = 12;
-          _context3.t0 = _context3["catch"](1);
-          console.error('Error checking admin status:', _context3.t0);
-          next((0, _error.errorHandler)(500, 'Error checking admin status'));
+        case 21:
+          _context3.prev = 21;
+          _context3.t0 = _context3["catch"](12);
+          console.error('Error updating profile:', _context3.t0);
+          next(errorHandler(500, 'Error updating profile'));
 
-        case 16:
+        case 25:
         case "end":
           return _context3.stop();
       }
     }
-  }, null, null, [[1, 12]]);
+  }, null, null, [[12, 21]]);
 };
 
-exports.checkAdmin = checkAdmin;
+exports.updateUserProfile = updateUserProfile;

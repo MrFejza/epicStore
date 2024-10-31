@@ -23,38 +23,44 @@ var protect = (0, _asyncHandler["default"])(function _callee(req, res, next) {
         case 0:
           token = req.cookies.jwt || req.headers.authorization && req.headers.authorization.split(" ")[1];
 
-          if (!token) {
-            _context.next = 16;
+          if (token) {
+            _context.next = 3;
             break;
           }
 
-          _context.prev = 2;
+          return _context.abrupt("return", res.status(401).json({
+            message: 'Not authorized, no token'
+          }));
+
+        case 3:
+          _context.prev = 3;
           decoded = _jsonwebtoken["default"].verify(token, process.env.JWT_SECRET);
-          _context.next = 6;
+          _context.next = 7;
           return regeneratorRuntime.awrap(_userModel["default"].findById(decoded.id).select('-password'));
 
-        case 6:
+        case 7:
           req.user = _context.sent;
-          // Attach user object to `req.user`
-          next();
-          _context.next = 14;
-          break;
+
+          if (req.user) {
+            _context.next = 10;
+            break;
+          }
+
+          return _context.abrupt("return", res.status(401).json({
+            message: 'Not authorized, user not found'
+          }));
 
         case 10:
-          _context.prev = 10;
-          _context.t0 = _context["catch"](2);
-          console.error('Token verification failed:', _context.t0);
-          res.status(401).json({
-            message: 'Not authorized, token failed'
-          });
-
-        case 14:
+          next();
           _context.next = 17;
           break;
 
-        case 16:
+        case 13:
+          _context.prev = 13;
+          _context.t0 = _context["catch"](3);
+          console.error('Token verification failed:', _context.t0);
           res.status(401).json({
-            message: 'Not authorized, no token'
+            message: 'Not authorized, token failed'
           });
 
         case 17:
@@ -62,7 +68,7 @@ var protect = (0, _asyncHandler["default"])(function _callee(req, res, next) {
           return _context.stop();
       }
     }
-  }, null, null, [[2, 10]]);
+  }, null, null, [[3, 13]]);
 });
 exports.protect = protect;
 

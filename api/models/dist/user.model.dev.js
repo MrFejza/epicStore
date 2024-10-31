@@ -13,7 +13,7 @@ var userSchema = new _mongoose["default"].Schema({
   username: {
     type: String,
     required: true,
-    unique: true
+    unique: false
   },
   email: {
     type: String,
@@ -45,7 +45,8 @@ var userSchema = new _mongoose["default"].Schema({
     required: true,
     validate: {
       validator: function validator(v) {
-        return /\d{10}/.test(v);
+        // Allow +355 with 9 digits or +383 with 8 digits
+        return /^(\+355\d{9}|\+383\d{8})$/.test(v);
       },
       message: function message(props) {
         return "".concat(props.value, " is not a valid phone number!");
@@ -53,14 +54,11 @@ var userSchema = new _mongoose["default"].Schema({
     }
   },
   homeAddress: {
-    // Nested address object
     qyteti: {
-      type: String // City
-
+      type: String
     },
     rruga: {
-      type: String // Street
-
+      type: String
     }
   }
 }, {

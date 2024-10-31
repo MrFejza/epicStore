@@ -26,7 +26,7 @@ const Footer = () => {
 
           {/* Column 2: Contact Information */}
           <div className="flex flex-col space-y-2">
-            <h3 className="font-bold text-lg">Na Kontakton</h3>
+            <h3 className="font-bold text-lg">Na Kontaktoni</h3>
             <p>📞 +355 68 368 7387</p>
             <p>✉️ epicstore2020.info@gmail.com</p>
             {/* No physical address since it's an online store */}

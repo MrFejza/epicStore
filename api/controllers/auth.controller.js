@@ -2,6 +2,7 @@ import User from "../models/user.model.js";
 import bcryptjs from 'bcryptjs';
 import jwt from "jsonwebtoken";
 import { errorHandler } from "../utils/error.js";
+import asyncHandler from "../middleware/asyncHandler.js";
 
 // Function to handle user signup
 export const signup = async (req, res, next) => {
@@ -88,46 +89,104 @@ export const checkAdmin = async (req, res, next) => {
   }
 };
 
-// Function to get user profile based on user ID
-export const getUserProfile = async (req, res, next) => {
-  try {
-    const user = await User.findById(req.user.id).select('-password'); // Exclude password
-    if (!user) return res.status(404).json({ message: "User not found" });
-
-    res.status(200).json({
-      userId: user._id,
-      username: user.username,
-      email: user.email,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      homeAddress: user.homeAddress || null, // Include homeAddress or null if empty
-      isAdmin: user.isAdmin,
-    });
-  } catch (error) {
-    console.error('Error fetching user profile:', error);
-    next(errorHandler(500, 'Error fetching user profile'));
+export const getUserProfile = asyncHandler(async (req, res) => {
+  if (!req.user) {
+      return res.status(401).json({ message: 'User not found' });
   }
+
+  res.status(200).json({
+      userId: req.user._id,
+      username: req.user.username,
+      email: req.user.email,
+      firstName: req.user.firstName,
+      lastName: req.user.lastName,
+      phone: req.user.phone,
+      homeAddress: req.user.homeAddress || null,
+      isAdmin: req.user.isAdmin,
+  });
+});
+
+
+// Common function to handle phone formatting with prefix
+const formatPhoneWithPrefix = (phone, prefix) => {
+  const phonePrefix = prefix === 'KOS' ? '+383' : '+355';
+  return phone.startsWith('+') ? phone : phonePrefix + phone;
 };
 
-// Function to update user profile
-export const updateUserProfile = async (req, res, next) => {
-  const { firstName, lastName, qyteti, rruga, phone } = req.body;
+// Kasa Controller
+export const updateUserKasa = async (req, res, next) => {
+  const { firstName, lastName, qyteti, rruga, phone, prefix = 'AL' } = req.body;
 
-  // Create an update object dynamically based on provided fields, excluding email
   const updateFields = {};
   if (firstName) updateFields.firstName = firstName;
   if (lastName) updateFields.lastName = lastName;
-  if (phone) updateFields.phone = phone;
+  if (phone) updateFields.phone = formatPhoneWithPrefix(phone, prefix);
 
-  // Handle partial updates to homeAddress fields without overwriting the whole object
-  if (qyteti) updateFields['homeAddress.qyteti'] = qyteti;
-  if (rruga) updateFields['homeAddress.rruga'] = rruga;
+  // Ensure nested fields in `homeAddress` are updated correctly
+  if (qyteti || rruga) {
+    updateFields.homeAddress = {};
+    if (qyteti) updateFields.homeAddress.qyteti = qyteti;
+    if (rruga) updateFields.homeAddress.rruga = rruga;
+  }
+
+  console.log("User ID:", req.user.id);  // Log user ID
+  console.log("Request Body:", req.body);  // Log request body
+  console.log("Update Fields:", updateFields);  // Log update fields
 
   try {
-    // Update user profile based on req.user.id
     const updatedUser = await User.findByIdAndUpdate(
       req.user.id,
-      { $set: updateFields }, // Use $set to prevent conflicts
+      { $set: updateFields },
+      { new: true, runValidators: true }
+    ).select('-password');
+
+    if (!updatedUser) return res.status(404).json({ message: "User not found" });
+
+    res.status(200).json({
+      success: true,
+      message: 'Profile updated successfully from Kasa',
+      user: updatedUser
+    });
+  } catch (error) {
+    console.error('Error updating Kasa profile:', error.message, error.stack);
+    next(errorHandler(500, 'Error updating Kasa profile'));
+  }
+};
+
+
+
+// Account Controller
+export const updateUserProfile = async (req, res, next) => {
+
+  console.log("User ID:", req.body);
+  const { firstName, lastName, qyteti, rruga, phone, prefix } = req.body;
+  const updateFields = {};
+
+  // Only add fields to updateFields if they are provided in the request
+  if (firstName !== undefined) updateFields.firstName = firstName;
+  if (lastName !== undefined) updateFields.lastName = lastName;
+
+  // Process and validate phone if provided
+  if (phone !== undefined) {
+    const formattedPhone = formatPhoneWithPrefix(phone, prefix || 'AL');
+    const phoneRegex = /^(\+355\d{9}|\+383\d{8})$/;
+    
+    if (!phoneRegex.test(formattedPhone)) {
+      return res.status(400).json({ message: "Invalid phone number format" });
+    }
+    updateFields.phone = formattedPhone;
+  }
+
+  // Update homeAddress fields if provided
+  if (qyteti !== undefined) updateFields['homeAddress.qyteti'] = qyteti;
+  if (rruga !== undefined) updateFields['homeAddress.rruga'] = rruga;
+
+    // Log user ID
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user.id,
+      { $set: updateFields },
       { new: true, runValidators: true }
     ).select('-password'); // Exclude password from returned data
 
@@ -136,20 +195,10 @@ export const updateUserProfile = async (req, res, next) => {
     res.status(200).json({
       success: true,
       message: 'Profile updated successfully',
-      user: {
-        userId: updatedUser._id,
-        username: updatedUser.username,
-        email: updatedUser.email, // Email remains unchanged
-        phone: updatedUser.phone,
-        firstName: updatedUser.firstName,
-        lastName: updatedUser.lastName,
-        homeAddress: updatedUser.homeAddress,
-      },
+      user: updatedUser,
     });
   } catch (error) {
-    console.error('Error updating user profile:', error);
+    console.error('Error updating profile:', error);
     next(errorHandler(500, 'Error updating profile'));
   }
 };
-
-
