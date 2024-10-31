@@ -21,11 +21,7 @@ var router = _express["default"].Router(); // Public routes
 router.post('/signup', _authController.signup);
 router.post('/signin', _authController.signin); // Protected routes
 
-router.post('/check-admin', _authMiddleware.protect, function (req, res) {
-  res.json({
-    isAdmin: req.user.isAdmin
-  });
-}); // Use 'protect' for full user data in getUserProfile and updateUserProfile
+router.get('/check-admin', _authMiddleware.protect, _authController.checkAdmin); // Use 'protect' for full user data in getUserProfile and updateUserProfile
 
 router.get('/me', _authMiddleware.protect, _authController.getUserProfile);
 router.put('/update-profile', _authMiddleware.protect, _authController.updateUserProfile);

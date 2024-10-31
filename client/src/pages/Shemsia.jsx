@@ -13,6 +13,14 @@ const Shemsia = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
+  
+    // Check for missing required fields
+    if (!formData.username || !formData.email || !formData.password) {
+      setError("Please fill in all required fields.");
+      return;
+    }
+  
     try {
       const res = await fetch("/api/auth/signup", {
         method: "POST",
@@ -24,12 +32,12 @@ const Shemsia = () => {
   
       const data = await res.json();
       
-      if (res.ok) { // Check if the response is OK
-        localStorage.setItem("token", data.token); // Store token
-        localStorage.setItem("userId", data.userId); // Store userId (assuming the backend returns it)
-        navigate("/llogaria-ime"); // Redirect to account page
+      if (res.ok) {
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("userId", data.userId);
+        navigate("/llogaria-ime");
       } else {
-        setError(data.message || "Something went wrong. Please try again."); // Handle errors better
+        setError(data.message || "Something went wrong. Please try again.");
       }
     } catch (err) {
       setError("An error occurred. Please try again.");

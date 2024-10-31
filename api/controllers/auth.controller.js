@@ -6,7 +6,7 @@ import asyncHandler from "../middleware/asyncHandler.js";
 
 // Function to handle user signup
 export const signup = async (req, res, next) => {
-  const { username, email, password, firstName, lastName, qyteti, rruga, isAdmin } = req.body;
+  const { username, email, password, firstName, lastName, qyteti, rruga } = req.body;
   console.log('Request Body:', req.body); // Log the request body
 
   // Validate required fields
@@ -18,14 +18,14 @@ export const signup = async (req, res, next) => {
     // Hash the password before storing it
     const hashedPassword = bcryptjs.hashSync(password, 10);
 
-    // Create a new user with the provided details, including homeAddress if provided
+    // Create a new user, setting isAdmin to false by default
     const newUser = new User({
       username,
       email,
       password: hashedPassword,
       firstName,
       lastName,
-      isAdmin,
+      isAdmin: false, // Set admin status to false by default
       homeAddress: qyteti && rruga ? { qyteti, rruga } : undefined, // Only set if both fields are provided
     });
 
@@ -38,6 +38,7 @@ export const signup = async (req, res, next) => {
   }
 };
 
+
 // Function to handle user signin
 export const signin = async (req, res, next) => {
   const { email, password } = req.body;
@@ -48,14 +49,14 @@ export const signin = async (req, res, next) => {
     const validPassword = bcryptjs.compareSync(password, validUser.password);
     if (!validPassword) return next(errorHandler(401, "Invalid credentials"));
 
-    // Create JWT token including isAdmin property
+    // Create JWT token with only user ID
     const token = jwt.sign(
-      { id: validUser._id, isAdmin: validUser.isAdmin },
+      { id: validUser._id },
       process.env.JWT_SECRET,
       { expiresIn: '1h' }
     );
 
-    // Return user ID, token, and isAdmin status alongside success flag
+    // Return user ID, token, and isAdmin status
     res.status(200).json({
       userId: validUser._id,
       access_token: token,
@@ -68,26 +69,23 @@ export const signin = async (req, res, next) => {
   }
 };
 
+
 // Function to check if the user is an admin
 export const checkAdmin = async (req, res, next) => {
   try {
-    const token = req.headers.authorization?.split(" ")[1];
-    if (!token) {
-      return res.status(401).json({ isAdmin: false, message: "No token provided" });
-    }
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id);
+    const user = await User.findById(req.user.id);
     if (!user) {
-      return res.status(404).json({ isAdmin: false, message: "User not found" });
+      return res.status(404).json({ message: "User not found" });
     }
 
     res.status(200).json({ isAdmin: user.isAdmin });
   } catch (err) {
-    console.error('Error checking admin status:', err);
-    next(errorHandler(500, 'Error checking admin status'));
+    console.error("Error checking admin status:", err);
+    next(errorHandler(500, "Error checking admin status"));
   }
 };
+
+
 
 export const getUserProfile = asyncHandler(async (req, res) => {
   if (!req.user) {

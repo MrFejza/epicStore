@@ -1,35 +1,56 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Outlet, Navigate } from 'react-router-dom';
 
-// Utility function to get token from localStorage
 const getToken = () => {
   return localStorage.getItem('jwt');
 };
 
-const PrivateRoutes = ({ adminOnly, userOnly }) => {
-  const isAuth = localStorage.getItem('isAuth') === 'true';
-  const isAdmin = localStorage.getItem('isAdmin') === 'true';
+const PrivateRoutes = ({ adminOnly = false, userOnly = false }) => {
+  const [isAuth, setIsAuth] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(null); // Use null to distinguish between "not checked" and "not admin"
+  const [loading, setLoading] = useState(true);
   const hasToken = getToken();
 
-  console.log("PrivateRoutes check: ", { isAuth, isAdmin, hasToken, adminOnly, userOnly });
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      if (!hasToken) {
+        setLoading(false);
+        return;
+      }
 
-  if (isAuth && hasToken) {
-    if (adminOnly && !isAdmin) {
-      console.log('Redirecting to /unauthorized because user is not admin');
-      return <Navigate to='/unauthorized' />;
-    }
-    if (userOnly && isAdmin) {
-      console.log('Redirecting to /unauthorized because user is admin');
-      return <Navigate to='/unauthorized' />;
-    }
-    // If the user meets the required conditions, render the protected route
-    console.log("User meets required conditions, rendering Outlet.");
-    return <Outlet />;
-  }
+      try {
+        const res = await fetch(`/api/auth/check-admin`, {
+          headers: { Authorization: `Bearer ${hasToken}` },
+        });
+        const data = await res.json();
 
-  // If not authenticated, redirect to sign-in
-  console.log("Redirecting to /sign-in because user is not authenticated");
-  return <Navigate to='/sign-in' />;
+        console.log("Admin check response:", data); // Confirm response from backend
+        if (!res.ok) throw new Error(data.message || 'Failed to verify admin status');
+
+        setIsAuth(true);
+        setIsAdmin(data.isAdmin); // Set isAdmin based on API response
+      } catch (error) {
+        console.error("Error checking admin status:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    checkAdminStatus();
+  }, [hasToken]);
+
+  console.log("Rendering PrivateRoutes:", { isAuth, isAdmin, adminOnly, userOnly });
+
+  if (loading) return <p>Loading...</p>;
+
+  if (!isAuth) return <Navigate to="/sign-in" />;
+
+  // For admin-only routes, only allow access if the user is an admin
+  if (adminOnly && !isAdmin) return <Navigate to="/unauthorized" />;
+
+  // For user-only routes, allow access to non-admins only
+  if (userOnly && isAdmin) return <Navigate to="/menaxhimi-i-produkteve" />;
+
+  return <Outlet />;
 };
 
 export default PrivateRoutes;

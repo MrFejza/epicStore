@@ -10,9 +10,8 @@ router.post('/signup', signup);
 router.post('/signin', signin);
 
 // Protected routes
-router.post('/check-admin', protect, (req, res) => {
-  res.json({ isAdmin: req.user.isAdmin });
-});
+router.get('/check-admin', protect, checkAdmin);
+
 
 // Use 'protect' for full user data in getUserProfile and updateUserProfile
 router.get('/me', protect, getUserProfile);

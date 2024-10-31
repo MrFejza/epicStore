@@ -34,14 +34,14 @@ const Header = () => {
       </nav>
 
       {/* Logout Button */}
-      {isAuth && isAdmin && (
+      
         <button
           onClick={handleLogout}
           className="bg-violet-600 px-4 py-2 rounded-md hover:bg-violet-700 text-white transition-colors"
         >
           Logout
         </button>
-      )}
+    
     </header>
     
   );

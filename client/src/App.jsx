@@ -19,66 +19,46 @@ import LogariaIme from './pages/LogariaIme';
 import Contact from './pages/Contact';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsAndConditions from './pages/TermsAndConditions';
-import GoogleCallbackHandler from './components/GoogleCallbackHandler';
 import Unauthorized from './pages/Unauthorized';
 import Kasa from './pages/Kasa';
-
 
 function App() {
   return (
     <CheckoutModalProvider>
       <CartProvider>
         <Router>
-
-
           <Routes>
-            {/* Home Route */}
+            {/* Public Routes */}
             <Route path="/" element={<Home />} />
-
-            {/* Search Route */}
             <Route path="/search" element={<Kategori />} />
-
-            {/* Category Route */}
             <Route path="/kategori/:category" element={<Kategori />} />
-
-            <Route path='/kasa' element={<Kasa />} />
-
-            {/* Information Route */}
             <Route path="/information/:_id" element={<Information />} />
             <Route path="/faq" element={<FAQs />} />
-            <Route path='/contact' element={<Contact />} />
-            <Route path='/privacy-policy' element={<PrivacyPolicy />} />
-            <Route path='/terms' element={<TermsAndConditions />} />
-
-
-
-
-            {/* Admin and Other Pages */}
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<TermsAndConditions />} />
             <Route path="/sign-in" element={<Admin />} />
             <Route path="/sign-up" element={<Shemsia />} />
-            
+            <Route path="/kasa" element={<Kasa />} />
 
-
-            {/* Private routes for users */}
+            {/* User-Only Routes */}
             <Route element={<PrivateRoutes userOnly={true} />}>
-              <Route path='/llogaria-ime' element={<LogariaIme />} />
+              <Route path="/llogaria-ime" element={<LogariaIme />} />
             </Route>
 
-
-
-            {/* Private routes */}
+            {/* Admin-Only Routes */}
             <Route element={<PrivateRoutes adminOnly={true} />}>
               <Route path="/orders" element={<Orders />} />
               <Route path="/edit/:_id" element={<Edit />} />
               <Route path="/upload" element={<Upload />} />
-              <Route path='/menaxhimi-i-produkteve' element={<ManageProducts />} />
-              <Route path='/menaxhimi-i-kategorive' element={<CategoryManagement />} />
+              <Route path="/menaxhimi-i-produkteve" element={<ManageProducts />} />
+              <Route path="/menaxhimi-i-kategorive" element={<CategoryManagement />} />
             </Route>
 
-            {/* Unauthorized route */}
-            <Route path="/unauthorized" element={<Unauthorized/>} />
+            {/* Unauthorized Route */}
+            <Route path="/unauthorized" element={<Unauthorized />} />
 
-            {/* Catch-all route for undefined routes */}
+            {/* Catch-All Route */}
             <Route path="*" element={<Navigate to="/sign-in" replace />} />
           </Routes>
           <Footer />

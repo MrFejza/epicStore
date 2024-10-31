@@ -17,8 +17,8 @@ const Admin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true); // Start loading when submitting
-
+    setLoading(true);
+  
     try {
       const res = await fetch("/api/auth/signin", {
         method: "POST",
@@ -27,36 +27,40 @@ const Admin = () => {
         },
         body: JSON.stringify(formData),
       });
-
+  
       const data = await res.json();
-
+  
       if (!res.ok) {
         setLoading(false);
         setError(data.message || "An error occurred, please try again.");
         return;
       }
-
-      // Store token, userId, and role in localStorage
-      localStorage.setItem("jwt", data.access_token); // Save the token
-      localStorage.setItem("userId", data._id); // Save userId
+  
+      // Store only token and user ID in localStorage
+      localStorage.setItem("jwt", data.access_token);
+      localStorage.setItem("userId", data.userId);
       localStorage.setItem("isAuth", "true");
-      localStorage.setItem("isAdmin", data.isAdmin ? "true" : "false");
-
-      // Redirect based on user role
+  
+      // Clear form data
+      setFormData({ email: "", password: "" });
+  
+      // Redirect based on admin status
       if (data.isAdmin) {
-        navigate("/menaxhimi-i-produkteve");  // Redirect to admin page
+        navigate("/menaxhimi-i-produkteve");
       } else {
-        navigate("/llogaria-ime");  // Redirect to user page
+        navigate("/llogaria-ime");
       }
-
+  
       setLoading(false);
       setError(null);
-
+  
     } catch (error) {
       setLoading(false);
       setError("An error occurred: " + error.message);
     }
   };
+  
+  
 
   return (
     <>
