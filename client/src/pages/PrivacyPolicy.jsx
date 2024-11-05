@@ -1,7 +1,6 @@
 import React from 'react';
 import Header from '../components/Header';
 
-
 const PrivacyPolicy = () => {
   return (
     <>
@@ -31,9 +30,8 @@ const PrivacyPolicy = () => {
 
           <h2 className="text-2xl font-semibold mt-6 mb-2 text-gray-800">Ndërmjetësimi i Informacionit</h2>
           <p className="mb-4 text-gray-700">
-            Ne mund të ndajmë informacionin tuaj me ofrues të shërbimeve të palëve të treta siç janë përpunuesit e
-            pagesave ose kompanitë e transportit për të përmbushur porositë. Nuk i shesim apo ndajmë të dhënat tuaja
-            personale me palë të treta për qëllime marketingu pa pëlqimin tuaj.
+            Ne mund të ndajmë informacionin tuaj me ofrues të shërbimeve të palëve të treta, si kompani transporti, për
+            të përmbushur porositë. Nuk i shesim apo ndajmë të dhënat tuaja personale me palë të treta për qëllime marketingu pa pëlqimin tuaj.
           </p>
 
           <h2 className="text-2xl font-semibold mt-6 mb-2 text-gray-800">Cookies dhe Teknologji të Ngjashme</h2>
@@ -45,9 +43,8 @@ const PrivacyPolicy = () => {
 
           <h2 className="text-2xl font-semibold mt-6 mb-2 text-gray-800">Siguria e të Dhënave</h2>
           <p className="mb-4 text-gray-700">
-            Ne zbatojmë një sërë masash sigurie, duke përfshirë enkriptimin dhe përpunimin e sigurt të pagesave, për të
-            siguruar sigurinë e informacionit tuaj personal gjatë transaksioneve. Megjithatë, asnjë metodë transmetimi
-            mbi internet nuk është 100% e sigurt.
+            Ne zbatojmë një sërë masash sigurie për të mbrojtur informacionin tuaj personal gjatë transaksioneve. 
+            Megjithatë, asnjë metodë transmetimi mbi internet nuk është 100% e sigurt.
           </p>
 
           <h2 className="text-2xl font-semibold mt-6 mb-2 text-gray-800">Të Drejtat Tuaja</h2>
@@ -81,7 +78,6 @@ const PrivacyPolicy = () => {
           </p>
         </div>
       </div>
-      
     </>
   );
 };

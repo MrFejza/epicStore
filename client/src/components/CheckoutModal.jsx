@@ -58,15 +58,13 @@ const CheckoutModal = () => {
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
 
-    if (!validateForm()) {
-      setIsSubmitting(false);
-      return;
-    }
+    // Only set isSubmitting if form validation passes
+    if (!validateForm()) return;
+
+    setIsSubmitting(true);
 
     const orderData = {
       customerName,
@@ -75,26 +73,20 @@ const CheckoutModal = () => {
       rruga,
       phone: (prefix === 'AL' ? '+355' : '+383') + phone,
       email,
-      products: cartItems.map((item) => ({
+      products: cart.map((item) => ({
         productId: item.product._id,
         quantity: item.quantity,
         price: item.product.onSale ? item.product.salePrice : item.product.price,
       })),
-      totalAmount: cartItems.reduce(
-        (total, item) =>
-          total + item.quantity * (item.product.onSale ? item.product.salePrice : item.product.price),
-        0
-      ),
+      totalAmount,
     };
 
     try {
       const token = localStorage.getItem('jwt');
-      const config = {
-        headers: { Authorization: `Bearer ${token}` },
-      };
-
-      await axios.post('/api/orders', orderData, config);
-      await axios.post('/api/whatsapp', orderData, config);
+      await Promise.all([
+        axios.post('/api/orders', orderData, { headers: { Authorization: `Bearer ${token}` }}),
+        axios.post('/api/whatsapp', orderData),
+      ]);
 
       clearCart();
       setSuccessMessage('Porosia u vendos me sukses dhe njoftimi u dërgua!');
@@ -108,9 +100,9 @@ const CheckoutModal = () => {
       console.error('Error placing order or sending WhatsApp message:', error);
     } finally {
       setIsSubmitting(false);
-      closeCheckoutModal();
     }
   };
+
 
   return (
     isCheckoutModalOpen && (

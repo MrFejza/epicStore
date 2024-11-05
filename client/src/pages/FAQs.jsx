@@ -11,7 +11,7 @@ const FAQs = () => {
   const faqs = [
     {
       question: 'Si mund të bëj porosi?',
-      answer: 'Ju mund të bëni porosi duke zgjedhur produktin e dëshiruar, shtuar atë në shportë dhe ndjekur hapat për të plotësuar të dhënat e dorëzimit dhe pagesës, ose duke na kontaktuar në rrjetet tona sociale si Instagram, Facebook, dhe TikTok, si dhe në WhatsApp në numrin +355 68 368 7387.'
+      answer: 'Ju mund të bëni porosi duke zgjedhur produktin e dëshiruar, shtuar atë në shportë dhe ndjekur hapat për të plotësuar të dhënat e dorëzimit, ose duke na kontaktuar në rrjetet tona sociale si Instagram, Facebook, dhe TikTok, si dhe në WhatsApp në numrin +355 68 368 7387.'
     },
     {
       question: 'Për sa kohë më vjen porosia?',
@@ -23,11 +23,11 @@ const FAQs = () => {
     },
     {
       question: 'A mund të bëj pagesë me kartë krediti?',
-      answer: 'Po, ne pranojmë pagesa me kartë krediti dhe debitit në platformën tonë.'
+      answer: 'Aktualisht, ne pranojmë vetëm pagesë në dorëzim. Pagesat me kartë krediti nuk janë të disponueshme për momentin.'
     },
     {
       question: 'Çfarë mënyra pagesash ofroni?',
-      answer: 'Ne ofrojmë pagesa me kartë krediti/debiti, transfertë bankare, dhe pagesë në dorëzim.'
+      answer: 'Ofrojmë vetëm pagesë në dorëzim për të gjithë produktet tona.'
     },
     {
       question: 'Deri në çfarë ore punoni?',
@@ -58,7 +58,6 @@ const FAQs = () => {
       ))}
     </div>
     </>
-   
   );
 };
 
