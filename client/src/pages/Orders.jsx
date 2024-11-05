@@ -26,17 +26,22 @@ const Orders = () => {
   }, []);
 
   // Function to update order status to "Delivered"
-  const handleOrderDelivered = async (orderId) => {
-    try {
-      const response = await axios.put(`/api/orders/${orderId}`, { status: 'Delivered' });
-      if (response.status === 200) {
-        // Remove the delivered order from the state
-        setOrders(orders.filter(order => order._id !== orderId));
-      } 
-    } catch (error) {
-      console.error('Failed to update order status:', error);
-    }
-  };
+const handleOrderDelivered = async (orderId) => {
+  const isConfirmed = window.confirm("A je i sigurt qe e ke derguar porosin?");
+  
+  if (!isConfirmed) return; // If the user selects "Jo," stop here
+
+  try {
+    const response = await axios.put(`/api/orders/${orderId}`, { status: 'Delivered' });
+    if (response.status === 200) {
+      // Remove the delivered order from the state
+      setOrders(orders.filter(order => order._id !== orderId));
+    } 
+  } catch (error) {
+    console.error('Failed to update order status:', error);
+  }
+};
+
   
 
   if (loading) return <p>Loading...</p>;

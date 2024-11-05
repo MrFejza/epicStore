@@ -30,18 +30,7 @@ const CategoryManagement = () => {
     fetchCategories();
   }, []);
 
-  useEffect(() => {
-    // Parse the access token from the query parameters
-    const queryParams = new URLSearchParams(location.search);
-    const token = queryParams.get('access_token');
-
-    if (token) {
-      // Store the token in localStorage or context, depending on your use case
-      localStorage.setItem('access_token', token);
-    }
-  }, [location]);
-
-  // Add a new category and shift the others down
+  // Add a new category in the specified row
   const addCategoryInRow = async (index) => {
     if (newCategoryName.trim() === '') {
       toast.error('Emri i kategorisë nuk mund të jetë bosh.');
@@ -51,12 +40,12 @@ const CategoryManagement = () => {
     const slug = newCategoryName.toLowerCase().replace(/\s+/g, '-');
 
     try {
-      const response = await axios.post('/api/category/create', { name: newCategoryName, slug, insertAtIndex: index + 1 });
+      const response = await axios.post('/api/category/insert-at-index', { name: newCategoryName, slug, insertAtIndex: index + 1 });
       const newCategory = response.data.category;
 
-      // Insert the new category at the specified index, shifting the others down
+      // Update category list with new category at specified index
       const updatedCategories = [...categories];
-      updatedCategories.splice(index, 0, newCategory); // Insert at the specified index (pushing others down)
+      updatedCategories.splice(index, 0, newCategory);
       setCategories(updatedCategories);
 
       toast.success('Kategoria u shtua me sukses.');
@@ -77,10 +66,10 @@ const CategoryManagement = () => {
     const slug = newCategoryName.toLowerCase().replace(/\s+/g, '-');
 
     try {
-      const response = await axios.post('/api/category/create', { name: newCategoryName, slug, insertAtIndex: categories.length + 1 });
+      const response = await axios.post('/api/category/add-to-end', { name: newCategoryName, slug });
       const newCategory = response.data.category;
 
-      // Add the new category at the bottom of the list
+      // Add the new category at the end
       setCategories([...categories, newCategory]);
 
       toast.success('Kategoria u shtua në fund me sukses.');
@@ -92,6 +81,10 @@ const CategoryManagement = () => {
   };
 
   const handleDeleteCategory = async (id) => {
+    // Ask for confirmation before proceeding with deletion
+    const confirmDelete = window.confirm("A jeni i sigurt që dëshironi të fshini këtë kategori?");
+    if (!confirmDelete) return; // Exit if the user cancels
+  
     try {
       await axios.delete(`/api/category/${id}`);
       setCategories(categories.filter((category) => category._id !== id));
@@ -100,6 +93,7 @@ const CategoryManagement = () => {
       toast.error('Error deleting category.');
     }
   };
+  
 
   const updateCategory = async (id, updatedName) => {
     if (!updatedName.trim()) {

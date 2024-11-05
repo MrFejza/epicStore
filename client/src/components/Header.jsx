@@ -10,6 +10,7 @@ import { useCart } from '../context/CartContext';
 import { useCheckoutModal } from '../context/CheckoutModalContext';
 import NavComponent from './NavComponent';
 import UserButton from './UserButton';
+import {jwtDecode} from 'jwt-decode';
 
 const Header = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -64,9 +65,22 @@ const Header = () => {
 
   const isAuth = localStorage.getItem('isAuth');
   const isAdmin = localStorage.getItem('isAdmin');
+  const token = localStorage.getItem('jwt');
+
+  const isTokenExpired = (token) => {
+    if (!token) return true;
+    try {
+      const decodedToken = jwtDecode(token);
+      const currentTime = Date.now() / 1000;
+      return decodedToken.exp < currentTime;
+    } catch (error) {
+      console.error('Error decoding token:', error);
+      return true;
+    }
+  };
 
   const LogoutButton = () => {
-    if (isAuth || isAdmin) {
+    if (token && !isTokenExpired(token)) {
       return (
         <>
           <div className="md:hidden text-gray-800">

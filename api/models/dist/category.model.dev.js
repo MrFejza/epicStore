@@ -23,8 +23,8 @@ var categorySchema = new _mongoose["default"].Schema({
   },
   order: {
     type: Number,
-    required: true // Ensure the order field is required
-
+    required: true,
+    unique: true
   },
   createdAt: {
     type: Date,

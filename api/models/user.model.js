@@ -31,7 +31,7 @@ const userSchema = new mongoose.Schema({
   },
   phone: {
     type: String,
-    required: true,
+    required: false,
     validate: {
       validator: function (v) {
         // Allow +355 with 9 digits or +383 with 8 digits

@@ -59,7 +59,15 @@ const ManageProducts = () => {
     <>
       <AdminHeader />
       <div className="container mx-auto p-4">
+        
         <h1 className="text-2xl font-bold mb-4 text-center">Menaxhimi i Produkteve</h1>
+        <div className="flex justify-start my-8">
+            <Link to="/upload">
+              <button className="bg-green-500 text-white px-6 py-3 rounded hover:bg-green-600">
+                Shto nje Produkt te Ri
+              </button>
+            </Link>
+          </div>
 
         {/* Search Bar */}
         <div className="mb-4">
@@ -120,16 +128,10 @@ const ManageProducts = () => {
           </div>
         )}
 
-        {/* "Shto nje Produkt te Ri" Button */}
-        {isAdmin && (
-          <div className="flex justify-center mt-8">
-            <Link to="/upload">
-              <button className="bg-green-500 text-white px-6 py-3 rounded hover:bg-green-600">
-                Shto nje Produkt te Ri
-              </button>
-            </Link>
-          </div>
-        )}
+   
+        
+
+      
       </div>
     </>
   );

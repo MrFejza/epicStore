@@ -33,7 +33,7 @@ const Shemsia = () => {
       const data = await res.json();
       
       if (res.ok) {
-        localStorage.setItem("token", data.token);
+        localStorage.setItem("jwt", data.token);
         localStorage.setItem("userId", data.userId);
         navigate("/llogaria-ime");
       } else {

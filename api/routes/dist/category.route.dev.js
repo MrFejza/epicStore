@@ -11,10 +11,12 @@ var _categoryController = require("../controllers/category.controller.js");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
-var router = _express["default"].Router(); // Route for creating a category
+var router = _express["default"].Router(); // Route for adding a category at the end
 
 
-router.post('/create', _categoryController.createCategory); // Route for retrieving all categories
+router.post('/add-to-end', _categoryController.addCategoryToEnd); // Route for inserting a category at a specified index
+
+router.post('/insert-at-index', _categoryController.insertCategoryAtIndex); // Route for retrieving all categories
 
 router.get('/', _categoryController.getAllCategories); // Route for updating a category
 

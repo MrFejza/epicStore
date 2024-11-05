@@ -19,7 +19,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
 
 // Function to handle user signup
 var signup = function signup(req, res, next) {
-  var _req$body, username, email, password, firstName, lastName, qyteti, rruga, hashedPassword, newUser;
+  var _req$body, username, email, password, firstName, lastName, qyteti, rruga, hashedPassword, newUser, token;
 
   return regeneratorRuntime.async(function signup$(_context) {
     while (1) {
@@ -63,25 +63,35 @@ var signup = function signup(req, res, next) {
           return regeneratorRuntime.awrap(newUser.save());
 
         case 9:
+          // Generate a JWT token for the new user, just like in signin
+          token = _jsonwebtoken["default"].sign({
+            id: newUser._id
+          }, process.env.JWT_SECRET, {
+            expiresIn: '24h'
+          } // Ensure this value is set to the intended duration
+          ); // Return user ID and token so they can access protected routes
+
           res.status(201).json({
             success: true,
-            message: 'User created successfully'
+            message: 'User created successfully',
+            userId: newUser._id,
+            token: token
           });
-          _context.next = 16;
+          _context.next = 17;
           break;
 
-        case 12:
-          _context.prev = 12;
+        case 13:
+          _context.prev = 13;
           _context.t0 = _context["catch"](4);
           console.error('Signup error:', _context.t0);
           next((0, _error.errorHandler)(500, 'Error creating user'));
 
-        case 16:
+        case 17:
         case "end":
           return _context.stop();
       }
     }
-  }, null, null, [[4, 12]]);
+  }, null, null, [[4, 13]]);
 }; // Function to handle user signin
 
 
@@ -126,7 +136,7 @@ var signin = function signin(req, res, next) {
           token = _jsonwebtoken["default"].sign({
             id: validUser._id
           }, process.env.JWT_SECRET, {
-            expiresIn: '1h'
+            expiresIn: '24h'
           }); // Return user ID, token, and isAdmin status
 
           res.status(200).json({

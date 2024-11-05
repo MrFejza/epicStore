@@ -14,7 +14,8 @@ const categorySchema = new mongoose.Schema({
   },
   order: {
     type: Number,
-    required: true, // Ensure the order field is required
+    required: true, 
+    unique: true,
   },
   createdAt: {
     type: Date,

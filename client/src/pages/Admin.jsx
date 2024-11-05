@@ -44,12 +44,9 @@ const Admin = () => {
       // Clear form data
       setFormData({ email: "", password: "" });
   
-      // Redirect based on admin status
-      if (data.isAdmin) {
-        navigate("/menaxhimi-i-produkteve");
-      } else {
+ 
         navigate("/llogaria-ime");
-      }
+
   
       setLoading(false);
       setError(null);

@@ -42,7 +42,7 @@ var userSchema = new _mongoose["default"].Schema({
   },
   phone: {
     type: String,
-    required: true,
+    required: false,
     validate: {
       validator: function validator(v) {
         // Allow +355 with 9 digits or +383 with 8 digits

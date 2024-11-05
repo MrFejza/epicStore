@@ -1,6 +1,7 @@
 import express from 'express';
 import { 
-  createCategory, 
+  addCategoryToEnd, 
+  insertCategoryAtIndex, 
   getAllCategories, 
   updateCategory, 
   deleteCategory 
@@ -8,8 +9,11 @@ import {
 
 const router = express.Router();
 
-// Route for creating a category
-router.post('/create', createCategory);
+// Route for adding a category at the end
+router.post('/add-to-end', addCategoryToEnd);
+
+// Route for inserting a category at a specified index
+router.post('/insert-at-index', insertCategoryAtIndex);
 
 // Route for retrieving all categories
 router.get('/', getAllCategories);
