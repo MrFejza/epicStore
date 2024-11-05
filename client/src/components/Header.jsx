@@ -156,7 +156,7 @@ const Header = () => {
 
               {/* Mobile View */}
               <div className="flex md:hidden justify-between items-center pt-4">
-                <div className="flex items-center space-x-0">
+                <div className="flex items-center space-x-0 ">
                   <Disclosure.Button className="inline-flex items-center justify-center p-2 rounded-md text-black hover:text-violet-600 focus:outline-none">
                     <span className="sr-only">Open main menu</span>
                     {open ? (
@@ -171,10 +171,10 @@ const Header = () => {
                   </Link>
                 </div>
 
-                <div className="flex items-center space-x-6">
+                <div className="flex items-center space-x-6 ">
                   <button
                     onClick={() => setShowSearch(!showSearch)}
-                    className="text-4xl text-violet-600"
+                    className="text-4xl text-violet-600 mb-2"
                   >
                     ⌕
                   </button>
@@ -182,12 +182,14 @@ const Header = () => {
                   <div className='block md:hidden'>
                 <UserButton/>
               </div>
-
-                  <ShoppingCart
+                    <div className='mb-2 '>
+                    <ShoppingCart
                     cartItems={cart}
                     handleCheckout={() => openCheckoutModal(cart)} // Only pass cart items, not totalAmount
                     removeFromCart={removeFromCart}
                   />
+                    </div>
+
                   
                 </div>
               </div>
@@ -195,7 +197,7 @@ const Header = () => {
                 <div className="flex justify-center mt-2">
                   <form onSubmit={handleSearch} className="w-full max-w-lg">
                     <label htmlFor="mobile-search" className="sr-only">Search</label>
-                    <div className="relative pb-2">
+                    <div className="relative mb-2">
                       <input
                         id="mobile-search"
                         type="text"
@@ -207,7 +209,7 @@ const Header = () => {
                       <button
                         onClick={handleSearch}
                         type="submit"
-                        className="absolute inset-y-0 right-0 text-3xl flex items-center pr-3  text-gray-500 hover:text-violet-600"
+                        className="absolute inset-y-0 right-0 text-3xl flex items-center pr-3   text-gray-500 hover:text-violet-600"
                       >
                         ⌕
                       </button>

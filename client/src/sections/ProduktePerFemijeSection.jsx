@@ -20,12 +20,16 @@ const ProduktePerFemijeSection = () => {
       try {
         const response = await axios.get('/api/product');
         const allProducts = response.data;
-
+  
+        // Determine the number of products to fetch based on screen size
+        const productsToFetch = window.innerWidth <= 640 ? 8 : 9; // 8 for mobile, 9 for larger screens
+  
+        // Filter, shuffle, and slice the products based on the category and desired count
         const filteredProducts = allProducts
           .filter(product => product.category === 'produkte-për-fëmijë')
           .sort(() => 0.5 - Math.random())
-          .slice(0, 6);
-
+          .slice(0, productsToFetch);
+  
         setProducts(filteredProducts);
         setLoading(false);
       } catch (error) {
@@ -33,10 +37,21 @@ const ProduktePerFemijeSection = () => {
         setLoading(false);
       }
     };
-
+  
     fetchProduktePerFemije();
+  
+    // Optional: Add a resize event listener to refetch on window resize
+    const handleResize = () => {
+      fetchProduktePerFemije();
+    };
+  
+    window.addEventListener('resize', handleResize);
+  
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
-
+  
   const handleAddToCart = (product) => {
     setSelectedProduct(product);
     setIsModalOpen(true); // Open the modal
