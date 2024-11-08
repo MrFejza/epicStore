@@ -116,7 +116,10 @@ const Upload = () => {
       toast.error(error?.response?.data?.message || error.message);
     }
   };
-
+  
+  const handleRemoveNewImage = (index) => {
+    setSelectedFiles((prevFiles) => prevFiles.filter((_, i) => i !== index));
+  };
   // Form submit handler
   const submitHandler = (e) => {
     e.preventDefault();
@@ -273,6 +276,16 @@ const Upload = () => {
                           alt={`preview - ${index}`}
                           className="w-full h-auto rounded-md border border-gray-300"
                         />
+                       <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleRemoveNewImage(index);
+                      }}
+                      className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full"
+                    >
+                      ✕
+                    </button>
                       </div>
                     ))}
                   </div>
