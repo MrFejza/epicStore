@@ -17,7 +17,13 @@ const Shemsia = () => {
   
     // Check for missing required fields
     if (!formData.username || !formData.email || !formData.password) {
-      setError("Please fill in all required fields.");
+      setError("Ju lutem plotësoni të gjitha fushat.");
+      return;
+    }
+  
+    // Check for password length
+    if (formData.password.length < 8) {
+      setError("Fjalëkalimi duhet të ketë të paktën 8 karaktere.");
       return;
     }
   
@@ -31,18 +37,21 @@ const Shemsia = () => {
       });
   
       const data = await res.json();
-      
+  
       if (res.ok) {
         localStorage.setItem("jwt", data.token);
         localStorage.setItem("userId", data.userId);
         navigate("/llogaria-ime");
       } else {
-        setError(data.message || "Something went wrong. Please try again.");
+        // Display the server-provided error message or a default one
+        setError(data.message || "Diçka shkoi keq. Ju lutem provoni përsëri.");
       }
     } catch (err) {
-      setError("An error occurred. Please try again.");
+      setError("Ndodhi një gabim. Ju lutem provoni përsëri.");
     }
   };
+  
+  
   
   return (
     <>

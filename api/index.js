@@ -9,6 +9,7 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import path from 'path';
+import { errorHandler } from './utils/error.js';
 
 
 
@@ -36,9 +37,12 @@ app.use('/api/whatsapp', whatsappRoutes);
 app.use('/api/category', categoryRoutes);
 
 
+
 app.get('/', (req, res) => {
   res.send('API is running...');
 });
+
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

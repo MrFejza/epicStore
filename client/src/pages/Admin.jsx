@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from "react"; 
 import { useNavigate, Link } from "react-router-dom";
 import Header from "../components/Header";
 
@@ -32,7 +32,16 @@ const Admin = () => {
   
       if (!res.ok) {
         setLoading(false);
-        setError(data.message || "An error occurred, please try again.");
+
+        // Display specific error messages based on the response from the backend
+        if (data.message === "Përdoruesi nuk ekziston") {
+          setError("Përdoruesi nuk ekziston");
+        } else if (data.message === "Passwordi është gabim") {
+          setError("Passwordi është gabim");
+        } else {
+          setError(data.message || "Ndodhi një gabim, ju lutemi provoni përsëri.");
+        }
+
         return;
       }
   
@@ -44,20 +53,19 @@ const Admin = () => {
       // Clear form data
       setFormData({ email: "", password: "" });
   
- 
-        navigate("/llogaria-ime");
-
-  
+      navigate("/llogaria-ime");
       setLoading(false);
       setError(null);
   
     } catch (error) {
       setLoading(false);
-      setError("An error occurred: " + error.message);
+      if (error.message === "Failed to fetch") {
+        setError("Probleme me lidhjen. Ju lutemi kontrolloni rrjetin tuaj dhe provoni përsëri.");
+      } else {
+        setError("Ndodhi një gabim: " + error.message);
+      }
     }
   };
-  
-  
 
   return (
     <>
@@ -91,7 +99,7 @@ const Admin = () => {
           </button>
         </form>
 
-        {error && <p className="text-red-500 mt-4">{error}</p>}
+        {error && <p className="text-red-500 mt-4" aria-live="polite">{error}</p>}
 
         {/* Add the sign-up message */}
         <p className="text-start mt-2 pb-10">

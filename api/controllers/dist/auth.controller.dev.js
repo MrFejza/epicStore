@@ -19,7 +19,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "d
 
 // Function to handle user signup
 var signup = function signup(req, res, next) {
-  var _req$body, username, email, password, firstName, lastName, qyteti, rruga, hashedPassword, newUser, token;
+  var _req$body, username, email, password, firstName, lastName, qyteti, rruga, existingUser, hashedPassword, newUser, token;
 
   return regeneratorRuntime.async(function signup$(_context) {
     while (1) {
@@ -40,7 +40,37 @@ var signup = function signup(req, res, next) {
           }));
 
         case 4:
-          _context.prev = 4;
+          if (!(password.length < 8)) {
+            _context.next = 6;
+            break;
+          }
+
+          return _context.abrupt("return", res.status(400).json({
+            success: false,
+            message: 'Password must be at least 8 characters long'
+          }));
+
+        case 6:
+          _context.prev = 6;
+          _context.next = 9;
+          return regeneratorRuntime.awrap(_userModel["default"].findOne({
+            email: email
+          }));
+
+        case 9:
+          existingUser = _context.sent;
+
+          if (!existingUser) {
+            _context.next = 12;
+            break;
+          }
+
+          return _context.abrupt("return", res.status(400).json({
+            success: false,
+            message: 'Ky përdorues ekziston'
+          }));
+
+        case 12:
           // Hash the password before storing it
           hashedPassword = _bcryptjs["default"].hashSync(password, 10); // Create a new user, setting isAdmin to false by default
 
@@ -59,10 +89,10 @@ var signup = function signup(req, res, next) {
 
           }); // Save the new user in the database
 
-          _context.next = 9;
+          _context.next = 16;
           return regeneratorRuntime.awrap(newUser.save());
 
-        case 9:
+        case 16:
           // Generate a JWT token for the new user, just like in signin
           token = _jsonwebtoken["default"].sign({
             id: newUser._id
@@ -77,21 +107,21 @@ var signup = function signup(req, res, next) {
             userId: newUser._id,
             token: token
           });
-          _context.next = 17;
+          _context.next = 24;
           break;
 
-        case 13:
-          _context.prev = 13;
-          _context.t0 = _context["catch"](4);
+        case 20:
+          _context.prev = 20;
+          _context.t0 = _context["catch"](6);
           console.error('Signup error:', _context.t0);
-          next((0, _error.errorHandler)(500, 'Error creating user'));
+          next((0, _error.createError)(500, 'Error creating user'));
 
-        case 17:
+        case 24:
         case "end":
           return _context.stop();
       }
     }
-  }, null, null, [[4, 13]]);
+  }, null, null, [[6, 20]]);
 }; // Function to handle user signin
 
 
@@ -119,7 +149,7 @@ var signin = function signin(req, res, next) {
             break;
           }
 
-          return _context2.abrupt("return", next((0, _error.errorHandler)(404, "User not found")));
+          return _context2.abrupt("return", next((0, _error.createError)(404, "Përdoruesi nuk ekziston")));
 
         case 7:
           validPassword = _bcryptjs["default"].compareSync(password, validUser.password);
@@ -129,7 +159,7 @@ var signin = function signin(req, res, next) {
             break;
           }
 
-          return _context2.abrupt("return", next((0, _error.errorHandler)(401, "Invalid credentials")));
+          return _context2.abrupt("return", next((0, _error.createError)(401, "Passwordi është gabim")));
 
         case 10:
           // Create JWT token with only user ID
@@ -152,7 +182,7 @@ var signin = function signin(req, res, next) {
           _context2.prev = 14;
           _context2.t0 = _context2["catch"](1);
           console.error("Signin error:", _context2.t0);
-          next((0, _error.errorHandler)(500, 'Error signing in'));
+          next((0, _error.createError)(500, 'Error signing in'));
 
         case 18:
         case "end":
@@ -198,7 +228,7 @@ var checkAdmin = function checkAdmin(req, res, next) {
           _context3.prev = 9;
           _context3.t0 = _context3["catch"](0);
           console.error("Error checking admin status:", _context3.t0);
-          next((0, _error.errorHandler)(500, "Error checking admin status"));
+          next(errorHandler(500, "Error checking admin status"));
 
         case 13:
         case "end":
@@ -310,7 +340,7 @@ var updateUserKasa = function updateUserKasa(req, res, next) {
           _context5.prev = 18;
           _context5.t0 = _context5["catch"](9);
           console.error('Error updating Kasa profile:', _context5.t0.message, _context5.t0.stack);
-          next((0, _error.errorHandler)(500, 'Error updating Kasa profile'));
+          next(errorHandler(500, 'Error updating Kasa profile'));
 
         case 22:
         case "end":
@@ -396,7 +426,7 @@ var updateUserProfile = function updateUserProfile(req, res, next) {
           _context6.prev = 22;
           _context6.t0 = _context6["catch"](13);
           console.error('Error updating profile:', _context6.t0);
-          next((0, _error.errorHandler)(500, 'Error updating profile'));
+          next(errorHandler(500, 'Error updating profile'));
 
         case 26:
         case "end":

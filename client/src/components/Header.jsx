@@ -255,6 +255,7 @@ const Header = () => {
                   Të Gjitha
                 </Link>
               </div>
+              
             </Disclosure.Panel>
           </>
         )}

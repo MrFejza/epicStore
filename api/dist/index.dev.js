@@ -22,6 +22,8 @@ var _cors = _interopRequireDefault(require("cors"));
 
 var _path = _interopRequireDefault(require("path"));
 
+var _error = require("./utils/error.js");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 _dotenv["default"].config();
@@ -46,6 +48,7 @@ app.use('/api/category', _categoryRoute["default"]);
 app.get('/', function (req, res) {
   res.send('API is running...');
 });
+app.use(_error.errorHandler);
 app.listen(PORT, function () {
   console.log("Server is running on port ".concat(PORT));
 });

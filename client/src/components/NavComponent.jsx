@@ -1,17 +1,48 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import {jwtDecode} from 'jwt-decode';
 
 const NavComponent = () => {
   const navigate = useNavigate();
 
   const isAuth = localStorage.getItem('isAuth');
   const isAdmin = localStorage.getItem('isAdmin');
+  const token = localStorage.getItem('jwt');
+
+  const isTokenExpired = (token) => {
+    if (!token) return true;
+    try {
+      const decodedToken = jwtDecode(token);
+      const currentTime = Date.now() / 1000;
+      return decodedToken.exp < currentTime;
+    } catch (error) {
+      console.error('Error decoding token:', error);
+      return true;
+    }
+  };
 
   const handleLogout = () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('isAuth');
-    localStorage.removeItem('isAdmin');
-    navigate('/'); // Redirect to home page
+    localStorage.clear(); // Clears all local storage
+    navigate('/');
+  };
+  
+  const LogoutButton = () => {
+    if (token && !isTokenExpired(token)) {
+      return (
+        <>
+        <div>
+                   <button
+          onClick={handleLogout}
+          className="mx-4 text-red-600 font-medium hover:text-red-800"
+        >
+          Logout
+        </button>  
+        </div>
+
+        </>
+      );
+    }
+    return null;
   };
 
   return (
@@ -37,14 +68,9 @@ const NavComponent = () => {
       </Link>
 
       {/* Show Logout button if the user is authenticated */}
-      {isAuth && isAdmin && (
-        <button
-          onClick={handleLogout}
-          className="mx-4 text-red-600 font-medium hover:text-red-800"
-        >
-          Logout
-        </button>
-      )}
+    
+
+      <LogoutButton  />
     </div>
   );
 };

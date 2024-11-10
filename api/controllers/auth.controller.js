@@ -1,7 +1,7 @@
 import User from "../models/user.model.js";
 import bcryptjs from 'bcryptjs';
 import jwt from "jsonwebtoken";
-import { errorHandler } from "../utils/error.js";
+import { createError } from '../utils/error.js';
 import asyncHandler from "../middleware/asyncHandler.js";
 
 // Function to handle user signup
@@ -14,7 +14,19 @@ export const signup = async (req, res, next) => {
     return res.status(400).json({ success: false, message: 'Missing required fields' });
   }
 
+  // Validate password length
+  if (password.length < 8) {
+    return res.status(400).json({ success: false, message: 'Password must be at least 8 characters long' });
+  }
+
   try {
+    // Check if the email already exists in the database
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      // Return a custom error message if the email is already in use
+      return res.status(400).json({ success: false, message: 'Ky përdorues ekziston' });
+    }
+
     // Hash the password before storing it
     const hashedPassword = bcryptjs.hashSync(password, 10);
 
@@ -38,7 +50,6 @@ export const signup = async (req, res, next) => {
       process.env.JWT_SECRET,
       { expiresIn: '24h' } // Ensure this value is set to the intended duration
     );
-    
 
     // Return user ID and token so they can access protected routes
     res.status(201).json({
@@ -49,20 +60,19 @@ export const signup = async (req, res, next) => {
     });
   } catch (error) {
     console.error('Signup error:', error);
-    next(errorHandler(500, 'Error creating user'));
+    next(createError(500, 'Error creating user'));
   }
 };
-
 
 // Function to handle user signin
 export const signin = async (req, res, next) => {
   const { email, password } = req.body;
   try {
     const validUser = await User.findOne({ email });
-    if (!validUser) return next(errorHandler(404, "User not found"));
+    if (!validUser) return next(createError(404, "Përdoruesi nuk ekziston"));
 
     const validPassword = bcryptjs.compareSync(password, validUser.password);
-    if (!validPassword) return next(errorHandler(401, "Invalid credentials"));
+    if (!validPassword) return next(createError(401, "Passwordi është gabim"));
 
     // Create JWT token with only user ID
     const token = jwt.sign(
@@ -80,7 +90,7 @@ export const signin = async (req, res, next) => {
     });
   } catch (error) {
     console.error("Signin error:", error);
-    next(errorHandler(500, 'Error signing in'));
+    next(createError(500, 'Error signing in'));
   }
 };
 
