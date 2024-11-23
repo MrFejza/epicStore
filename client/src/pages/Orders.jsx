@@ -59,15 +59,15 @@ const handleOrderDelivered = async (orderId) => {
             <table className="min-w-full bg-white">
               <thead>
                 <tr>
-                  <th className="py-2 px-4 border-b">Customer</th>
+                  <th className="py-2 px-4 border-b">KLienti</th>
                   <th className="py-2 px-4 border-b">Phone</th>
                   <th className="py-2 px-4 border-b">Email</th>
-                  <th className="py-2 px-4 border-b">Address</th>
-                  <th className="py-2 px-4 border-b">Total Amount</th>
-                  <th className="py-2 px-4 border-b">Products</th>
-                  <th className="py-2 px-4 border-b">Order Date</th>
+                  <th className="py-2 px-4 border-b">Adresa</th>
+                  <th className="py-2 px-4 border-b">Totali</th>
+                  <th className="py-2 px-4 border-b">Produktet</th>
+                  <th className="py-2 px-4 border-b">Data </th>
                   
-                  <th className="py-2 px-4 border-b">Actions</th>
+                  <th className="py-2 px-4 border-b">Veprime</th>
                 </tr>
               </thead>
               <tbody>
@@ -134,7 +134,7 @@ const ProductInfo = ({ product }) => {
       <p><strong>Emri i Produktit:</strong> {productName}</p>
       <p><strong>Sasia:</strong> {product.quantity}, <strong>Cmimi:</strong> {product.price.toFixed(2)} Lek</p>
       <Link to={`/information/${product.productId}`} className="text-blue-500 hover:underline">
-        View Product Information
+        Shiko Produktin
       </Link>
     </div>
   );
