@@ -47,8 +47,7 @@ export const signup = async (req, res, next) => {
     // Generate a JWT token for the new user, just like in signin
     const token = jwt.sign(
       { id: newUser._id },
-      process.env.JWT_SECRET,
-      { expiresIn: '24h' } // Ensure this value is set to the intended duration
+      process.env.JWT_SECRET, // Ensure this value is set to the intended duration
     );
 
     // Return user ID and token so they can access protected routes
@@ -78,7 +77,6 @@ export const signin = async (req, res, next) => {
     const token = jwt.sign(
       { id: validUser._id },
       process.env.JWT_SECRET,
-      { expiresIn: '24h' }
     );
 
     // Return user ID, token, and isAdmin status

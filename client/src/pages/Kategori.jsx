@@ -46,9 +46,9 @@ const Kategori = () => {
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth <= 640) {
-        setProductsPerPage(8); // Fetch 8 products for mobile view
+        setProductsPerPage(8); 
       } else {
-        setProductsPerPage(9); // Fetch 9 products for larger screens
+        setProductsPerPage(9); 
       }
     };
 
