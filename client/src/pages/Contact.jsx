@@ -5,6 +5,7 @@ import TikTokLogo from '../assets/TikTokLogo.png';
 import FacebookLogo from '../assets/Facebook-Logosu.png';
 import EmailLogo from '../assets/EmailLogo.png';
 import Header from '../components/Header';
+import MyMap from '../components/MyMap';
 
 const Contact = () => {
   return (
@@ -72,7 +73,12 @@ const Contact = () => {
             </a>
           </div>
         </div>
+        <div className='py-5 max-w-[95%] mx-auto'>
+          <MyMap />
+        </div>
+        
       </div>
+      
     </>
   );
 };
