@@ -9,7 +9,7 @@ const MyMap = () => {
   const [showCard, setShowCard] = useState(false);
 
   // Google Maps link for the location
-  const googleMapsLink = `https://www.google.com/maps?q=${location[0]},${location[1]}`;
+  const googleMapsLink = `https://www.google.com/maps/place/Epic_store.al/@41.3718717,19.7760116,691m/data=!3m2!1e3!4b1!4m6!3m5!1s0x1350331f3acd375b:0x2a56c0b12ad74ab5!8m2!3d41.3718717!4d19.7785919!16s%2Fg%2F11wqykd17y?entry=ttu&g_ep=EgoyMDI0MTExOS4yIKXMDSoASAFQAw%3D%3D`;
 
   return (
     <section style={{ width: '100%', height: '400px', position: 'relative' }}>

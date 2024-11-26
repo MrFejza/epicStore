@@ -82,7 +82,7 @@ const Home = () => {
 
   return (
     <>
-    <Header />`
+    <Header />
     <div className="container lg:max-w-[80%] mx-auto py-4">
       <div className="grid grid-cols-12 gap-4">
         {/* Kategoritë section */}
