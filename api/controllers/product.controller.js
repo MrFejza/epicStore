@@ -1,15 +1,12 @@
-import Product from '../models/product.model.js';
-
+const Product = require('../models/product.model.js');
 
 // Create a new product
-export const createProduct = async (req, res) => {
+exports.createProduct = async (req, res) => {
   try {
     const { name, price, description, stock, category, popular, onSale, salePrice, saleEndDate } = req.body;
 
-    // Ensure that the images are handled correctly if they exist
     const images = req.files ? req.files.map(file => `/uploads/${file.filename}`) : [];
 
-    // Validate required fields
     if (!name || !price || !description || images.length === 0) {
       return res.status(400).json({ message: 'Missing required fields: name, price, description, and at least one image are mandatory' });
     }
@@ -18,13 +15,13 @@ export const createProduct = async (req, res) => {
       name,
       price,
       description,
-      image: images,  // Use images array here
-      stock: stock === 'true',  // Convert stock to boolean
+      image: images,
+      stock: stock === 'true',
       category,
-      popular: popular === 'true',  // Ensure it's a boolean
-      onSale: onSale === 'true',  // Ensure it's a boolean
-      salePrice: onSale === 'true' && salePrice ? salePrice : null,  // Sale price if applicable
-      saleEndDate: onSale === 'true' && saleEndDate ? new Date(saleEndDate) : null  // Optional sale end date
+      popular: popular === 'true',
+      onSale: onSale === 'true',
+      salePrice: onSale === 'true' && salePrice ? salePrice : null,
+      saleEndDate: onSale === 'true' && saleEndDate ? new Date(saleEndDate) : null,
     });
 
     await newProduct.save();
@@ -35,46 +32,39 @@ export const createProduct = async (req, res) => {
   }
 };
 
-
 // Get all products, or filter by onSale, sort by createdAt, or randomize
-export const getProducts = async (req, res) => {
+exports.getProducts = async (req, res) => {
   try {
     const { onSale, sort, order, random } = req.query;
 
     let query = {};
 
-    // Filter by onSale if specified
     if (onSale === 'true') {
       query.onSale = true;
     }
 
     let productsQuery;
 
-    // Randomize products using MongoDB's $sample if random=true
     if (random === 'true') {
-      productsQuery = await Product.aggregate([{ $sample: { size: 10 } }]); // Random 10 products
+      productsQuery = await Product.aggregate([{ $sample: { size: 10 } }]);
     } else {
       productsQuery = Product.find(query);
 
-      // Sorting by createdAt
       if (sort === 'createdAt') {
         const sortOrder = order === 'asc' ? 1 : -1;
         productsQuery = productsQuery.sort({ createdAt: sortOrder });
       }
     }
 
-    // Fetch products from database
     const products = await productsQuery;
 
-    // Check and update products with expired sales
     const now = new Date();
     products.forEach(async (product) => {
       if (product.onSale && product.saleEndDate && new Date(product.saleEndDate) <= now) {
-        // Expired sale: update product to remove sale
         product.onSale = false;
         product.salePrice = null;
         product.saleEndDate = null;
-        await product.save(); // Save the updated product to the database
+        await product.save();
       }
     });
 
@@ -85,13 +75,11 @@ export const getProducts = async (req, res) => {
   }
 };
 
-
 // Get products by category
-export const getProductsByCategory = async (req, res) => {
+exports.getProductsByCategory = async (req, res) => {
   try {
     const category = req.params.category;
 
-    // Case-insensitive category search
     const products = await Product.find({ category: new RegExp(`${category}$`, 'i') });
 
     if (!products.length) {
@@ -106,7 +94,7 @@ export const getProductsByCategory = async (req, res) => {
 };
 
 // Get a product by ID
-export const getProductById = async (req, res) => {
+exports.getProductById = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
     if (!product) {
@@ -120,29 +108,26 @@ export const getProductById = async (req, res) => {
 };
 
 // Update a product by ID
-export const updateProduct = async (req, res) => {
+exports.updateProduct = async (req, res) => {
   try {
     const { existingImages, removedImages = [], onSale, salePrice, saleEndDate } = req.body;
     let newImages = [];
 
-    // Handle new images
     if (req.files && req.files.length > 0) {
       newImages = req.files.map(file => `/uploads/${file.filename}`);
     }
 
-    // Safely filter out removed images
     const updatedImages = existingImages ? existingImages.filter(img => !removedImages.includes(img)) : [];
 
-    // Update the product with new data
     const updatedProduct = await Product.findByIdAndUpdate(
       req.params.id,
       {
         ...req.body,
-        image: [...updatedImages, ...newImages],  // Combine new and existing images
-        stock: Boolean(req.body.stock), 
-        onSale: Boolean(onSale),  // Ensure onSale is treated as a boolean
-        salePrice: onSale === 'true' || onSale === true ? salePrice : null,  // Set salePrice to null if onSale is false
-        saleEndDate: onSale === 'true' || onSale === true ? (saleEndDate ? new Date(saleEndDate) : null) : null,  // Set saleEndDate only if onSale is true
+        image: [...updatedImages, ...newImages],
+        stock: Boolean(req.body.stock),
+        onSale: Boolean(onSale),
+        salePrice: onSale === 'true' || onSale === true ? salePrice : null,
+        saleEndDate: onSale === 'true' || onSale === true ? (saleEndDate ? new Date(saleEndDate) : null) : null,
       },
       { new: true }
     );
@@ -159,7 +144,7 @@ export const updateProduct = async (req, res) => {
 };
 
 // Delete a product by ID
-export const deleteProduct = async (req, res) => {
+exports.deleteProduct = async (req, res) => {
   try {
     const product = await Product.findByIdAndDelete(req.params.id);
     if (!product) {
@@ -171,4 +156,3 @@ export const deleteProduct = async (req, res) => {
     res.status(500).json({ message: 'Error deleting product', error: error.message });
   }
 };
-

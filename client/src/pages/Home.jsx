@@ -29,7 +29,7 @@ const Carousel = ({ images, rtl = false }) => {
 
   return (
     <Slider {...carouselSettings} className="w-full h-full overflow-hidden">
-      {images.map((image, index) => (
+      {images?.map((image, index) => (
         <div key={index} className="h-full overflow-hidden">
           <img
             src={image.src}
@@ -38,7 +38,7 @@ const Carousel = ({ images, rtl = false }) => {
           />
         </div>
       ))}
-    </Slider>
+    </Slider> 
   );
 };
 

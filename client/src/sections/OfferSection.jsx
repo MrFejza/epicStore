@@ -21,7 +21,7 @@ const OfferSection = () => {
     const fetchOffers = async () => {
       try {
         const response = await axios.get('/api/product?onSale=true');
-        const allProducts = response.data;
+        const allProducts = response.data || [];
 
         // Sort products by remaining sale time
         const sortedOffers = allProducts
@@ -92,7 +92,7 @@ const OfferSection = () => {
               <Link to={`/information/${offer._id}`}>
                 <div className="h-36 xl:h-48 mb-2">
                   <img
-                    src={`http://localhost:9000/${offer.image[0]}`}
+                    src={`https://epicstore.al/${offer.image[0]}`}
                     alt={offer.name}
                     className="w-full h-full object-cover"
                   />

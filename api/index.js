@@ -1,27 +1,19 @@
-import express from 'express';
-import mongoose from 'mongoose';
-import authRoutes from './routes/auth.route.js';
-import productRoutes from './routes/product.route.js';
-import orderRoutes from './routes/order.route.js'
-import whatsappRoutes from './routes/whatsapp.js';
-import categoryRoutes from './routes/category.route.js';
-import dotenv from 'dotenv';
-import cookieParser from 'cookie-parser';
-import cors from 'cors';
-import path from 'path';
-import { errorHandler } from './utils/error.js';
-
-
+const express = require('express');
+const mongoose = require('mongoose');
+const authRoutes = require('./routes/auth.route.js');
+const productRoutes = require('./routes/product.route.js');
+const orderRoutes = require('./routes/order.route.js');
+const whatsappRoutes = require('./routes/whatsapp.js');
+const categoryRoutes = require('./routes/category.route.js');
+const dotenv = require('dotenv');
+const cookieParser = require('cookie-parser');
+const path = require('path');
+const { errorHandler } = require('./utils/error.js');
 
 dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 9000;
-
-
-app.use(cors());
-
-
 
 app.use(express.json());
 app.use(cookieParser());
@@ -36,19 +28,8 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/whatsapp', whatsappRoutes);
 app.use('/api/category', categoryRoutes);
 
-
-
-app.get('/', (req, res) => {
-  res.send('API is running...');
-});
-
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
-
-const __dirname = path.resolve();
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use((err, req, res, next) => {
@@ -59,4 +40,14 @@ app.use((err, req, res, next) => {
     statusCode,
     message,
   });
+});
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+
+app.use(express.static(path.join(__dirname, 'dist')));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });

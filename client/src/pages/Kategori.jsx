@@ -63,7 +63,7 @@ const Kategori = () => {
     const fetchProducts = async () => {
       try {
         const response = await axios.get('/api/product');
-        const allProducts = response.data;
+        const allProducts = response.data || [];
 
         let filteredProducts = allProducts;
 
@@ -83,7 +83,7 @@ const Kategori = () => {
         } else {
           filteredProducts = allProducts.filter(
             product => product.category.toLowerCase() === category.toLowerCase()
-          );
+          )
         }
 
         setProducts(filteredProducts);
@@ -194,7 +194,7 @@ const Kategori = () => {
                   <img
                     src={
                       product.image && product.image.length > 0
-                        ? `http://localhost:9000/${product.image[0]}`
+                        ? `https://epicstore.al/${product.image[0]}`
                         : 'default-image-path.jpg'
                     }
                     alt={product.name}

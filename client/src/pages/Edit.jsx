@@ -288,7 +288,7 @@ const Edit = () => {
                 {existingImages.map((img, index) => (
                   <div key={`existing-${index}`} className="relative">
                     <img
-                      src={`http://localhost:9000/${img}`}
+                      src={`https:epicstore.al/${img}`}
                       className="w-full h-auto rounded-md border border-gray-300"
                       alt={`Existing Product ${index}`}
                     />

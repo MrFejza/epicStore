@@ -17,13 +17,13 @@ const ProdukteTeNdryshmeSection = () => {
     const fetchProdukteTeNdryshme = async () => {
       try {
         const response = await axios.get('/api/product');
-        const allProducts = response.data;
+        const allProducts = response.data || [];
 
         // Determine the number of products to fetch based on screen size
         const productsToFetch = window.innerWidth <= 640 ? 10 : 12; 
 
         // Get random products based on screen size
-        const randomProducts = allProducts.sort(() => 0.5 - Math.random()).slice(0, productsToFetch);
+        const randomProducts = allProducts?.sort(() => 0.5 - Math.random()).slice(0, productsToFetch);
 
         setProducts(randomProducts);
         setLoading(false);
@@ -94,7 +94,7 @@ const ProdukteTeNdryshmeSection = () => {
                 <img
                   src={
                     product.image && product.image.length > 0
-                      ? `http://localhost:9000/${product.image[0]}`
+                      ? `https://epicstore.al/${product.image[0]}`
                       : 'default-image-path.jpg'
                   }
                   alt={product.name}

@@ -1,11 +1,11 @@
-import express from 'express';
-import { 
+const express = require('express');
+const { 
   addCategoryToEnd, 
   insertCategoryAtIndex, 
   getAllCategories, 
   updateCategory, 
   deleteCategory 
-} from '../controllers/category.controller.js';
+} = require('../controllers/category.controller.js');
 
 const router = express.Router();
 
@@ -24,4 +24,4 @@ router.put('/:id', updateCategory);
 // Route for deleting a category
 router.delete('/:id', deleteCategory);
 
-export default router;
+module.exports = router;

@@ -58,8 +58,8 @@ function App() {
             {/* Unauthorized Route */}
             <Route path="/unauthorized" element={<Unauthorized />} />
 
-            {/* Catch-All Route */}
-            <Route path="*" element={<Navigate to="/sign-in" replace />} />
+            {/* Catch-All Route
+            <Route path="*" element={<Navigate to="/sign-in" replace />} /> */}
           </Routes>
           <Footer />
         </Router>

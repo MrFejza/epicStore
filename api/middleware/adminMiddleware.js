@@ -1,4 +1,7 @@
-export const checkAdmin = async (req, res, next) => {
+const jwt = require('jsonwebtoken');
+const User = require('../models/user.model.js');
+
+exports.checkAdmin = async (req, res, next) => {
   const token = req.cookies.access_token;
 
   if (!token) {
@@ -23,7 +26,7 @@ export const checkAdmin = async (req, res, next) => {
     req.user = user; // Add user to request object
     next();
   } catch (error) {
-    console.error('Token verification error:', error); // Updated to error.log
+    console.error('Token verification error:', error);
     res.status(401).json({ success: false, message: 'Invalid token' });
   }
 };

@@ -1,14 +1,12 @@
-import express from 'express';
-import Product from '../models/product.model.js'; // Import the Mongoose model
-import upload from '../middleware/upload.js';
-import fs from 'fs-extra';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { getProductsByCategory } from '../controllers/product.controller.js';
+const express = require('express');
+const Product = require('../models/product.model.js'); // Import the Mongoose model
+const upload = require('../middleware/upload.js');
+const fs = require('fs-extra');
+const path = require('path');
+const { getProductsByCategory } = require('../controllers/product.controller.js');
 
 const router = express.Router();
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+
 
 // Helper function to delete images
 const deleteImages = async (imagePaths) => {
@@ -61,7 +59,6 @@ router.post('/', upload, async (req, res) => {
     const { name, price, salePrice, description, stock, category, popular, onSale, saleEndDate } = req.body;
     const filePaths = req.files.map(file => `uploads/${file.filename}`);
 
-    // Validation: Sale price should be less than original price if on sale
     if (onSale === 'true' && parseFloat(salePrice) >= parseFloat(price)) {
       return res.status(400).json({
         success: false,
@@ -74,12 +71,12 @@ router.post('/', upload, async (req, res) => {
       price,
       description,
       image: filePaths,
-      stock: stock === 'true',  // Ensure stock is treated as a boolean
+      stock: stock === 'true',
       category,
-      popular: popular === 'true',  // Ensure it's a boolean
-      onSale: onSale === 'true',  // Ensure it's a boolean
-      salePrice: onSale === 'true' ? salePrice : null,  // Set salePrice to null if not on sale
-      saleEndDate: onSale === 'true' && saleEndDate ? new Date(saleEndDate) : null  // Set saleEndDate if applicable
+      popular: popular === 'true',
+      onSale: onSale === 'true',
+      salePrice: onSale === 'true' ? salePrice : null,
+      saleEndDate: onSale === 'true' && saleEndDate ? new Date(saleEndDate) : null
     });
 
     await newProduct.save();
@@ -101,38 +98,32 @@ router.get('/', async (req, res) => {
 
     let query = {};
 
-    // Filter by onSale if specified
     if (onSale === 'true') {
       query.onSale = true;
     }
 
     let productsQuery;
 
-    // Randomize products using MongoDB's $sample if random=true
     if (random === 'true') {
-      productsQuery = await Product.aggregate([{ $sample: { size: 10 } }]); // Random 10 products
+      productsQuery = await Product.aggregate([{ $sample: { size: 10 } }]);
     } else {
       productsQuery = Product.find(query);
 
-      // Sorting by createdAt
       if (sort === 'createdAt') {
         const sortOrder = order === 'asc' ? 1 : -1;
         productsQuery = productsQuery.sort({ createdAt: sortOrder });
       }
     }
 
-    // Fetch products from database
     const products = await productsQuery;
 
-    // Check and update products with expired sales
     const now = new Date();
     products.forEach(async (product) => {
       if (product.onSale && product.saleEndDate && new Date(product.saleEndDate) <= now) {
-        // Expired sale: update product to remove sale
         product.onSale = false;
         product.salePrice = null;
         product.saleEndDate = null;
-        await product.save(); // Save the updated product to the database
+        await product.save();
       }
     });
 
@@ -150,6 +141,7 @@ router.get('/category/:category', getProductsByCategory);
 router.get('/:id', async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
+    console.log(product)
     if (!product) {
       return res.status(404).json({ message: 'Product not found' });
     }
@@ -164,14 +156,13 @@ router.put('/:id', upload, checkProductExists, async (req, res) => {
   try {
     const product = req.product;
     const { name, price, salePrice, description, stock, category, popular, onSale, saleEndDate } = req.body;
-    
+
     const images = req.files && req.files.length > 0 ? req.files.map(file => `uploads/${file.filename}`) : product.image;
 
     if (req.files && req.files.length > 0 && product.image && Array.isArray(product.image)) {
       await deleteImages(product.image);
     }
 
-    // Validation: Sale price should be less than original price if on sale
     if (onSale === 'true' && parseFloat(salePrice) >= parseFloat(price)) {
       return res.status(400).json({
         success: false,
@@ -179,12 +170,11 @@ router.put('/:id', upload, checkProductExists, async (req, res) => {
       });
     }
 
-    // Update the product fields
     product.name = name || product.name;
     product.price = price || product.price;
     product.description = description || product.description;
     product.image = images;
-    product.stock = stock === 'true' || stock === 'in_stock';  // Convert stock to boolean
+    product.stock = stock === 'true' || stock === 'in_stock';
     product.category = category || product.category;
     product.popular = popular !== undefined ? popular === 'true' : product.popular;
     product.onSale = onSale !== undefined ? onSale === 'true' : product.onSale;
@@ -221,4 +211,4 @@ router.delete('/:id', checkProductExists, async (req, res) => {
   }
 });
 
-export default router;
+module.exports = router;

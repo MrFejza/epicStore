@@ -1,31 +1,27 @@
-import twilio from 'twilio';
-import dotenv from 'dotenv';
+const twilio = require('twilio');
+const dotenv = require('dotenv');
 dotenv.config();
 
-
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
-const authToken =  process.env.TWILIO_AUTH_TOKEN;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
 
 const client = twilio(accountSid, authToken);
 
-// Use the phone number from the .env file for the website owner 
+// Use the phone number from the .env file for the website owner
 const specificClientNumber = process.env.OWNER_PHONE_NUMBER || 'whatsapp:+355688697389';
 
-export const sendWhatsAppMessage = async (req, res) => {
+exports.sendWhatsAppMessage = async (req, res) => {
   const { customerName, customerLastName, phone, email, qyteti, rruga, products, totalAmount } = req.body;
 
   try {
-    // Ensure all required fields are present
     if (!customerName || !customerLastName || !phone || !qyteti || !rruga || !products || !totalAmount) {
       return res.status(400).json({ success: false, message: 'Missing required fields' });
     }
 
-    // Format the product details
     const productDetails = products.map(product =>
       `${product.quantity}x ${product.productName} (${product.price.toFixed(2)} Lek)`
     ).join(', ');
 
-    // Format the message to be sent via WhatsApp
     const message = `
       New Order Placed:
       - Customer: ${customerName} ${customerLastName}
@@ -37,11 +33,10 @@ export const sendWhatsAppMessage = async (req, res) => {
       - Products: ${productDetails}
     `;
 
-    // Send the WhatsApp message using Twilio's API
     const response = await client.messages.create({
-      from: 'whatsapp:+14155238886',  // Twilio sandbox number for WhatsApp
-      to: specificClientNumber,        // Send to the hardcoded owner's WhatsApp number
-      body: message,                   // Message body with order details
+      from: 'whatsapp:+14155238886',
+      to: specificClientNumber,
+      body: message,
     });
 
     return res.status(200).json({ success: true, message: 'Message sent!', sid: response.sid });

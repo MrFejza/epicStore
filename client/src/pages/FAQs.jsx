@@ -35,28 +35,30 @@ const FAQs = () => {
     }
   ];
 
+  console.log('FAQs Array:', faqs); // Debugging log
+
   return (
     <>
-    <Header />
-     <div className="max-w-2xl mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Pyetjet e Shpeshta</h2>
-      {faqs.map((faq, index) => (
-        <div key={index} className="mb-4">
-          <button
-            onClick={() => toggleQuestion(index)}
-            className="w-full text-left p-4 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
-          >
-            <span className="text-lg font-semibold">{faq.question}</span>
-            <span className="float-right">{openIndex === index ? '-' : '+'}</span>
-          </button>
-          {openIndex === index && (
-            <div className="mt-2 p-4 bg-white border border-gray-200 rounded-lg">
-              {faq.answer}
-            </div>
-          )}
-        </div>
-      ))}
-    </div>
+      <Header />
+      <div className="max-w-2xl mx-auto p-4">
+        <h2 className="text-2xl font-bold mb-4">Pyetjet e Shpeshta</h2>
+        {(faqs || []).map((faq, index) => (
+          <div key={index} className="mb-4">
+            <button
+              onClick={() => toggleQuestion(index)}
+              className="w-full text-left p-4 bg-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
+            >
+              <span className="text-lg font-semibold">{faq.question}</span>
+              <span className="float-right">{openIndex === index ? '-' : '+'}</span>
+            </button>
+            {openIndex === index && (
+              <div className="mt-2 p-4 bg-white border border-gray-200 rounded-lg">
+                {faq.answer}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
     </>
   );
 };

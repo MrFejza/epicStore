@@ -55,7 +55,7 @@ const ProductModal = ({ product, onClose }) => {
 
         {/* Product Image and Description */}
         <div className="flex flex-col items-center mt-4">
-          <img src={`http://localhost:9000/${product.image[0]}`} alt={product.name} className="w-32 h-32 object-cover mb-2 rounded-md" />
+          <img src={`https://epicstore.al/${product.image[0]}`} alt={product.name} className="w-32 h-32 object-cover mb-2 rounded-md" />
 
           {/* Product Description */}
           {product.description && (

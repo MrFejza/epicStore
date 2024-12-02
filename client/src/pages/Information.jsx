@@ -131,7 +131,7 @@ const Information = () => {
                         }}
                       >
                         <img
-                          src={`http://localhost:9000/${img}`}
+                          src={`https://epicstore.al/${img}`}
                           className={`d-block w-100 cursor-pointer ${isFullscreen ? 'h-screen object-contain' : 'object-cover'}`}
                           alt={`Image ${index + 1}`}
                           style={{

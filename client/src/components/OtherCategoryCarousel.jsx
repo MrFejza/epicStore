@@ -32,12 +32,13 @@ const OtherCategoryCarousel = ({ currentCategory }) => {
     const fetchProducts = async () => {
       try {
         const response = await axios.get('/api/product');
-        const allProducts = response.data;
+        console.log(response.data)
+        const allProducts = response.data || [];
 
         // Filter products that are not in the current category
-        const otherCategoryProducts = allProducts.filter(
+        const otherCategoryProducts = Array.isArray(allProducts) ? allProducts.filter(
           product => product.category.toLowerCase() !== currentCategory.toLowerCase()
-        );
+        ) : [];
 
         // Group products by category and keep only one product per category
         const groupedByCategory = otherCategoryProducts.reduce((acc, product) => {
@@ -67,7 +68,7 @@ const OtherCategoryCarousel = ({ currentCategory }) => {
 
   return (
     <div className="carousel-container" style={{ maxWidth: '50%', margin: '0 auto' }}>
-      {products.length > 0 ? (
+      {products?.length > 0 ? (
         <Slider {...carouselSettings}>
           {products.map((product, index) => (
             <div key={index} className="carousel-item relative">
@@ -81,7 +82,7 @@ const OtherCategoryCarousel = ({ currentCategory }) => {
                 }}
               >
                 <img
-                  src={`http://localhost:9000/${product.image[0]}`} // You can still pick a random image index if desired
+                  src={`https://epicstore.al/${product.image[0]}`} // You can still pick a random image index if desired
                   alt={product.name}
                   className="d-block w-100"
                   style={{

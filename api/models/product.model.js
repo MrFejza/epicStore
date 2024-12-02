@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+const mongoose = require('mongoose');
 
 const productSchema = new mongoose.Schema({
   name: {
@@ -20,7 +20,7 @@ const productSchema = new mongoose.Schema({
         return true;
       },
       message: 'Sale price must be less than the original price when the product is on sale.',
-    }
+    },
   },
   description: {
     type: String,
@@ -58,7 +58,7 @@ const productSchema = new mongoose.Schema({
   },
   saleEndDate: {
     type: Date,
-    default: null,  // Optional, can be set for time-limited sales
+    default: null, // Optional, can be set for time-limited sales
   },
 }, {
   timestamps: true,
@@ -73,4 +73,4 @@ productSchema.pre('save', function (next) {
 });
 
 const Product = mongoose.model('Product', productSchema);
-export default Product;
+module.exports = Product;

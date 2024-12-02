@@ -23,6 +23,16 @@ const Kasa = () => {
     0
   );
 
+//   <IfModule mod_rewrite.c>
+// RewriteEngine On
+// RewriteBase /
+// RewriteRule ^index\.html$ - [L]
+// RewriteCond %{REQUEST_FILENAME} !-f
+// RewriteCond %{REQUEST_FILENAME} !-d
+// RewriteRule %{REQUEST_FILENAME} !-l
+// RewriteRule . /index.html [L]
+// </IfModule>
+
   useEffect(() => {
     const fetchUserData = async () => {
       const token = localStorage.getItem('jwt');

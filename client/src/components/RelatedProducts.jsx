@@ -12,7 +12,7 @@ const RelatedProducts = ({ category, currentProductId }) => {
       try {
         // Fetch products by the given category
         const response = await axios.get(`/api/product?category=${category}`);
-        const allProducts = response.data;
+        const allProducts = response.data || [];
 
         // Filter out the current product and products not in "Oferta" or "Të Rejat"
         const filteredProducts = allProducts.filter(
@@ -50,7 +50,7 @@ const RelatedProducts = ({ category, currentProductId }) => {
           <Link key={product._id} to={`/information/${product._id}`} className="border p-4 rounded-lg hover:shadow-lg transition-shadow">
             <div>
               <img
-                src={`http://localhost:9000/${product.image[0]}`}
+                src={`https://epicstore.al/${product.image[0]}`}
                 alt={product.name}
                 className="w-full h-40 object-cover mb-2"
               />

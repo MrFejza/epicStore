@@ -28,9 +28,9 @@ const Navigation = ({ expanded, setExpanded, navHeight }) => {
   const categoriesToShow = location.pathname === '/kategori/new' || location.pathname === '/kategori/offers' || location.pathname === '/kategori/all' || location.pathname === '/kategori/search'  ? 7 : 5;
 
   // Get the first set of categories before expanding
-  const initialCategories = categories.slice(0, categoriesToShow);
+  const initialCategories = categories.slice(0, categoriesToShow) || [];
   // Remaining categories shown when expanded
-  const expandedCategories = categories.slice(categoriesToShow);
+  const expandedCategories = categories.slice(categoriesToShow || []);
 
   return (
     <div

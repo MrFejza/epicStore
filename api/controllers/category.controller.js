@@ -1,11 +1,9 @@
-import Category from '../models/category.model.js';
+const Category = require('../models/category.model.js');
 
-export const normalizeCategoryOrder = async (req, res) => {
+exports.normalizeCategoryOrder = async (req, res) => {
   try {
-    // Find all categories sorted by the current `order` field
     const categories = await Category.find().sort({ order: 1 });
 
-    // Reassign `order` values sequentially starting from 1
     for (let i = 0; i < categories.length; i++) {
       categories[i].order = i + 1;
       await categories[i].save();
@@ -18,9 +16,7 @@ export const normalizeCategoryOrder = async (req, res) => {
   }
 };
 
-
-// Create a new category
-export const addCategoryToEnd = async (req, res) => {
+exports.addCategoryToEnd = async (req, res) => {
   const { name, slug } = req.body;
 
   if (!name || slug === undefined) {
@@ -28,11 +24,9 @@ export const addCategoryToEnd = async (req, res) => {
   }
 
   try {
-    // Find the maximum order value in the categories collection
     const maxOrderCategory = await Category.findOne().sort({ order: -1 });
-    const newOrder = maxOrderCategory ? maxOrderCategory.order + 1 : 1; // If no categories exist, start with order 1
+    const newOrder = maxOrderCategory ? maxOrderCategory.order + 1 : 1;
 
-    // Create the new category with the next order value
     const category = new Category({ name, slug, order: newOrder });
     await category.save();
 
@@ -43,29 +37,21 @@ export const addCategoryToEnd = async (req, res) => {
   }
 };
 
-
-
-// Controller to insert a category at a specified index
-export const insertCategoryAtIndex = async (req, res) => {
+exports.insertCategoryAtIndex = async (req, res) => {
   const { name, slug, insertAtIndex } = req.body;
 
   if (!name || slug === undefined || insertAtIndex === undefined) {
     return res.status(400).json({ error: 'Category name, slug, and insert index are required' });
   }
 
-  
-
   try {
-    // Retrieve categories with order >= insertAtIndex, sorted in ascending order
     const categoriesToShift = await Category.find({ order: { $gte: insertAtIndex } }).sort({ order: 1 });
 
-    // Shift categories down by incrementing the order, from last to first to avoid conflicts
     for (let i = categoriesToShift.length - 1; i >= 0; i--) {
       categoriesToShift[i].order += 1;
       await categoriesToShift[i].save();
     }
 
-    // Now create the new category with the specified insertAtIndex
     const newCategory = new Category({ name, slug, order: insertAtIndex });
     await newCategory.save();
 
@@ -76,19 +62,12 @@ export const insertCategoryAtIndex = async (req, res) => {
   }
 };
 
-
-
-
-// Get all categories
-export const getAllCategories = async (req, res) => {
+exports.getAllCategories = async (req, res) => {
   try {
-    // Fetch all categories sorted by order
     const categories = await Category.find({}).sort({ order: 1 });
 
-    // Check if orders are sequential; if not, normalize them
     for (let i = 0; i < categories.length; i++) {
       if (categories[i].order !== i + 1) {
-        // Normalize the order values
         for (let j = 0; j < categories.length; j++) {
           categories[j].order = j + 1;
           await categories[j].save();
@@ -97,7 +76,6 @@ export const getAllCategories = async (req, res) => {
       }
     }
 
-    // Send the sorted and normalized categories
     res.status(200).json(categories);
   } catch (error) {
     console.error('Error in getAllCategories:', error);
@@ -105,18 +83,15 @@ export const getAllCategories = async (req, res) => {
   }
 };
 
-
-// Update a category
-export const updateCategory = async (req, res) => {
+exports.updateCategory = async (req, res) => {
   try {
-    const { id } = req.params; // Category ID from request
-    const { name, slug } = req.body; // New name and slug for the category
+    const { id } = req.params;
+    const { name, slug } = req.body;
 
     if (!name) {
       return res.status(400).json({ error: 'Category name is required.' });
     }
 
-    // Find and update the category (using both name and slug)
     const updatedCategory = await Category.findByIdAndUpdate(
       id,
       { name, slug },
@@ -133,13 +108,10 @@ export const updateCategory = async (req, res) => {
   }
 };
 
-
-// Delete a category
-export const deleteCategory = async (req, res) => {
+exports.deleteCategory = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Find and delete the category
     const deletedCategory = await Category.findByIdAndDelete(id);
 
     if (!deletedCategory) {
